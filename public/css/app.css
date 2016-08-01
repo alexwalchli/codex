@@ -1,0 +1,361 @@
+html,body{
+    font-family: 'Lato', sans-serif;
+    font-size:14px;
+    padding:0;
+    margin:0;
+}
+
+/* Top Bar */
+.top-bar{
+    margin-bottom:30px;
+    padding-left:40px;
+    padding-right:40px;
+}
+
+.top-bar .top-bar-left{
+    float:left;
+    width:auto;
+}
+
+.top-bar .top-bar-right{
+    float:right;
+    width:auto;
+}
+
+.top-bar ul{
+    list-style-type: none;
+    padding:0;
+}
+
+.top-bar li{
+    vertical-align: middle;
+    outline:0;
+    display:table-cell;
+    font-size:20px;
+    color:#6990BC;
+}
+
+.top-bar li a, .top-bar li logo{
+    padding:1.2em;
+    line-height:1.8em;
+}
+
+.top-bar .logo{
+    font-size:30px;
+}
+
+.top-bar .search {
+    margin-left:100px;
+    border-radius: 4px;
+    min-width:700px;
+    border:1px solid #E2E2E8;
+    font-size:20px;
+    padding:.4em;
+    color:#6990BC;
+}
+
+.top-bar .search:focus{
+    border:1px solid #6990BC;
+    outline: none;
+}
+
+.top-bar span {
+    font-size:30px;
+}
+
+/* */
+
+.right{
+    float:right;
+}
+
+.clearfix:after {
+     visibility: hidden;
+     display: block;
+     font-size: 0;
+     content: " ";
+     clear: both;
+     height: 0;
+}
+
+#app-context-menu{
+    display:none;
+}
+
+.clearfix:after {
+     visibility: hidden;
+     display: block;
+     font-size: 0;
+     content: " ";
+     clear: both;
+     height: 0;
+}
+
+/* depth 1 nodes */
+.item {
+    width:100%;
+}
+
+.item .children{
+    padding-left:68px;
+}
+
+.item .children:after{
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+}
+
+.item .bullet-container{
+    position: absolute;
+    height:60px;
+    width:22px;
+}
+
+.item .bullet-container .inner-circle{
+    border-radius: 50%;
+    width: 10px;
+    height: 10px;
+    background-color:#6990BC;
+    position:absolute;
+    top:29px;
+    left:7px;
+}
+
+.item .bullet-container .outer-circle{
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    border:1px solid #6990BC;
+    position: absolute;
+    top:22px;
+}
+
+.item .content{
+    height:60px;
+    width:100%;
+    margin-left:40px;
+}
+
+.item .content input, .item .content .view-mode-content{
+    line-height: 60px;
+    font-size:28px;
+    color:#6990BC;
+    font-family: 'Lato', sans-serif;
+    padding:0;
+    border:none;
+    outline: none;
+}
+
+/* depth 2 nodes */
+.children .children {
+    padding-left:68px;
+}
+
+.children .children .content {
+    height:36px;
+    margin-left:34px;
+}
+
+.children .children .content input, .children .children .content .view-mode-content {
+    font-size:22px;
+    line-height:36px;
+    color:#595963;
+}
+
+.item .bullet-container{
+    position: absolute;
+    height:36px;
+    width:22px;
+}
+
+.children .children .item .bullet-container .inner-circle{
+    border-radius: 50%;
+    width: 8px;
+    height: 8px;
+    background-color:#6990BC;
+    position:absolute;
+    top:17px;
+    left:6px;
+}
+
+.children .children .item .bullet-container .outer-circle{
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    border:1px solid #6990BC;
+    position: absolute;
+    top:11px;
+}
+/**/
+
+/* depth 3 nodes and beyond */
+.children .children {
+    padding-left:68px;
+}
+
+.children .children .content {
+    height:36px;
+    margin-left:30px;
+}
+
+.children .children .content input, .children .children .content .view-mode-content {
+    font-size:22px;
+    line-height:36px;
+    color:#595963;
+}
+
+.item .bullet-container{
+    position: absolute;
+    height:36px;
+    width:22px;
+}
+
+.children .children .children .item .bullet-container .inner-circle{
+    border-radius: 50%;
+    width: 8px;
+    height: 8px;
+    background-color:#6990BC;
+    position:absolute;
+    top:15px;
+    left:6px;
+}
+
+.children .children .children .item .bullet-container .outer-circle{
+    display:none;
+}
+
+
+
+
+/* list */
+/*#tree-container > .item > .children{
+    padding-left:70px;
+}
+
+.item {
+    font-size:28px;
+}
+
+.item .bullet-container{
+    height:68px;
+    width:40px;
+    position: absolute;
+}
+
+.item .bullet-container .inner-circle{
+    border-radius: 50%;
+    width: 10px;
+    height: 10px;
+    background-color:#6990BC;
+    position:absolute;
+    top:29px;
+    left:7px;
+}
+
+.item .bullet-container .outer-circle{
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    border:1px solid #6990BC;
+    position: absolute;
+    top:22px;
+}
+
+.item .content{
+    min-width:400px;
+    display:inline-block;
+}
+
+.item .content input, .item .content .view-mode-content{
+    font-size:28px;
+    color:#6990BC;
+    height:68px;
+    padding-left:48px;
+    font-family: 'Lato', sans-serif;
+    line-height: 68px;
+}*/
+
+/*.item .content .view-mode-content{
+    line-height: 68px;
+}*/
+
+/*.item .bullet{
+    border-radius: 50%;
+    width: 8px;
+    height: 8px;
+    display:inline-block;
+    background-color:#6990BC;
+}
+
+.item .content-wrapper{
+}
+
+.children{
+    padding-left:26px;
+    border:none;
+}
+
+.children .item .children{
+    padding-left:26px;
+    margin-left:10px;
+    border-left:1px #E2E2E8 solid;
+}*/
+
+/* depth 2 overrides */
+/*.children .children .item .content input, .children .children .item .content .view-mode-content{
+    font-size:22px;
+    color:#595963;
+    padding-left:38px;
+    height:34px;
+    line-height: 68px;
+}
+
+
+.children .children .item .bullet-container .inner-circle{
+    border-radius: 50%;
+    width: 8px;
+    height: 8px;
+    background-color:#6990BC;
+    position:absolute;
+    top:28px;
+    left:6px;
+}
+
+.children .children .item .bullet-container .outer-circle{
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    border:1px solid #6990BC;
+    position: absolute;
+    top:22px;
+}*/
+/**/
+
+/* depth 3 overrides */
+/*.children .children .children .item .content input, .children .children .children .item .content .view-mode-content{
+    font-size:18px;
+    color:#595963;
+    padding-left:28px;
+    height:24px;
+    line-height: 24px;
+}
+
+
+.children .children .children .item .bullet-container .inner-circle{
+    border-radius: 50%;
+    width: 8px;
+    height: 8px;
+    background-color:#6990BC;
+    position:absolute;
+    top:28px;
+    left:6px;
+}
+
+.children .children .children .item .bullet-container .outer-circle{
+    display:none;
+}*/
+/**/
