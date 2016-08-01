@@ -2,6 +2,7 @@ import fetch from 'isomorphic-fetch';
 import Endpoints from '../endpoints';
 import urlWidget from '../widgets/url-widget';
 import stockTickerWidget from '../widgets/stock-ticker-widget';
+import { ActionCreators } from 'redux-undo';
 
 //
 // TREE ACTIONS
@@ -31,6 +32,7 @@ export const NODE_WIDGETS_UPDATING = "NODE_WIDGETS_UPDATING"; // signifies a nod
 export const SELECT_NODE = "SELECT_NODE"; // for multi-selecting nodes
 export const DESELECT_NODE = "DESELECT_NODE"; // for deselecting multi-selected nodes
 export const DELETE_NODES = "DELETE_NODES"; // multi-deletion of nodes
+export const UNDO = "UNDO"; // undos last action
 
 export function createNode(fromSiblingId, fromSiblingOffset, parentId, content) {
     return {
@@ -45,6 +47,12 @@ export function createNode(fromSiblingId, fromSiblingOffset, parentId, content) 
         visible: true,
         widgets: []
     };
+}
+
+export function undo() {
+     return (dispatch) => {
+         dispatch(ActionCreators.undo());
+     };
 }
 
 export function updateContent(nodeId, content) {
@@ -178,7 +186,7 @@ export function updateNodeWidgetDataIfNecessary(nodeId, content){
     var morphedContent = content;
 
     return (dispatch, getState) => {
-        var node = getState().tree.filter(n => n.id === nodeId)[0];
+        var node = getState().tree.present.filter(n => n.id === nodeId)[0];
         
         dispatch(nodeWidgetDataUpdating(nodeId));
 
@@ -285,7 +293,7 @@ function fetchData(nodeId, dataSource, dataSourceParameters) {
 }
 
 function shouldFetchData(state, nodeId, dataSource) {
-  const node = state.tree.filter(node => node.id === nodeId)[0];
+  const node = state.tree.present.filter(node => node.id === nodeId)[0];
   if (!node.posts) {
     return true;
   } else if (node.isFetching) {
@@ -309,7 +317,7 @@ export function fetchDataIfNeeded(nodeId, dataSource, dataSourceParameters) {
 export function searchNodes(query){
     return (dispatch, getState) => {
         
-        var nodes = getState().tree;
+        var nodes = getState().tree.present;
         var resultingNodeIds = nodes.filter(node => {
             if(node.id === "0") {
                 return true;

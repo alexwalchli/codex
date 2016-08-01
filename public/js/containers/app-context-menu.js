@@ -11,13 +11,13 @@ export class AppContextMenu extends Component {
 
     handleOnClick(){
         const { deleteNodes, tree } = this.props;
-        deleteNodes(tree.filter(item => item.selected).map(node => node.id));
+        deleteNodes(tree.present.filter(item => item.selected).map(node => node.id));
     }
 
     render() {
         console.log(this.props);
         const { tree } = this.props;
-        var itemsSelected = tree.filter(item => item.selected);
+        var itemsSelected = tree.present.filter(item => item.selected);
         var cssClasses = '';
         if(!itemsSelected.length){
             cssClasses = 'hidden';

@@ -19,5 +19,9 @@ export default function generateTree() {
         }
     ];
 
-    return tree;
+    return {
+        past: {},
+        present: tree,
+        future: {}    
+    };
 }

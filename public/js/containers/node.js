@@ -81,7 +81,7 @@ export class Node extends Component {
     }
 
     handleOnKeyDown(e){
-        const { addChild, createNode, childIds, removeChild, deleteNode, focusNodeAbove,
+        const { addChild, createNode, childIds, removeChild, deleteNode, focusNodeAbove, undo,
                 focusNodeBelow, focusNode, parentId, id, demoteNode, promoteNode, updateContent } = this.props;
         e.stopPropagation();
 
@@ -128,6 +128,9 @@ export class Node extends Component {
         }
         else if(e.key === 'c' && (e.metaKey || e.cntrlKey)){
             // determine what nodes are selected, and copy them to a clipboardData
+        }
+        else if(e.key === 'z' && (e.metaKey || e.cntrlKey)){
+            undo();
         }
     }
 
@@ -310,7 +313,7 @@ export class Node extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-    return state.tree.filter(node => node.id === ownProps.id)[0];
+    return state.tree.present.filter(node => node.id === ownProps.id)[0];
 }
 
 const ConnectedNode = connect(mapStateToProps, actions)(Node)
