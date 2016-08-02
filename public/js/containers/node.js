@@ -246,13 +246,18 @@ export class Node extends Component {
 
         var bulletClasses = "item";
         if(focused){
-            bulletClasses = bulletClasses + ' focused';
+            bulletClasses += ' focused';
         }
         if(visible === false){
-            bulletClasses = bulletClasses + ' hidden';
+            bulletClasses += ' hidden';
         }
         if(selected){
-            bulletClasses = bulletClasses + ' selected';
+            bulletClasses += ' selected';
+        }
+        if(childIds.length > 0){
+            bulletClasses += ' has-children';
+        } else {
+            bulletClasses += ' no-children';
         }
 
         var showToggleExpansionIcon = childIds.length;
