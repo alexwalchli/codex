@@ -12,7 +12,6 @@ import defaultMentionStyle from "./defaultMentionStyle";
 export class Node extends Component {
     constructor(props) {
         super(props);
-        this.handleRemoveClick = this.handleRemoveClick.bind(this);
         this.handleAddChildClick = this.handleAddChildClick.bind(this);
         this.handleOnKeyDown = this.handleOnKeyDown.bind(this);
         this.handleOnClick = this.handleOnClick.bind(this);
@@ -81,16 +80,18 @@ export class Node extends Component {
     }
 
     handleOnKeyDown(e){
-        const { addChild, createNode, childIds, removeChild, deleteNode, focusNodeAbove, undo, redo,
+        const { addChild, createNode, childIds, deleteNode, focusNodeAbove, undo, redo,
                 focusNodeBelow, focusNode, parentId, id, demoteNode, promoteNode, updateContent } = this.props;
         e.stopPropagation();
 
         if(e.key === 'Tab' && e.shiftKey){
             e.preventDefault();
+            this.submitContent();
             promoteNode(id, parentId);
         } 
         else if(e.key === 'Tab'){
             e.preventDefault();
+            this.submitContent();
             demoteNode(id, parentId);
         }
         else if (e.key === 'Enter') {
@@ -154,14 +155,6 @@ export class Node extends Component {
         const { addChild, createNode, id } = this.props;
         const childId = createNode(id, 1, id).nodeId;
         addChild(id, childId);
-    }
-
-    handleRemoveClick(e) {
-        e.preventDefault();
-
-        const { removeChild, deleteNode, parentId, id } = this.props;
-        removeChild(parentId, id);
-        deleteNode(id);
     }
 
     handlePaste(e) {
