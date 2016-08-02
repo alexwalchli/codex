@@ -96,6 +96,10 @@ html,body{
     width:100%;
 }
 
+.item.hidden{
+    display:none;
+}
+
 .item .children{
     padding-left:68px;
 }
@@ -115,8 +119,16 @@ html,body{
     width:22px;
 }
 
+.item.has-children .bullet-container {
+    cursor:pointer;
+}
+
 .item.has-children .bullet-container .outer-circle{
     display:block;
+}
+
+.item.has-children .bullet-container:hover .inner-circle{
+    
 }
 
 .item.no-children .bullet-container .outer-circle{

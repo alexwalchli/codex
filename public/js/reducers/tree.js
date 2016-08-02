@@ -172,10 +172,10 @@ function deleteMany(state, ids) {
 }
 
 export function tree(state = [], action) {
-  const { nodeId } = action;
-  var newState = Object.assign([], state);
+    const { nodeId } = action;
+    var newState = Object.assign([], state);
 
-  if(action.type === SHOW_SEARCH_RESULTS){
+    if(action.type === SHOW_SEARCH_RESULTS){
         newState = newState.map((node) =>{
             if(action.nodeIds.indexOf(node.id) === -1){
                 return nodeReducer(node, { nodeId: node.id, type: HIDE_NODE });
@@ -276,7 +276,6 @@ function handleDeleteNode(treeState, action){
 
 function handleDemoteNode(newState, action){
     var demotedNodeIndex = nodeIndexById(newState, action.nodeId);
-    var parentIndex = nodeIndexById(newState, action.parentId);
     var demotedNode = newState[demotedNodeIndex];
     var siblingAbove = getSiblingNodeAbove(newState, action.nodeId, action.parentId);
     var addAfterLastChildOfSiblingAboveId = siblingAbove.childIds[siblingAbove.childIds.length - 1];

@@ -271,7 +271,7 @@ export class Node extends Component {
             {typeof parentId !== 'undefined' ?
                 <div className="depth">
                 
-                <div className="bullet-container">
+                <div className="bullet-container" onClick={this.handleOnToggleExpansionClick}>
                     <div className="outer-circle"></div>
                     <div className="inner-circle"></div>
                 </div>
