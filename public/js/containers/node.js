@@ -81,7 +81,7 @@ export class Node extends Component {
     }
 
     handleOnKeyDown(e){
-        const { addChild, createNode, childIds, removeChild, deleteNode, focusNodeAbove, undo,
+        const { addChild, createNode, childIds, removeChild, deleteNode, focusNodeAbove, undo, redo,
                 focusNodeBelow, focusNode, parentId, id, demoteNode, promoteNode, updateContent } = this.props;
         e.stopPropagation();
 
@@ -107,10 +107,11 @@ export class Node extends Component {
             }
         }
         else if(e.key === 'Backspace' && !this.props.content){
-            e.preventDefault();
-            focusNodeAbove(id);
-            removeChild(parentId, id);
-            deleteNode(id);
+            if(!this.state.content){
+                e.preventDefault();
+                focusNodeAbove(id);
+                deleteNode(id, parentId);
+            }
         }
         else if(e.key === 'ArrowDown'){
             e.preventDefault();
@@ -128,6 +129,9 @@ export class Node extends Component {
         }
         else if(e.key === 'c' && (e.metaKey || e.cntrlKey)){
             // determine what nodes are selected, and copy them to a clipboardData
+        }
+        else if(e.key === 'z' && e.shiftKey && (e.metaKey || e.cntrlKey)){
+            redo();
         }
         else if(e.key === 'z' && (e.metaKey || e.cntrlKey)){
             undo();

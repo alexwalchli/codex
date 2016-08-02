@@ -33,6 +33,7 @@ export const SELECT_NODE = "SELECT_NODE"; // for multi-selecting nodes
 export const DESELECT_NODE = "DESELECT_NODE"; // for deselecting multi-selected nodes
 export const DELETE_NODES = "DELETE_NODES"; // multi-deletion of nodes
 export const UNDO = "UNDO"; // undos last action
+export const REDO = "REDO"; // redo the last action
 
 export function createNode(fromSiblingId, fromSiblingOffset, parentId, content) {
     return {
@@ -52,6 +53,12 @@ export function createNode(fromSiblingId, fromSiblingOffset, parentId, content) 
 export function undo() {
      return (dispatch) => {
          dispatch(ActionCreators.undo());
+     };
+}
+
+export function redo() {
+     return (dispatch) => {
+         dispatch(ActionCreators.redo());
      };
 }
 
@@ -98,11 +105,13 @@ export function focusNodeBelow(currentNodeId){
   };
 }
 
-export function deleteNode(nodeId) {
-  return {
-    type: DELETE_NODE,
-    nodeId
-  };
+export function deleteNode(nodeId, parentId) {
+    return (dispatch, getState) => {
+        if(getState().tree.present.length > 2){
+            dispatch(removeChild(parentId, nodeId));
+            dispatch({ type: DELETE_NODE, nodeId });
+        }
+    };
 }
 
 export function deleteNodes(nodeIds) {

@@ -12,18 +12,18 @@ console.log(Topbar);
 
 const initialTree = generateTree();
 const store = configureStore({
-  tree: initialTree
+    tree: initialTree
 });
 
 render(
-  <Provider store={store}>
-  <div id="app">
-    <Topbar />
-    <AppContextMenu />
-    <div id="tree-container">
-      <Node id={'0'} />
-    </div>
-  </div>
-  </Provider>,
-  document.getElementById('root')
+    <Provider store={store}>
+        <div id="app">
+            <Topbar />
+            <AppContextMenu />
+            <div id="tree-container">
+                <Node id={'0'} />
+            </div>
+        </div>
+    </Provider>,
+    document.getElementById('root')
 )

@@ -1,4 +1,5 @@
 
+// TODO: Should no longer be dependent on the index of nodes in the array. Index will be stored in a seperate collection.
 // TODO: This all needs some serious clean-up at some point
 // TODO: Store index of node on nodes to remove use of nodeIndexById everywhere
 // TODO: Child actions should get created by original action, move all logic out
@@ -223,7 +224,6 @@ export function tree(state = [], action) {
     }
 
     if(action.type === SELECT_NODE){
-        // unfocus nodes
         newState = newState.map((node) =>{
             return nodeReducer(node, { type: UNFOCUS_NODE });
         });
