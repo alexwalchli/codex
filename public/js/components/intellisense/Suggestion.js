@@ -5,8 +5,6 @@ import keys from "lodash/keys";
 
 import { defaultStyle } from "substyle";
 
-console.log(defaultStyle);
-
 class Suggestion extends Component {
 
   static propTypes = {

@@ -5,8 +5,6 @@ import rootReducer from '../reducers/index';
 
 const loggerMiddleware = createLogger();
 
-console.log(rootReducer);
-
 export default function configureStore(preloadedState) {
   const store = createStore(
     rootReducer,

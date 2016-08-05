@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 import { externalDataCache, selectedDataSource } from './external-data-cache';
 import { search } from './search';
 import { tree } from './tree';
+import { auth } from './auth';
 import undoable, { excludeAction } from 'redux-undo';
 import {  FOCUS_NODE, FOCUS_NODE_ABOVE, FOCUS_NODE_BELOW, UNFOCUS_NODE, SEARCH_NODES, SHOW_SEARCH_RESULTS, 
   UPDATE_WIDGET_DATA_IF_NECESSARY, SELECT_NODE, DESELECT_NODE, NODE_WIDGETS_UPDATING, NODE_WIDGETS_UPDATED, REMOVE_CHILD, ADD_CHILD } 
@@ -23,6 +24,7 @@ const undoableTree = undoable(tree, {
                          ADD_CHILD])
 });
 const rootReducer = combineReducers({
+  auth,
   externalDataCache,
   selectedDataSource,
   tree: undoableTree,

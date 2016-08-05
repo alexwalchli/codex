@@ -10,7 +10,7 @@ import {    INCREMENT, ADD_CHILD, REMOVE_CHILD, CREATE_NODE, FOCUS_NODE, HIDE_NO
             INCREMENT_INDEX, DEMOTE_NODE, PROMOTE_NODE, UPDATE_PARENT, NODE_RECEIVED_DATA,
             UPDATE_CONTENT, TOGGLE_NODE_EXPANSION, SHOW_SEARCH_RESULTS, SELECT_NODE, DESELECT_NODE, DELETE_NODES,
             NODE_WIDGETS_UPDATED, NODE_WIDGETS_UPDATING  } 
-from '../actions';
+from '../actions/node';
 
 function childIds(state, action) {
     switch (action.type) {
@@ -30,7 +30,12 @@ function childIds(state, action) {
 }
 
 function nodeIds(state){
-    return Object.keys(state).map((node));
+    var rootId = [ state[0].id ];
+    var childrenOfRoot = state[0].childIds.reduce((acc, childId, idx) => (
+        [ ...acc, childId, ...getAllDescendantIds(state, childId) ]
+    ), []);
+
+    return [ rootId, ...childrenOfRoot ];
 }
 
 function nodeReducer(state, action) {
@@ -124,9 +129,7 @@ function reassignParentNode(state, nodeId, oldParentId, newParentId, addAfterSib
 }
 
 function nodeIndexById(state, nodeId){
-  return state.map(function(node) {
-    return node.id;
-  }).indexOf(nodeId);
+    return nodeIds(state).indexOf(nodeId);
 }
 
 function indexOfLastChildOrParentById(treeState, parentNodeId){
@@ -140,9 +143,13 @@ function indexOfLastChildOrParentById(treeState, parentNodeId){
 }
 
 function getAllDescendantIds(state, nodeId) {
-  return state[nodeIndexById(state, nodeId)].childIds.reduce((acc, childId) => (
+  return nodeById(state, nodeId).childIds.reduce((acc, childId) => (
     [ ...acc, childId, ...getAllDescendantIds(state, childId) ]
   ), []);
+}
+
+function nodeById(state, nodeId){
+    return state.find(n => n.id === nodeId);
 }
 
 function getNextNodeIndexThatIsVisible(treeState, nodeIndex, searchAbove = true){

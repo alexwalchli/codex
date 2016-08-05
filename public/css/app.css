@@ -47,7 +47,7 @@ html,body{
 .top-bar .search {
     margin-left:100px;
     border-radius: 4px;
-    min-width:700px;
+    min-width:400px;
     border:1px solid #E2E2E8;
     font-size:20px;
     padding:.4em;
@@ -123,12 +123,12 @@ html,body{
     cursor:pointer;
 }
 
-.item.has-children .bullet-container .outer-circle{
-    display:block;
+.item.no-children .bullet-container {
+    cursor: default;
 }
 
-.item.has-children .bullet-container:hover .inner-circle{
-    
+.item.has-children .bullet-container .outer-circle{
+    display:block;
 }
 
 .item.no-children .bullet-container .outer-circle{

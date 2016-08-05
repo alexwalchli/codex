@@ -2,28 +2,27 @@ import 'babel-polyfill';
 import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
-import Node from './containers/node';
-import Topbar from './components/top-bar';
-import AppContextMenu from './containers/app-context-menu';
 import configureStore from './store/configure-store';
 import generateTree from './generate-tree';
-
-console.log(Topbar);
+import App from './components/app';
+import userPageActions from './actions/user-pages';
+import { subscribeToAuthStateChanged } from './actions/auth';
 
 const initialTree = generateTree();
 const store = configureStore({
-    tree: initialTree
+    tree: initialTree,
+    auth: {}
+});
+
+setTimeout(function(){
+	//store.dispatch( userPageActions.subscribeToUserPages() );
 });
 
 render(
     <Provider store={store}>
-        <div id="app">
-            <Topbar />
-            <AppContextMenu />
-            <div id="tree-container">
-                <Node id={'0'} />
-            </div>
-        </div>
+        <App />
     </Provider>,
     document.getElementById('root')
 )
+
+subscribeToAuthStateChanged(store.dispatch);

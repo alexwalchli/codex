@@ -1,7 +1,7 @@
 import React from 'react';
 import { Component } from 'react';
 import { connect } from 'react-redux';
-import * as actions from '../actions/index';
+import * as actions from '../actions/node';
 import Endpoints from "../endpoints";
 import _ from "lodash";
 import urlWidget from '../widgets/url-widget';

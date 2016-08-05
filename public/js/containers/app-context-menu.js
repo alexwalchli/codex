@@ -1,7 +1,7 @@
 import React from 'react';
 import { Component } from 'react';
 import { connect } from 'react-redux';
-import * as actions from '../actions/index';
+import * as actions from '../actions/node';
 
 export class AppContextMenu extends Component {
     constructor(props) {
@@ -15,7 +15,6 @@ export class AppContextMenu extends Component {
     }
 
     render() {
-        console.log(this.props);
         const { tree } = this.props;
         var itemsSelected = tree.present.filter(item => item.selected);
         var cssClasses = '';

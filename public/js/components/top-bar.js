@@ -1,7 +1,9 @@
 import React from 'react';
 import { Component } from 'react';
 import { connect } from 'react-redux';
-import * as actions from '../actions/index';
+import * as actions from '../actions';
+console.log('actions')
+console.log(actions)
 import SearchInput from '../containers/search-input';
 
 export default class Topbar extends Component {
@@ -11,6 +13,8 @@ export default class Topbar extends Component {
     }
 
     render() {
+        const { signOut, auth } = this.props;
+        console.log(this.props);
         return (
             <nav className="top-bar clearfix">
                 <div className="top-bar-left">
@@ -22,7 +26,8 @@ export default class Topbar extends Component {
                 <div className="top-bar-right">
                     <ul>
                         <li><a>Clean Up</a></li>
-                        <li><a>Alex Walchli</a></li>
+                        <li><a>{ auth.displayName }</a></li>
+                        <li><a onClick={signOut}>Sign Out</a></li>
                     </ul>
                 </div>
             </nav>
@@ -33,3 +38,6 @@ export default class Topbar extends Component {
 function mapStateToProps(state, ownProps) {
     return state;
 }
+
+const ConnectedTopbar = connect(mapStateToProps, actions)(Topbar)
+export default ConnectedTopbar
