@@ -27,9 +27,19 @@ export function getAllNodeIdsOrdered(nodes, startNodeId){
 
 // recursively retrieves, and flattens, all node IDs under the startNodeId
 export function getAllDescendantIds(nodes, startNodeId) {
-  return nodes[startNodeId].childIds.reduce((acc, childId) => (
-    [ ...acc, childId, ...getAllDescendantIds(nodes, childId) ]
-  ), []);
+    return nodes[startNodeId].childIds.reduce((acc, childId) => (
+        [ ...acc, childId, ...getAllDescendantIds(nodes, childId) ]
+    ), []);
+}
+
+// recursively retrieves, and flattens, all node Ids excluding children of collapsed nodes
+export function getAllUncollapsedDescedantIds(nodes, startNodeId) {
+    return nodes[startNodeId].childIds.reduce((acc, childId) => {
+        if(nodes[nodes[childId].parentId].collapsed){
+            return acc;
+        }
+        return [ ...acc, childId, ...getAllUncollapsedDescedantIds(nodes, childId) ];
+    }, []);
 }
 
 export function getCurrentlySelectedNodeIds(nodes){

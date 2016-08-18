@@ -249,12 +249,13 @@ export class Node extends Component {
         } else {
             bulletClasses += ' no-children';
         }
+        if(collapsed){
+            bulletClasses += ' collapsed';
+        }
 
         var showToggleExpansionIcon = childIds.length;
         var childNodeClasses = 'children';
-        if(collapsed){
-            childNodeClasses = childNodeClasses + ' collapsed';
-        }
+        
 
         return (
             <div className={bulletClasses} onKeyDown={this.handleOnKeyDown}>
@@ -294,7 +295,7 @@ export class Node extends Component {
                 </div>:
                 null
             }
-            <div className={childNodeClasses}>
+            <div className="children">
                 {childIds.map(this.renderChild)}
             </div>
             </div>

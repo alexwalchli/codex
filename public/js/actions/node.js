@@ -6,27 +6,16 @@ import { ActionCreators } from 'redux-undo';
 import { firebaseDb } from '../firebase';
 import nodeFactory from '../utilities/node-factory';
 import { dictionaryToArray, getPresentNodes, getRootNodeId, getAllDescendantIds, getSiblingNodeAbove, getNextNodeThatIsVisible, 
-         getCurrentlySelectedAndFocusedNodes, getCurrentlySelectedNodeIds, getCurrentlyFocusedNodeId } 
+         getCurrentlySelectedAndFocusedNodes, getCurrentlySelectedNodeIds, getCurrentlyFocusedNodeId, getAllUncollapsedDescedantIds } 
     from '../utilities/state-queries';
 
-let nodeCreationAddNewNodeToNodeId;
-let nodeCreationAddNewNodeToNode;
-let nodeCreationCreatedFromSiblingId;
-let nodeCreationCreatedFromSiblingOffset;
 let initialized = false;
-
 export const NODE_TRANSACTION = 'NODE_TRANSACTION';
 
 ///////////////////
-// COMMANDS 
+// Action Creators 
 // Always Returns functions that perform I/O and dispatch one or more events and are not not handled by Reducers.
 ///////////////////
-export const SUBSCRIBE_TO_NODES = 'SUBSCRIBE_TO_NODES';
-export const CREATE_NODE = 'CREATE_NODE';
-export const FOCUS_NODE = 'FOCUS_NODE'; // set focused the node
-export const FOCUS_NODE_ABOVE = 'FOCUS_NODE_ABOVE'; // set focused prop of the node above
-export const FOCUS_NODE_BELOW = 'FOCUS_NODE_BELOW'; // set focused prop of the node below
-export const UNFOCUS_NODE = 'UNFOCUS_NODE'; // set focused prop to false
 
 export function subscribeToNodes(userPageId){
     return (dispatch, getState) => {
@@ -114,26 +103,6 @@ function nodeTransaction(events){
     };
 }
 
-function getUpdatedChildIdsForAddition(addChildToNode, newNodeId, createdFromSiblingId, createdFromSiblingOffset){
-    let updatedChildIds;    
-    
-    if(addChildToNode.childIds.includes(newNodeId)){
-        // don't add the child ID if it's already been added
-        return addChildToNode.childIds;
-    }
-
-    if(createdFromSiblingId){
-        // if the child was created from a specific node, add it in front or behind the node it was created from based on the offset
-        updatedChildIds = [...addChildToNode.childIds];
-        updatedChildIds.splice(addChildToNode.childIds.indexOf(createdFromSiblingId) + createdFromSiblingOffset, 0, newNodeId);
-    } else {
-        // prepend the childId by default
-        updatedChildIds = [newNodeId, ...addChildToNode.childIds];
-    }
-
-    return updatedChildIds;
-}
-
 export function updateContent(nodeId, content) {
     return (dispatch) => {
         firebaseDb.ref('nodes/' + nodeId + '/content').set(content);
@@ -201,11 +170,11 @@ export function promoteNode(nodeId, parentId){
         }
 
         dispatch(reassignParentNode(nodeId, parentId, parentNode.parentId, parentId));
-
         dispatch(nodeFocused(nodeId));
     };
 }
 
+// attaches a node to a new parent node and optimistically updates local app store
 function reassignParentNode(nodeId, oldParentId, newParentId, addAfterSiblingId){
    return (dispatch, getState) => {
         let optimisticEvents = [];
@@ -236,17 +205,6 @@ function reassignParentNode(nodeId, oldParentId, newParentId, addAfterSiblingId)
    }; 
 }
 
-function updateParent(nodeId, newParentId){
-    const nodeParentIdRef = firebaseDb.ref('nodes/' + nodeId);
-    nodeParentIdRef.update({ parentId: newParentId});
-
-    return {
-        type: PARENT_UPDATED,
-        nodeId,
-        payload: newParentId
-    };
-}
-
 export function removeChild(nodeId, childId) {
     return (dispatch, getState) => {
         const appState = getState();
@@ -274,7 +232,7 @@ export function deleteNode(nodeId, parentId) {
 export function toggleNodeExpansion(nodeId){
     return (dispatch, getState) => {
         const nodes = getPresentNodes(getState());
-        var allDescendentIds = getAllDescendantIds(nodes, nodeId);
+        var allDescendentIds = getAllUncollapsedDescedantIds(nodes, nodeId);
         if(nodes[nodeId].collapsed){
             dispatch(nodeExpanded(nodeId, allDescendentIds));
         } else {
@@ -300,18 +258,68 @@ export function searchNodes(query){
         }).map(node => { return node.id; });
 
         dispatch(nodesSearched(resultingNodeIds));
-        // dispatch({
-        //     type: SEARCH_NODES,
-        //     resultingNodeIds: [],
-        //     query: query
-        // });
+    };
+}
+
+export function undo() {
+     return (dispatch) => {
+         dispatch(ActionCreators.undo());
+     };
+}
+
+export function redo() {
+     return (dispatch) => {
+         dispatch(ActionCreators.redo());
+     };
+}
+
+export function selectNode(nodeId){
+    return (dispatch, getState) => {
+        // TODO: let other collaborators know this user has selected this node
+        dispatch(nodeSelected(nodeId));
+    };
+}
+
+export function deselectNode(nodeId){
+    return (dispatch, getState) => {
+        // TODO: let other collaborators know this user has deselected this node
+        dispatch(nodeDeselected(nodeId));
+    };
+}
+
+export function updateNodeWidgetDataIfNecessary(nodeId, content){
+    var morphedContent = content;
+
+    return (dispatch, getState) => {
+        var node = getState().tree.present[nodeId];
+        
+        dispatch(nodeWidgetDataUpdating(nodeId));
+
+        var widgetPromises = [];
+        if(content){
+            widgetPromises.push(urlWidget.parse(node));
+            widgetPromises.push(stockTickerWidget.parse(node));
+        }
+        
+        // TODO: user-defined widgets
+
+        Promise.all(widgetPromises).then(widgetResults => {
+            var allWidgets = widgetResults.reduce((prevValue, currValue) => {
+                if(currValue){
+                    return[ prevValue, ...currValue];
+                }
+            }, []);
+
+            dispatch(nodeWidgetsUpdated(nodeId, allWidgets || []));
+        });
     };
 }
 
 ///////////////////
-// EVENTS 
+// Actions 
 // Always return plain objects of facts that have happened via commands. They are handled by Reducers to update this clients state.
 ///////////////////
+
 export const NODE_CREATED = 'NODE_CREATED';
 export const NODE_UPDATED = 'NODE_UPDATED';
 export const INITIAL_NODE_STATE_LOADED = 'INITIAL_NODE_STATE_LOADED';
@@ -329,6 +337,8 @@ export const NODE_UNFOCUSED = 'NODE_UNFOCUSED';
 export const NODE_SELECTED = 'NODE_SELECTED';
 export const NODE_DESELECTED = 'NODE_DESELECTED';
 export const NODES_SEARCHED = 'NODES_SEARCHED';
+export const NODE_WIDGETS_UPDATED = "NODE_WIDGETS_UPDATED"; // signifies a node that has had its widget data updated
+export const NODE_WIDGETS_UPDATING = "NODE_WIDGETS_UPDATING"; // signifies a node that is having its widget data updated
 
 export function nodeCreated(newNode){
     return {
@@ -412,6 +422,13 @@ export function nodeDeselected(nodeId){
     };
 }
 
+export function nodeSelected(nodeId){
+    return {
+        type: NODE_SELECTED,
+        nodeId
+    };
+}
+
 export function nodeParentUpdated(nodeId, newParentId, updatedById){
     return {
         type: NODE_PARENT_UPDATED,
@@ -432,93 +449,6 @@ export function nodesSearched(nodeIds){
     };
 }
 
-// 
-
-// --- TODO --- //
-export const DELETE_NODE = 'DELETE_NODE'; // delete a node
-export const HIDE_NODE = 'HIDE_NODE'; // hides a node from view
-export const SHOW_NODE = 'SHOW_NODE'; // displays a node
-export const REMOVE_CHILD = 'REMOVE_CHILD'; // remove, but not delete, a child
-export const DEMOTE_NODE = 'DEMOTE_NODE'; // 'indent' a bullet
-export const PROMOTE_NODE = 'PROMOTE_NODE'; // 'outdent' a bullet
-export const UPDATE_PARENT = 'UPDATE_PARENT'; // change the parent ID of a node
-export const NODE_RECEIVED_DATA = "NODE_RECEIVED_DATA"; // node received data from a API response
-export const UPDATE_CONTENT = "UPDATE_CONTENT"; // user entered new content into the Node
-export const TOGGLE_NODE_EXPANSION = "TOGGLE_NODE_EXPANSION"; // show/hides a node's children
-export const SEARCH_NODES = "SEARCH_NODES"; // fires a search/filter on nodes, stores query in state
-export const SHOW_SEARCH_RESULTS = "SHOW_SEARCH_RESULTS"; // shows the result of a search and hides all other nodes
-export const UPDATE_WIDGET_DATA_IF_NECESSARY = "UPDATE_WIDGET_DATA_IF_NECESSARY"; // updates a node's widget data
-export const NODE_WIDGETS_UPDATED = "NODE_WIDGETS_UPDATED"; // signifies a node that has had its widget data updated
-export const NODE_WIDGETS_UPDATING = "NODE_WIDGETS_UPDATING"; // signifies a node that is having its widget data updated
-export const SELECT_NODE = "SELECT_NODE"; // for multi-selecting nodes
-export const DESELECT_NODE = "DESELECT_NODE"; // for deselecting multi-selected nodes
-export const DELETE_NODES = "DELETE_NODES"; // multi-deletion of nodes
-export const UNDO = "UNDO"; // undos last action
-export const REDO = "REDO"; // redo the last action
-
-
-export function undo() {
-     return (dispatch) => {
-         dispatch(ActionCreators.undo());
-     };
-}
-
-export function redo() {
-     return (dispatch) => {
-         dispatch(ActionCreators.redo());
-     };
-}
-
-export function selectNode(nodeId){
-    return {
-        type: SELECT_NODE,
-        nodeId
-    };
-}
-
-export function deselectNode(nodeId){
-    return {
-        type: DESELECT_NODE,
-        nodeId
-    };
-}
-
-export function nodeReceivedData(nodeId, dataSource){
-  return {
-    type: NODE_RECEIVED_DATA,
-    nodeId,
-    dataSource
-  };
-}
-
-export function updateNodeWidgetDataIfNecessary(nodeId, content){
-    var morphedContent = content;
-
-    return (dispatch, getState) => {
-        var node = getState().tree.present[nodeId];
-        
-        dispatch(nodeWidgetDataUpdating(nodeId));
-
-        var widgetPromises = [];
-        if(content){
-            widgetPromises.push(urlWidget.parse(node));
-            widgetPromises.push(stockTickerWidget.parse(node));
-        }
-        
-        // TODO: user-defined widgets
-
-        Promise.all(widgetPromises).then(widgetResults => {
-            var allWidgets = widgetResults.reduce((prevValue, currValue) => {
-                if(currValue){
-                    return[ prevValue, ...currValue];
-                }
-            }, []);
-
-            dispatch(nodeWidgetsUpdated(nodeId, allWidgets || []));
-        });
-    };
-}
-
 export function nodeWidgetsUpdated(nodeId, widgets){
     return {
         type: NODE_WIDGETS_UPDATED,
@@ -533,6 +463,10 @@ export function nodeWidgetDataUpdating(nodeId){
         nodeId
     };
 }
+
+///////////////////////
+// Utilities
+///////////////////////
 
 function unwrapNodesSnapshot(nodesSnapshot){
     let nodes = nodesSnapshot.val();
@@ -551,3 +485,24 @@ function unwrapNodeSnapshot(nodeSnapshot){
     node.childIds = node.childIds || [];
     return node;
 }
+
+function getUpdatedChildIdsForAddition(addChildToNode, newNodeId, createdFromSiblingId, createdFromSiblingOffset){
+    let updatedChildIds;    
+    
+    if(addChildToNode.childIds.includes(newNodeId)){
+        // don't add the child ID if it's already been added
+        return addChildToNode.childIds;
+    }
+
+    if(createdFromSiblingId){
+        // if the child was created from a specific node, add it in front or behind the node it was created from based on the offset
+        updatedChildIds = [...addChildToNode.childIds];
+        updatedChildIds.splice(addChildToNode.childIds.indexOf(createdFromSiblingId) + createdFromSiblingOffset, 0, newNodeId);
+    } else {
+        // prepend the childId by default
+        updatedChildIds = [newNodeId, ...addChildToNode.childIds];
+    }
+
+    return updatedChildIds;
+}
+

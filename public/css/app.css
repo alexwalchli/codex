@@ -96,6 +96,10 @@ html,body{
     width:100%;
 }
 
+.item.selected{
+    background-color:#E2E2E8;
+}
+
 .item.hidden{
     display:none;
 }
@@ -125,6 +129,15 @@ html,body{
 
 .item.no-children .bullet-container {
     cursor: default;
+}
+
+.item.has-children.collapsed .bullet-container .outer-circle{
+    background-color:#2185C5 !important;
+}
+
+.item.has-children.collapsed .bullet-container .inner-circle{
+    background-color:#FFF !important;
+    z-index:1;
 }
 
 .item.has-children .bullet-container .outer-circle{
