@@ -5,7 +5,7 @@ import Node from '../containers/node';
 import Topbar from './top-bar';
 import AppContextMenu from '../containers/app-context-menu';
 import * as authActions from '../actions/auth';
-console.log(authActions);
+
 export class SignIn extends Component {
     constructor(props) {
         super(props);

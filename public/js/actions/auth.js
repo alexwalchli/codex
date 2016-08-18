@@ -1,7 +1,8 @@
 import { firebaseAuth } from '../firebase';
+import { subscribeToUserPages } from './user-pages';
 
 export const SUBSCRIBE_TO_AUTH_STATE_CHANGED = 'SUBSCRIBE_TO_AUTH_STATE_CHANGED';
-export const INIT_AUTH = 'INIT_AUTH';
+export const UPDATE_AUTH_STATE = 'UPDATE_AUTH_STATE';
 export const SIGN_IN_ERROR = 'SIGN_IN_ERROR';
 export const SIGN_IN_SUCCESS = 'SIGN_IN_SUCCESS';
 export const SIGN_OUT_SUCCESS = 'SIGN_OUT_SUCCESS';
@@ -16,20 +17,21 @@ function authenticate(provider) {
 
 export function subscribeToAuthStateChanged(dispatch) {
     return new Promise((resolve, reject) => {
-        const unsub = firebaseAuth.onAuthStateChanged(
+        firebaseAuth.onAuthStateChanged(
             user => {
-                dispatch(initAuth(user));
-                unsub();
-                resolve();
+                if(user){
+                    dispatch(subscribeToUserPages());
+                }
+                dispatch(updateAuthState(user));
             },
             error => reject(error)
         );
     });
 }
 
-export function initAuth(user) {
+export function updateAuthState(user) {
   return {
-    type: INIT_AUTH,
+    type: UPDATE_AUTH_STATE,
     payload: user
   };
 }
@@ -42,10 +44,12 @@ export function signInError(error) {
 }
 
 export function signInSuccess(result) {
-  return {
-    type: SIGN_IN_SUCCESS,
-    payload: result.user
-  };
+    return (dispatch, getState) => {
+        dispatch({
+            type: SIGN_IN_SUCCESS,  
+            payload: result.user
+        });
+    };
 }
 
 export function signInWithGithub() {

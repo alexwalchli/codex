@@ -2,8 +2,6 @@ import React from 'react';
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
-console.log('actions')
-console.log(actions)
 import SearchInput from '../containers/search-input';
 
 export default class Topbar extends Component {
@@ -14,7 +12,6 @@ export default class Topbar extends Component {
 
     render() {
         const { signOut, auth } = this.props;
-        console.log(this.props);
         return (
             <nav className="top-bar clearfix">
                 <div className="top-bar-left">

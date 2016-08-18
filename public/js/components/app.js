@@ -15,18 +15,32 @@ export class App extends Component {
 
     render() {
 
+        let currentUserPage = userPagesList(this.props.userPages).filter(u => u.isHome)[0];
+        let appIsInitialized = isAuthenticated(this.props) && currentUserPage && this.props.tree.present[currentUserPage.rootNodeId];
+        let userIsAuthenticated = isAuthenticated(this.props);
+        let showSignIn = !userIsAuthenticated;
+
         return (
             <div id="app">
-                { isAuthenticated(this.props) ?
+                { showSignIn ? 
+                    <SignIn />
+                    : null    
+                }
+
+                { userIsAuthenticated && !appIsInitialized ? 
+                    <h2>Loading...</h2>
+                : null }
+
+                { appIsInitialized ?
                     <div id="signed-in">
                         <Topbar />
                         <AppContextMenu />
                         <div id="tree-container">
-                            <Node id={'0'} />
+                            <Node id={currentUserPage.rootNodeId} />
                         </div>  
                     </div>  
                     :
-                    <SignIn />
+                    null
                 }
             </div>
         )
@@ -35,6 +49,10 @@ export class App extends Component {
 
 function mapStateToProps(state, ownProps) {
     return state;
+}
+
+function userPagesList(userPages){
+    return Object.keys(userPages).map(userPageId => userPages[userPageId]);
 }
 
 const ConnectedApp = connect(mapStateToProps, actions)(App)

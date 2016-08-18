@@ -11,12 +11,12 @@ export class AppContextMenu extends Component {
 
     handleOnClick(){
         const { deleteNodes, tree } = this.props;
-        deleteNodes(tree.present.filter(item => item.selected).map(node => node.id));
+        deleteNodes(nodeList(tree.present).filter(item => item.selected).map(node => node.id));
     }
 
     render() {
         const { tree } = this.props;
-        var itemsSelected = tree.present.filter(item => item.selected);
+        var itemsSelected = nodeList(tree.present).filter(item => item.selected);
         var cssClasses = '';
         if(!itemsSelected.length){
             cssClasses = 'hidden';
@@ -28,6 +28,12 @@ export class AppContextMenu extends Component {
             </div>
         )
     }
+}
+
+function nodeList(nodes){
+    var nodeList = Object.keys(nodes).map(nodeId => nodes[nodeId]);
+
+    return nodeList;
 }
 
 function mapStateToProps(state, ownProps) {

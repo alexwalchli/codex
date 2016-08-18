@@ -99,20 +99,12 @@ export class Node extends Component {
             this.submitContent();
             // if cursor is add the beginning of the input, add new node at current position, else below
             const fromSilbingOffset = e.target.selectionEnd === 0 && e.target.value ? 0 : 1;
-            const newSiblingId = createNode(id, fromSilbingOffset, parentId).nodeId;
-            addChild(childIds.length === 0 ? parentId : id, newSiblingId, id, fromSilbingOffset);
-
-            // keep focused on the current node if we add the new node above it
-            if(fromSilbingOffset > 0){
-                focusNode(newSiblingId);
-            }
+            createNode(id, fromSilbingOffset, parentId);
         }
-        else if(e.key === 'Backspace' && !this.props.content){
-            if(!this.state.content){
-                e.preventDefault();
-                focusNodeAbove(id);
-                deleteNode(id, parentId);
-            }
+        else if(e.key === 'Backspace' && !this.state.content){
+            e.preventDefault();
+            focusNodeAbove(id);
+            deleteNode(id, parentId);
         }
         else if(e.key === 'ArrowDown'){
             e.preventDefault();
@@ -235,13 +227,11 @@ export class Node extends Component {
 
         if(this.state.content !== content){
             updateContent(id, this.state.content);
-            updateNodeWidgetDataIfNecessary(id, this.state.content);
         }
     }
 
     render() {
-        const { counter, parentId, childIds, id, focused, inReadMode, externalList,
-                collapsed, visible, selected, morphedContent, widgetDataUpdating } = this.props;
+        const { parentId, childIds, id, focused, inReadMode, externalList, collapsed, visible, selected, morphedContent, widgetDataUpdating } = this.props;
         const { content, suggestions } = this.state;
 
         var bulletClasses = "item";
@@ -276,21 +266,19 @@ export class Node extends Component {
                     <div className="inner-circle"></div>
                 </div>
                 <div className="content" onClick={this.handleOnClick} onMouseEnter={this.handleOnMouseEnter} onMouseLeave={this.handleOnMouseLeave} onPaste={this.handlePaste}>
-                    {focused ? 
-                        <MentionsInput
-                            singleLine
-                            value={content}
-                            onChange={this.handleChange}
-                            style={ defaultStyle({ singleLine: true }) }
-                            placeholder={""}
-                            focused={this.props.focused}
-                            onSelect={this.onSelect}
-                            onBlur={this.handleOnBlur}>
+                    
+                    <MentionsInput
+                        singleLine
+                        value={content}
+                        onChange={this.handleChange}
+                        style={ defaultStyle({ singleLine: true }) }
+                        placeholder={""}
+                        focused={this.props.focused}
+                        onSelect={this.onSelect}
+                        onBlur={this.handleOnBlur}>
 
-                        <Mention onAdd={this.onAdd} onRemove={this.onRemove} data={ suggestions } style={defaultMentionStyle} />
-                        </MentionsInput>
-                    :
-                    this.renderNodeWidgets()}
+                    <Mention onAdd={this.onAdd} onRemove={this.onRemove} data={ suggestions } style={defaultMentionStyle} />
+                    </MentionsInput>
 
                     {externalList ? 
                     <ul className="external-data-children">
@@ -315,7 +303,9 @@ export class Node extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-    return state.tree.present.filter(node => node.id === ownProps.id)[0];
+    var node = Object.assign({}, state.tree.present[ownProps.id]);
+
+    return node;
 }
 
 const ConnectedNode = connect(mapStateToProps, actions)(Node)
@@ -330,3 +320,19 @@ export default ConnectedNode
 //                     }
 //                 </div>
 //                 : null }
+
+// {focused ? 
+//                         <MentionsInput
+//                             singleLine
+//                             value={content}
+//                             onChange={this.handleChange}
+//                             style={ defaultStyle({ singleLine: true }) }
+//                             placeholder={""}
+//                             focused={this.props.focused}
+//                             onSelect={this.onSelect}
+//                             onBlur={this.handleOnBlur}>
+
+//                         <Mention onAdd={this.onAdd} onRemove={this.onRemove} data={ suggestions } style={defaultMentionStyle} />
+//                         </MentionsInput>
+//                     :
+//                     this.renderNodeWidgets()}
