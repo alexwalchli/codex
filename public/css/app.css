@@ -22,6 +22,14 @@ html,body{
     width:auto;
 }
 
+.top-bar .top-bar-right a{
+    cursor:pointer;
+}
+
+.top-bar .top-bar-right a:hover{
+    text-decoration: underline;
+}
+
 .top-bar ul{
     list-style-type: none;
     padding:0;

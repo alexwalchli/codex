@@ -6,6 +6,7 @@ import Node from '../containers/node';
 import Topbar from './top-bar';
 import AppContextMenu from '../containers/app-context-menu';
 import SignIn from './sign-in';
+import AppLoader from './app-loader';
 import { isAuthenticated } from '../auth';
 
 export class App extends Component {
@@ -18,7 +19,12 @@ export class App extends Component {
         let currentUserPage = userPagesList(this.props.userPages).filter(u => u.isHome)[0];
         let appIsInitialized = isAuthenticated(this.props) && currentUserPage && this.props.tree.present[currentUserPage.rootNodeId];
         let userIsAuthenticated = isAuthenticated(this.props);
-        let showSignIn = !userIsAuthenticated;
+        let showSignIn = !userIsAuthenticated && this.props.auth.initialCheck;
+        let showLoading = userIsAuthenticated && !appIsInitialized;
+
+        console.log('userIsAuthenticated ' + userIsAuthenticated);
+        console.log('appIsInitialized ' + appIsInitialized);
+        console.log('initialCheck ' + this.props.initialCheck);
 
         return (
             <div id="app">
@@ -27,8 +33,8 @@ export class App extends Component {
                     : null    
                 }
 
-                { userIsAuthenticated && !appIsInitialized ? 
-                    <h2>Loading...</h2>
+                { showLoading ? 
+                    <AppLoader />
                 : null }
 
                 { appIsInitialized ?

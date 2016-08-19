@@ -22,7 +22,6 @@ export default class Topbar extends Component {
                 </div>
                 <div className="top-bar-right">
                     <ul>
-                        <li><a>Clean Up</a></li>
                         <li><a>{ auth.displayName }</a></li>
                         <li><a onClick={signOut}>Sign Out</a></li>
                     </ul>
