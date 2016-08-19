@@ -20,13 +20,11 @@ export class Node extends Component {
         this.handleOnMouseEnter = this.handleOnMouseEnter.bind(this);
         this.handleOnMouseLeave = this.handleOnMouseLeave.bind(this);
         this.renderChild = this.renderChild.bind(this);
-        //this.componentDidMount = this.componentDidMount.bind(this);
         this.handleOnBlur = this.handleOnBlur.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.onSelect = this.onSelect.bind(this);
         this.onAdd = this.onAdd.bind(this);
         this.onRemove = this.onRemove.bind(this);
-        this.debouncedUpdateNodeWidgetDataIfNecessary = _.debounce(this.debouncedUpdateNodeWidgetDataIfNecessary.bind(this),1000);
 
         this.state = { 
             tags: [],
@@ -42,27 +40,13 @@ export class Node extends Component {
     }
 
     handleChange(e, value) {
-        // const {id, updateContent, updateNodeWidgetDataIfNecessary } = this.props;
         this.setState({
             content: value
         });
-
-        // this.debouncedUpdateNodeWidgetDataIfNecessary(id, value);
-    }
-
-    debouncedUpdateNodeWidgetDataIfNecessary(id, value){
-        // const { updateNodeWidgetDataIfNecessary } = this.props;
-        
-        // updateNodeWidgetDataIfNecessary(id, value);
     }
 
     handleOnBlur(e){
        this.submitContent();
-        // const { id, content, morphNodeContent } = this.props;
-
-        // if(content){
-        //     morphNodeContent(id, content);
-        // }
     }
 
     handleOnToggleExpansionClick(){
@@ -255,7 +239,6 @@ export class Node extends Component {
 
         var showToggleExpansionIcon = childIds.length;
         var childNodeClasses = 'children';
-        
 
         return (
             <div className={bulletClasses} onKeyDown={this.handleOnKeyDown}>

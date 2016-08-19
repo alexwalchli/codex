@@ -32,13 +32,13 @@ export function getAllDescendantIds(nodes, startNodeId) {
     ), []);
 }
 
-// recursively retrieves, and flattens, all node Ids excluding children of collapsed nodes
-export function getAllUncollapsedDescedantIds(nodes, startNodeId) {
+// recursively retrieves, and flattens, all node Ids excluding children of collapsed nodes, except children of the start node
+export function getAllUncollapsedDescedantIds(rootNodeId, nodes, startNodeId) {
     return nodes[startNodeId].childIds.reduce((acc, childId) => {
-        if(nodes[nodes[childId].parentId].collapsed){
+        if(rootNodeId !== startNodeId && nodes[nodes[childId].parentId].collapsed){
             return acc;
         }
-        return [ ...acc, childId, ...getAllUncollapsedDescedantIds(nodes, childId) ];
+        return [ ...acc, childId, ...getAllUncollapsedDescedantIds(rootNodeId, nodes, childId) ];
     }, []);
 }
 

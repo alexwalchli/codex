@@ -232,7 +232,7 @@ export function deleteNode(nodeId, parentId) {
 export function toggleNodeExpansion(nodeId){
     return (dispatch, getState) => {
         const nodes = getPresentNodes(getState());
-        var allDescendentIds = getAllUncollapsedDescedantIds(nodes, nodeId);
+        var allDescendentIds = getAllUncollapsedDescedantIds(nodeId, nodes, nodeId);
         if(nodes[nodeId].collapsed){
             dispatch(nodeExpanded(nodeId, allDescendentIds));
         } else {

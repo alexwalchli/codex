@@ -2,11 +2,9 @@ import { firebaseDb } from '../firebase';
 import * as nodeActions from './node';
 import nodeFactory from '../utilities/node-factory';
 
-// command actions
-export const SUBSCRIBE_TO_USER_PAGES = 'SUBSCRIBE_TO_USER_PAGES';
-
-// event actions
-export const USER_PAGE_CREATED = 'USER_PAGE_CREATED';
+///////////////////
+// Action Creators 
+///////////////////
 
 export function subscribeToUserPages(){
     return (dispatch, getState) => {
@@ -42,6 +40,12 @@ export function initializeUserHomePage(){
             });
     };
 }
+
+///////////////////
+// Actions 
+///////////////////
+
+export const USER_PAGE_CREATED = 'USER_PAGE_CREATED';
 
 export function userPageCreated(userPage){
     return {

@@ -139,11 +139,11 @@ html,body{
     cursor: default;
 }
 
-.item.has-children.collapsed .bullet-container .outer-circle{
+.item.has-children.collapsed > .depth > .bullet-container .outer-circle{
     background-color:#2185C5 !important;
 }
 
-.item.has-children.collapsed .bullet-container .inner-circle{
+.item.has-children.collapsed > .depth > .bullet-container .inner-circle{
     background-color:#FFF !important;
     z-index:1;
 }
