@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 import { externalDataCache, selectedDataSource } from './external-data-cache';
+import { app } from './app';
 import { search } from './search';
 import { tree } from './tree';
 import { auth } from './auth';
@@ -15,6 +16,7 @@ const undoableTree = undoable(tree, {
     }
 });
 const rootReducer = combineReducers({
+    app,
     auth,
     externalDataCache,
     selectedDataSource,

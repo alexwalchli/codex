@@ -11,7 +11,7 @@ export default class Topbar extends Component {
     }
 
     render() {
-        const { signOut, auth } = this.props;
+        const { signOut, auth, togglePagesSidePanel } = this.props;
         return (
             <nav className="top-bar clearfix">
                 <div className="top-bar-left">
@@ -24,6 +24,7 @@ export default class Topbar extends Component {
                     <ul>
                         <li><a>{ auth.displayName }</a></li>
                         <li><a onClick={signOut}>Sign Out</a></li>
+                        <li><a onClick={togglePagesSidePanel} ><i className="icon dripicons-folder"></i></a></li>
                     </ul>
                 </div>
             </nav>

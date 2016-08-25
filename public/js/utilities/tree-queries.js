@@ -9,8 +9,8 @@ export function getPresentNodes(appState){
 
 // retrieves the root node ID of the current page
 export function getRootNodeId(appState){
-    // TODO: get current userPage
-    return dictionaryToArray(appState.userPages).find(up => up.isHome).rootNodeId;
+    let currentUserPageId = appState.app.currentUserPageId;
+    return dictionaryToArray(appState.userPages).find(up => up.id === currentUserPageId).rootNodeId;
 }
 
 // retrieves a node's index in the full, flattened, tree

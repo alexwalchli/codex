@@ -15,7 +15,7 @@ export class Node extends Component {
         this.handleAddChildClick = this.handleAddChildClick.bind(this);
         this.handleOnKeyDown = this.handleOnKeyDown.bind(this);
         this.handleOnClick = this.handleOnClick.bind(this);
-        this.handleOnToggleExpansionClick = this.handleOnToggleExpansionClick.bind(this);
+        this.handleBulletClick = this.handleBulletClick.bind(this);
         this.handlePaste = this.handlePaste.bind(this);
         this.handleOnMouseEnter = this.handleOnMouseEnter.bind(this);
         this.handleOnMouseLeave = this.handleOnMouseLeave.bind(this);
@@ -49,11 +49,18 @@ export class Node extends Component {
        this.submitContent();
     }
 
-    handleOnToggleExpansionClick(){
+    handleBulletClick(){
         const { id, toggleNodeExpansion, focusNode } = this.props;
         toggleNodeExpansion(id);
         focusNode(id);
     }
+
+    // TODO: This doesn't work when both click and double click are bound to the same component
+    // handleBulletDoubleClick(){
+    //     const { id, toggleNodeExpansion, focusNode } = this.props;
+    //     toggleNodeExpansion(id, true);
+    //     focusNode(id);
+    // }
 
     handleOnMouseEnter(e){
         this.selectNodeIfHoldingMouseDown(e);
@@ -245,9 +252,11 @@ export class Node extends Component {
             {typeof parentId !== 'undefined' ?
                 <div className="depth">
                 
-                <div className="bullet-container" onClick={this.handleOnToggleExpansionClick}>
-                    <div className="outer-circle"></div>
-                    <div className="inner-circle"></div>
+                <div className="bullet-container" onClick={this.handleBulletClick}>
+                    <div className="unordered-bullet">
+                        <div className="outer-circle"></div>
+                        <div className="inner-circle"></div>
+                    </div>
                 </div>
                 <div className="content" onClick={this.handleOnClick} onMouseEnter={this.handleOnMouseEnter} onMouseLeave={this.handleOnMouseLeave} onPaste={this.handlePaste}>
                     
@@ -294,29 +303,3 @@ const mapStateToProps = (state, ownProps) => {
 
 const ConnectedNode = connect(mapStateToProps, actions)(Node)
 export default ConnectedNode
-
-// {showToggleExpansionIcon ? 
-//                 <div className="toggle-expansion" onClick={this.handleOnToggleExpansionClick}>
-//                     {collapsed ?
-//                         <strong>+</strong>
-//                         :
-//                         <strong>-</strong>
-//                     }
-//                 </div>
-//                 : null }
-
-// {focused ? 
-//                         <MentionsInput
-//                             singleLine
-//                             value={content}
-//                             onChange={this.handleChange}
-//                             style={ defaultStyle({ singleLine: true }) }
-//                             placeholder={""}
-//                             focused={this.props.focused}
-//                             onSelect={this.onSelect}
-//                             onBlur={this.handleOnBlur}>
-
-//                         <Mention onAdd={this.onAdd} onRemove={this.onRemove} data={ suggestions } style={defaultMentionStyle} />
-//                         </MentionsInput>
-//                     :
-//                     this.renderNodeWidgets()}

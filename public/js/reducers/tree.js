@@ -2,7 +2,7 @@ import { NODE_CREATED, NODE_FOCUSED, INITIAL_NODE_STATE_LOADED, NODE_SHOWN, NODE
          CONTENT_UPDATED, CHILD_IDS_UPDATED, NODE_UNFOCUSED, NODES_DELETED, PARENT_UPDATED, NODE_SELECTED, NODE_DESELECTED,
          NODE_EXPANSION_TOGGLED, NODE_TRANSACTION, NODE_PARENT_UPDATED, NODE_UPDATED, NODES_SEARCHED } 
     from '../actions/node';
-import { dictionaryToArray } from '../utilities/state-queries';
+import { dictionaryToArray } from '../utilities/tree-queries';
 
 function childIds(state, action) {
     return Object.assign([], action.payload.newChildIds);

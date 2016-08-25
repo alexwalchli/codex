@@ -7,7 +7,8 @@ import { firebaseDb } from '../firebase';
 import nodeFactory from '../utilities/node-factory';
 import { dictionaryToArray, getPresentNodes, getRootNodeId, getAllDescendantIds, getSiblingNodeAbove, getNextNodeThatIsVisible, 
          getCurrentlySelectedAndFocusedNodes, getCurrentlySelectedNodeIds, getCurrentlyFocusedNodeId, getAllUncollapsedDescedantIds } 
-    from '../utilities/state-queries';
+    from '../utilities/tree-queries';
+import treeDiffer from '../utilities/tree-differ';
 
 let initialized = false;
 export const NODE_TRANSACTION = 'NODE_TRANSACTION';
@@ -229,10 +230,11 @@ export function deleteNode(nodeId, parentId) {
     };
 }
 
-export function toggleNodeExpansion(nodeId){
+export function toggleNodeExpansion(nodeId, forceToggleChildrenExpansion){
     return (dispatch, getState) => {
         const nodes = getPresentNodes(getState());
-        var allDescendentIds = getAllUncollapsedDescedantIds(nodeId, nodes, nodeId);
+        var allDescendentIds = forceToggleChildrenExpansion ? getAllDescendantIds(nodes, nodeId) 
+                                : getAllUncollapsedDescedantIds(nodeId, nodes, nodeId);
         if(nodes[nodeId].collapsed){
             dispatch(nodeExpanded(nodeId, allDescendentIds));
         } else {
@@ -262,8 +264,12 @@ export function searchNodes(query){
 }
 
 export function undo() {
-     return (dispatch) => {
+     return (dispatch, getState) => {
+         const currentTreeState = getPresentNodes(getState());
          dispatch(ActionCreators.undo());
+         const undoneTreeState = getPresentNodes(getState());
+
+         let differences = treeDiffer(currentTreeState, undoneTreeState);
      };
 }
 
