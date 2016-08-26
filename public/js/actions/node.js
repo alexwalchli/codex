@@ -149,10 +149,10 @@ export function focusNodeBelow(currentNodeId){
 
 export function demoteNode(nodeId, parentId){
     return (dispatch, getState) => {
-        const state = getState();
-        var siblingAbove = getSiblingNodeAbove(getPresentNodes(state), nodeId, parentId);
+        const appState = getState();
+        var siblingAbove = getSiblingNodeAbove(getPresentNodes(appState), nodeId, parentId);
         var addAfterLastChildOfSiblingAboveId = siblingAbove.childIds[siblingAbove.childIds.length - 1];
-        dispatch(reassignParentNode(nodeId, parentId, siblingAbove.id, addAfterLastChildOfSiblingAboveId));
+        dispatch(nodeTransaction(generateEventsForReassignParentNode(nodeId, parentId, siblingAbove.id, addAfterLastChildOfSiblingAboveId, appState)));
         dispatch(nodeFocused(nodeId));
     };
 }
@@ -162,48 +162,45 @@ export function promoteNode(nodeId, parentId){
         const appState = getState();
         const nodes = getPresentNodes(appState);
         let parentNode = nodes[parentId];
-
+        let optimisticEvents = [];
         // reassign all siblings below to the promoted node
         var siblingIds = parentNode.childIds;
         for(let i = siblingIds.indexOf(nodeId) + 1; i < siblingIds.length; i++){
             let sibling = nodes[siblingIds[i]];
-            dispatch(reassignParentNode(sibling.id, sibling.parentId, nodeId));
+            optimisticEvents.push(generateEventsForReassignParentNode(sibling.id, sibling.parentId, nodeId, appState));
         }
-
-        dispatch(reassignParentNode(nodeId, parentId, parentNode.parentId, parentId));
+        optimisticEvents = [ ...optimisticEvents, ...generateEventsForReassignParentNode(nodeId, parentId, parentNode.parentId, parentId, appState)];
+        dispatch(nodeTransaction(optimisticEvents));
         dispatch(nodeFocused(nodeId));
     };
 }
 
 // attaches a node to a new parent node and optimistically updates local app store
-function reassignParentNode(nodeId, oldParentId, newParentId, addAfterSiblingId){
-   return (dispatch, getState) => {
-        let optimisticEvents = [];
-        const appState = getState();
-        const updatedById = appState.auth.id;
-        
-        // remove child from its current parent
-        let oldParentChildIds = getPresentNodes(appState)[oldParentId].childIds;
-        let updatedChildIdsForOldParent = oldParentChildIds.filter(id => id !== nodeId);
-        optimisticEvents.push(childIdsUpdated(oldParentId, updatedChildIdsForOldParent, updatedById));
+function generateEventsForReassignParentNode(nodeId, oldParentId, newParentId, addAfterSiblingId, appState){
+    let optimisticEvents = [];
+    const updatedById = appState.auth.id;
+    
+    // remove child from its current parent
+    let oldParentChildIds = getPresentNodes(appState)[oldParentId].childIds;
+    let updatedChildIdsForOldParent = oldParentChildIds.filter(id => id !== nodeId);
+    optimisticEvents.push(childIdsUpdated(oldParentId, updatedChildIdsForOldParent, updatedById));
 
-        // update the parent Id of the child
-        optimisticEvents.push(nodeParentUpdated(nodeId, newParentId, updatedById));
+    // update the parent Id of the child
+    optimisticEvents.push(nodeParentUpdated(nodeId, newParentId, updatedById));
 
-        // add the child to its new parent
-        let newParentNode = appState.tree.present[newParentId];
-        let updatedChildIdsForNewParent = getUpdatedChildIdsForAddition(newParentNode, nodeId, addAfterSiblingId, 1);
-        optimisticEvents.push(childIdsUpdated(newParentId, updatedChildIdsForNewParent, updatedById));
+    // add the child to its new parent
+    let newParentNode = appState.tree.present[newParentId];
+    let updatedChildIdsForNewParent = getUpdatedChildIdsForAddition(newParentNode, nodeId, addAfterSiblingId, 1);
+    optimisticEvents.push(childIdsUpdated(newParentId, updatedChildIdsForNewParent, updatedById));
 
-        const nodeParentIdRef = firebaseDb.ref('nodes/' + nodeId);
-        const nodeChildIdsRef = firebaseDb.ref('nodes/' + oldParentId);
-        const parentNodeRef = firebaseDb.ref('nodes/' + newParentId);
-        nodeChildIdsRef.update({ childIds: updatedChildIdsForOldParent, lastUpdatedById: updatedById });
-        parentNodeRef.update({ childIds: updatedChildIdsForNewParent, lastUpdatedById: updatedById });
-        nodeParentIdRef.update({ parentId: newParentId, lastUpdatedById: updatedById });
+    const nodeParentIdRef = firebaseDb.ref('nodes/' + nodeId);
+    const nodeChildIdsRef = firebaseDb.ref('nodes/' + oldParentId);
+    const parentNodeRef = firebaseDb.ref('nodes/' + newParentId);
+    nodeChildIdsRef.update({ childIds: updatedChildIdsForOldParent, lastUpdatedById: updatedById });
+    parentNodeRef.update({ childIds: updatedChildIdsForNewParent, lastUpdatedById: updatedById });
+    nodeParentIdRef.update({ parentId: newParentId, lastUpdatedById: updatedById });
 
-        dispatch(nodeTransaction(optimisticEvents));
-   }; 
+    return optimisticEvents;
 }
 
 export function removeChild(nodeId, childId) {
@@ -268,14 +265,20 @@ export function undo() {
          const currentTreeState = getPresentNodes(getState());
          dispatch(ActionCreators.undo());
          const undoneTreeState = getPresentNodes(getState());
-
          let differences = treeDiffer(currentTreeState, undoneTreeState);
+
+         // TODO: Sync FirebaseDb
      };
 }
 
 export function redo() {
      return (dispatch) => {
+         const currentTreeState = getPresentNodes(getState());
          dispatch(ActionCreators.redo());
+         const redoneTreeState = getPresentNodes(getState());
+         let differences = treeDiffer(currentTreeState, redoneTreeState);
+         
+         // TODO: Sync FirebaseDb
      };
 }
 
@@ -410,6 +413,7 @@ export function nodeCollapsed(nodeId, allDescendentIds){
 export function nodeFocused(nodeId){
     return {
         type: NODE_FOCUSED,
+        undoable: false,
         nodeId
     };
 }
@@ -417,6 +421,7 @@ export function nodeFocused(nodeId){
 export function nodeUnfocused(nodeId){
     return {
         type: NODE_UNFOCUSED,
+        undoable: false,
         nodeId
     };
 }
@@ -424,6 +429,7 @@ export function nodeUnfocused(nodeId){
 export function nodeDeselected(nodeId){
     return {
         type: NODE_DESELECTED,
+        undoable: false,
         nodeId
     };
 }
@@ -431,6 +437,7 @@ export function nodeDeselected(nodeId){
 export function nodeSelected(nodeId){
     return {
         type: NODE_SELECTED,
+        undoable: false,
         nodeId
     };
 }
