@@ -103,24 +103,46 @@ html,body{
      height: 0;
 }
 
-/* depth 1 nodes */
-.item {
+/* root node */
+#tree-container > .item{
     width:100%;
-}
-
-.item.selected{
-    background-color:#E2E2E8;
-}
-
-.item.hidden{
-    display:none;
-}
-
-.item .children{
     padding-left:68px;
 }
 
-.item .children:after{
+/* common node css */
+.item{
+    width:100%;
+    position:relative;
+}
+
+.children-outline{
+    background-color:#d3eaf8;
+    position:absolute;
+    width:1px;
+}
+
+/* depth 1 nodes */
+.children .item.selected{
+    background-color:#E2E2E8;
+}
+
+.children .item.hidden{
+    display:none;
+}
+
+.children .children-outline{
+    top:68px;
+    bottom:0px;
+    margin-bottom:-5px;
+    margin-left:12px;
+}
+
+.children .item .children{
+    margin-left:10px;
+    padding-left:58px;
+}
+
+.children .item .children:after{
     visibility: hidden;
     display: block;
     font-size: 0;
@@ -129,43 +151,43 @@ html,body{
     height: 0;
 }
 
-.item .bullet-container{
+.children .item .bullet-container{
     position: absolute;
     height:60px;
     width:22px;
 }
 
-.item.has-children .bullet-container {
+.children .item.has-children .bullet-container {
     cursor:pointer;
 }
 
-.item.no-children .bullet-container {
+.children .item.no-children .bullet-container {
     cursor: default;
 }
 
-.item.has-children.collapsed > .depth > .bullet-container .outer-circle{
+.children .item.has-children.collapsed > .depth > .bullet-container .outer-circle{
     background-color:#2185C5 !important;
 }
 
-.item.has-children.collapsed > .depth > .bullet-container .inner-circle{
+.children .item.has-children.collapsed > .depth > .bullet-container .inner-circle{
     background-color:#FFF !important;
     z-index:1;
 }
 
-.item.has-children .bullet-container .outer-circle{
+.children .item.has-children .bullet-container .outer-circle{
     display:block;
 }
 
-.item.no-children .bullet-container .outer-circle{
+.children .item.no-children .bullet-container .outer-circle{
     display:none;
 }
 
-.item.no-children .bullet-container .inner-circle{
+.children .item.no-children .bullet-container .inner-circle{
     width: 12px;
     height: 12px;
 }
 
-.item .bullet-container .inner-circle{
+.children .item .bullet-container .inner-circle{
     border-radius: 50%;
     width: 10px;
     height: 10px;
@@ -175,7 +197,7 @@ html,body{
     left:7px;
 }
 
-.item .bullet-container .outer-circle{
+.children .item .bullet-container .outer-circle{
     border-radius: 50%;
     width: 22px;
     height: 22px;
@@ -184,13 +206,13 @@ html,body{
     top:22px;
 }
 
-.item .content{
+.children .item .content{
     height:60px;
     width:100%;
     margin-left:40px;
 }
 
-.item .content input, .item .content .view-mode-content{
+.children .item .content input, .item .content .view-mode-content{
     line-height: 60px;
     font-size:28px;
     color:#2185C5;
@@ -202,12 +224,20 @@ html,body{
 
 /* depth 2 nodes */
 .children .children {
-    padding-left:68px;
+    margin-left:10px;
+    padding-left:58px;
 }
 
 .children .children .content {
     height:36px;
     margin-left:34px;
+}
+
+.children .children .children-outline{
+    top:46px;
+    bottom:0px;
+    margin-bottom:0px;
+    margin-left:9px;
 }
 
 .children .children .content input, .children .children .content .view-mode-content {
@@ -249,12 +279,20 @@ html,body{
 
 /* depth 3 nodes and beyond */
 .children .children .children {
-    padding-left:68px;
+    margin-left:10px;
+    padding-left:58px;
 }
 
 .children .children .children .content {
     height:36px;
     margin-left:30px;
+}
+
+.children .children .children .children-outline{
+    top:40px;
+    bottom:0px;
+    margin-bottom:0px;
+    margin-left:7px;
 }
 
 .children .children .children .content input, .children .children .children .content .view-mode-content {
