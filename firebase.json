@@ -1,4 +1,5 @@
 {
+  "firebase": "codex",
   "database": {
     "rules": "database.rules.json"
   },

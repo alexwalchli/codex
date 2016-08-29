@@ -1,0 +1,92 @@
+.pages-side-panel{
+    position:fixed;
+    right:0;
+    height:100%;
+    width:300px;
+    background-color:transparent;
+    z-index:1;
+}
+
+.pages-side-panel .pages .page {
+    width: 100%;
+    height:100px;
+    background-color:#d4eaf7;
+    border-left:1px solid #bee0f3;
+    border-bottom:1px solid #bee0f3;
+    cursor:pointer;
+    position:relative;
+}
+
+.pages-side-panel .pages .page:hover{
+    background-color:#e9f5fb;
+}
+
+.pages-side-panel .pages .page:first-child {
+    border-top:1px solid #bee0f3;
+}
+
+.pages-side-panel .pages .page:last-child {
+    background-color:#e9f5fb;
+}
+
+.pages-side-panel .pages .page:last-child {
+    background-color:#e9f5fb;
+}
+
+.pages-side-panel .pages .page:last-child:hover{
+    background-color:#fff;
+}
+
+.pages-side-panel .pages .page .title {
+    width:100%;
+    text-align:center;
+    line-height:100px;
+    font-size:1.8em;
+    color:#2185C5;
+}
+
+.pages-side-panel .pages .page input.title {
+    background-color: #fff;
+    padding:0;
+    border:0;
+    outline:none;
+    font-family: 'Lato', sans-serif;
+}
+
+.pages-side-panel .pages .page .button {
+    position:absolute;
+    z-index: 1;
+    color:#2185C5;
+    font-size:1.2em;
+    display:none;
+}
+
+.pages-side-panel .pages .page:hover .button {
+    position:absolute;
+    z-index: 1;
+    color:#2185C5;
+    font-size:1.2em;
+    display:block;
+}
+
+.pages-side-panel .pages .page .button:hover {
+    color:#51aae1;
+}
+
+.pages-side-panel .pages .page .delete {
+    position:absolute;
+    right:10px;
+    bottom:10px;
+}
+
+.pages-side-panel .pages .page .share {
+    position:absolute;
+    right:10px;
+    top:42px;
+}
+
+.pages-side-panel .pages .page .edit-name {
+    position:absolute;
+    right:10px;
+    top:10px;
+}

@@ -7,6 +7,8 @@ import App from './components/app';
 import userPageActions from './actions/user-pages';
 import { subscribeToAuthStateChanged } from './actions/auth';
 
+let stylesheet = require('../css/app.less');
+
 const store = configureStore({
     tree: {},
     auth: {},
