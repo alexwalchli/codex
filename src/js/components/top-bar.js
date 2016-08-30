@@ -21,10 +21,10 @@ export default class Topbar extends Component {
                     </ul>
                 </div>
                 <div className="top-bar-right">
-                    <ul>
+                    <ul className="menu">
                         <li><a>{ auth.displayName }</a></li>
                         <li><a onClick={signOut}>Sign Out</a></li>
-                        <li><a onClick={togglePagesSidePanel} ><i className="icon dripicons-folder"></i></a></li>
+                        <li><a onClick={togglePagesSidePanel} ><i className="icon dripicons-menu"></i></a></li>
                     </ul>
                 </div>
             </nav>
