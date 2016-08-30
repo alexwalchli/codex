@@ -16,7 +16,11 @@ export class SearchInput extends Component {
 
     render() {
         return (
-            <input className="search" ref="searchInput" onChange={this.handleInputChange} />
+            <div className="search">
+                <div className="icon dripicons-search"></div>
+                <div className="icon dripicons-tags"></div>
+                <input ref="searchInput" onChange={this.handleInputChange} />
+            </div>
         )
     }
 }
