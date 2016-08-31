@@ -11,7 +11,7 @@
 }
 
 .children-outline{
-    background-color:#d3eaf8;
+    background-color:@children-outline-color;
     position:absolute;
     width:1px;
 }
@@ -61,11 +61,11 @@
 }
 
 .children .item.has-children.collapsed > .depth > .bullet-container .outer-circle{
-    background-color:@base-color !important;
+    background-color:@bullet-color !important;
 }
 
 .children .item.has-children.collapsed > .depth > .bullet-container .inner-circle{
-    background-color:#FFF !important;
+    background-color:@background-color !important;
     z-index:1;
 }
 
@@ -86,7 +86,7 @@
     border-radius: 50%;
     width: 10px;
     height: 10px;
-    background-color:@base-color;
+    background-color:@bullet-color;
     position:absolute;
     top:29px;
     left:7px;
@@ -96,7 +96,7 @@
     border-radius: 50%;
     width: 22px;
     height: 22px;
-    border:1px solid @base-color;
+    border:1px solid @bullet-color;
     position: absolute;
     top:22px;
 }
@@ -109,8 +109,9 @@
 
 .children .item .content input, .item .content .view-mode-content{
     line-height: 60px;
-    font-size:28px;
-    color:@base-color;
+    // font-size:28px;
+    font-size:24px;
+    color:@tree-depth-1-font-color;
     font-family: 'Lato', sans-serif;
     padding:0;
     border:none;
@@ -136,7 +137,8 @@
 }
 
 .children .children .content input, .children .children .content .view-mode-content {
-    font-size:22px;
+    // font-size:22px;
+    font-size:20px;
     line-height:36px;
     color:@secondary-color;
 }
@@ -156,7 +158,7 @@
     border-radius: 50%;
     width: 8px;
     height: 8px;
-    background-color:@base-color;
+    background-color:@bullet-color;
     position:absolute;
     top:17px;
     left:6px;
@@ -166,7 +168,7 @@
     border-radius: 50%;
     width: 18px;
     height: 18px;
-    border:1px solid @base-color;
+    border:1px solid @bullet-color;
     position: absolute;
     top:11px;
 }
@@ -211,7 +213,7 @@
     border-radius: 50%;
     width: 6px;
     height: 6px;
-    background-color:@base-color;
+    background-color:@bullet-color;
     position:absolute;
     top:16px;
     left:5px;

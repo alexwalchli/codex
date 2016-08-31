@@ -19,7 +19,7 @@ export function createNewUserPage(title){
         
         createNewPageUpdates['nodes/' + rootNodeId] = nodeFactory(rootNodeId, null, [firstNodeId], '', state.auth.id);
         createNewPageUpdates['nodes/' + firstNodeId] = nodeFactory(firstNodeId, rootNodeId, [], 'Your first node', state.auth.id);
-        createNewPageUpdates['userPages/' + newUserPageId] = { id: newUserPageId, isHome: false, title: 'New Page', rootNodeId: rootNodeId };
+        createNewPageUpdates['userPages/' + newUserPageId] = { id: newUserPageId, userId: state.auth.id, isHome: false, title: 'New Page', rootNodeId: rootNodeId };
 
         firebaseDb.ref().update(createNewPageUpdates)
             .then(snapshot => {
@@ -55,7 +55,7 @@ export function initializeUserHomePage(){
         const homeUserPageId = firebaseDb.ref('userPages').push().key;
         initialAppStateUpdates['nodes/' + rootNodeId] = nodeFactory(rootNodeId, null, [firstNodeId], '', state.auth.id);
         initialAppStateUpdates['nodes/' + firstNodeId] = nodeFactory(firstNodeId, rootNodeId, [], 'Your first node', state.auth.id);
-        initialAppStateUpdates['userPages/' + homeUserPageId] = { id: homeUserPageId, isHome: true, title: 'Home', rootNodeId: rootNodeId};
+        initialAppStateUpdates['userPages/' + homeUserPageId] = { id: homeUserPageId, userId: state.auth.id, isHome: true, title: 'Home', rootNodeId: rootNodeId};
 
         firebaseDb.ref().update(initialAppStateUpdates)
             .then(snapshot => {
