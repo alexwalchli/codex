@@ -9,7 +9,7 @@ export default class AppLoader extends Component {
     render() {
         return (
         <div className="app-loader">
-            Loading...
+            <div className="spinner-container"><i className="icon dripicons-loading spinner"></i></div>&nbsp;&nbsp;Loading...
         </div>
     );
     }

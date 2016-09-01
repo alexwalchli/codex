@@ -1,6 +1,12 @@
 {
-  "rules": {
-    ".read": "auth != null",
-    ".write": "auth != null"
-  }
+    "rules": {
+        "userPages": {
+            "$userPage": {
+                // only allow read on userPages created by a user
+                ".read": "data.child('createdById').val() === auth.uid",
+                // only allow a user to update a page created by them or create a new one
+                ".write": "!data.exists() || data.child('createdById').val() === auth.uid"
+            }
+        }
+    }
 }
