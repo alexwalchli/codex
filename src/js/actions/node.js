@@ -20,45 +20,47 @@ export const NODE_TRANSACTION = 'NODE_TRANSACTION';
 
 export function subscribeToNodes(userPageId){
     return (dispatch, getState) => {
-        // TODO: limit to userPage's allDescendentNodeIds array...
 
-        // do an initial load of the user's nodes and then subscribe to changes to each node
-        const nodeRef = firebaseDb.ref('nodes');
-        nodeRef.once('value').then(snapshot => {
+        // do an initial load of the user's nodes based on the current user page's descendantIds
+        // and then subscribe to changes on each node
+        let appState = getState();
+        let currentUserPage =  appState.userPages[getState().app.currentUserPageId];
+        currentUserPage.allDescendentIds.forEach(descendantId => {
+            firebaseDb.once('nodes/' + descendantId).then(snapshot => {
 
-            // load the nodes into state
-            dispatch({
-                type: INITIAL_NODE_STATE_LOADED,
-                payload: unwrapNodesSnapshot(snapshot)
+                // load the nodes into state
+                dispatch({
+                    type: INITIAL_NODE_STATE_LOADED,
+                    payload: unwrapNodesSnapshot(snapshot)
+                });
+                
+                nodeRef.on('child_added', snapshot => {
+                    let nodeDoesNotExistsInAppState = !getPresentNodes(getState())[snapshot.key];
+                    if(initialized && nodeDoesNotExistsInAppState){
+                        dispatch(nodeCreated(unwrapNodeSnapshot(snapshot)));
+                    }
+                });
+
+                nodeRef.on('child_changed', snapshot => {
+                    let appState = getState();
+                    let nodeWasNotChangedByCurrentUser = getPresentNodes(appState)[snapshot.key].lastUpdatedById !== appState.auth.id;
+                    if(initialized && nodeWasNotChangedByCurrentUser){
+                        dispatch(nodeUpdated(unwrapNodeSnapshot(snapshot)));
+                    }
+                });
+
+                nodeRef.on('child_removed', snapshot => {
+                    let nodeExistsInAppState = getPresentNodes(getState())[snapshot.key];
+                    if(initialized && nodeExistsInAppState){
+                        dispatch(nodesDeleted([snapshot.key]));
+                    }
+                });
+
+                setTimeout(() => {
+                    initialized = true;
+                }, 0);
             });
-            
-            nodeRef.on('child_added', snapshot => {
-                let nodeDoesNotExistsInAppState = !getPresentNodes(getState())[snapshot.key];
-                if(initialized && nodeDoesNotExistsInAppState){
-                    dispatch(nodeCreated(unwrapNodeSnapshot(snapshot)));
-                }
-            });
-
-            nodeRef.on('child_changed', snapshot => {
-                let appState = getState();
-                let nodeWasNotChangedByCurrentUser = getPresentNodes(appState)[snapshot.key].lastUpdatedById !== appState.auth.id;
-                if(initialized && nodeWasNotChangedByCurrentUser){
-                    dispatch(nodeUpdated(unwrapNodeSnapshot(snapshot)));
-                }
-            });
-
-            nodeRef.on('child_removed', snapshot => {
-                let nodeExistsInAppState = getPresentNodes(getState())[snapshot.key];
-                if(initialized && nodeExistsInAppState){
-                    dispatch(nodesDeleted([snapshot.key]));
-                }
-            });
-
-            setTimeout(() => {
-                initialized = true;
-            }, 0);
         });
-
     };
 }
 

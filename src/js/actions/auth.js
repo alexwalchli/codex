@@ -19,10 +19,10 @@ export function subscribeToAuthStateChanged(dispatch) {
     return new Promise((resolve, reject) => {
         firebaseAuth.onAuthStateChanged(
             user => {
+                dispatch(updateAuthState(user));
                 if(user){
                     dispatch(subscribeToUserPages());
                 }
-                dispatch(updateAuthState(user));
             },
             error => reject(error)
         );
