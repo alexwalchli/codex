@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import * as actions from '../actions';
 import { dictionaryToArray } from '../utilities/tree-queries';
 
-export default class PagesSidePanel extends Component {
+export class PagesSidePanel extends Component {
     constructor(props) {
         super(props);
 

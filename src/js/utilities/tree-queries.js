@@ -1,4 +1,7 @@
 export function dictionaryToArray(dictionary){
+    if(!dictionary){
+        return null;
+    }
     return Object.keys(dictionary).map(key => dictionary[key]);
 }
 

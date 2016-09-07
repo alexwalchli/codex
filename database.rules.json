@@ -1,25 +1,16 @@
 {
     "rules": {
 
-        // codex/nodes/$nodeId
-        // A flattened list of all nodes in the application across all users
         "nodes": {
           	"$nodeId" : {
-                // Do not allow updates or deletes to createdById. It is used to determine which user
-                // can share this node via nodeUsers
-                ".validate" : "(data.val() != null && newData.child('createdById').val() === data.child('createdById').val())",
-                    
-                // 1.) Give access to read if a nodeUsers/$nodeId/$userId record exists
-                ".read": "(auth != null) && root.child('nodeUsers/' + $nodeId + '/' + auth.uid).exists()",
+              // 1.) Give access to read if a nodeUsers/$nodeId/$userId record exists
+              ".read": "(auth != null) && root.child('node_users/' + $nodeId + '/' + auth.uid).exists()",
 
-                // 1.) Give access to create if no node presently exists with the nodeId
-                // 2.) Give access to update/delete if a nodeUsers/$nodeId/$userId record exists
-                ".write": "(auth != null) && (root.child('nodeUsers/' + $nodeId+ '/' + auth.uid).exists() || data.val() === null)"
+              // 1.) Give access to create if no node presently exists with the nodeId
+              // 2.) Give access to update/delete if a nodeUsers/$nodeId/$userId record exists
+              ".write": "(auth != null) && (data.val() === null || root.child('node_users/' + $nodeId+ '/' + auth.uid).exists())"
             }
         },
-
-        // codex/userPages/$userId
-        // List of pages for each user and a corresponding rootNodeId to start the tree from
         "userPages": {
             "$uid": {
                 // Only give access to userPages/$userId for the logged in user
@@ -27,19 +18,24 @@
                 ".write": "$uid === auth.uid"
             }
         },
-
-        // codex/nodeUsers/$nodeId/$userId
-        // List of nodes and users that have access to each
-        "nodeUsers": {
+        "node_users": {
             "$nodeId": {
-                // 1.) If a user created a node, give them access to add/remove nodeUsers/$nodeId/$userId
+                // 1.) Must be authorized
+                // 2.) If a user created a node, give them access to add/remove nodeUsers/$nodeId/$userId
                 //     (for when nodes are created, or for sharing or revoking nodes from another User)
-                // 2.) If a user has a nodeUsers/$nodeId/$userId, give them access to delete(but not create or update)
+                // 3.) If a user has a nodeUsers/$nodeId/$userId, give them access to delete(but not create or update) nodeUsers/$nodeId 
                 //     (for when a node is deleted so there are no orphaned nodeUsers from nodes,
-                //      we also don't want a user who didn't create a node to be able to give node access to other users)
+                //      but we also don't want non-creators to be able to give node access to other users)
                 ".write": "(auth != null) && (root.child('nodes/' + $nodeId + '/createdById').val() === auth.uid || (newData.val() === null && root.child('nodeUsers/' + $nodeId + '/' + auth.uid).exists()))"
             }
+        },
+        "node_userPages_users": {
+        	".read": "(auth != null)",
+            ".write": "(auth != null)"
+        },
+        "userPage_users_nodes": {
+            ".read": "(auth != null)",
+            ".write": "(auth != null)"
         }
-
     }
 }

@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import * as actions from '../actions';
 import SearchInput from '../containers/search-input';
 
-export default class Topbar extends Component {
+export class Topbar extends Component {
     constructor(props) {
         super(props);
         

@@ -22,10 +22,6 @@ export class App extends Component {
         let showSignIn = !userIsAuthenticated && this.props.auth.initialCheck;
         let showLoading = userIsAuthenticated && !appIsInitialized;
 
-        console.log('userIsAuthenticated ' + userIsAuthenticated);
-        console.log('appIsInitialized ' + appIsInitialized);
-        console.log('initialCheck ' + this.props.initialCheck);
-
         return (
             <div id="app">
                 { showSignIn ? 

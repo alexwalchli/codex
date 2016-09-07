@@ -4,6 +4,7 @@ import { navigateToUserPage } from './app';
 import nodeFactory from '../utilities/node-factory';
 import userPageFactory from '../utilities/user-page-factory';
 import { dictionaryToArray } from '../utilities/tree-queries';
+import * as dbRepository from '../repositories/database-repository';
 
 ///////////////////
 // Action Creators 
@@ -12,17 +13,17 @@ import { dictionaryToArray } from '../utilities/tree-queries';
 export function createNewUserPage(title){
     return (dispatch, getState) => {
         // create new root node
-        let createNewPageUpdates = {};
-        const state = getState();
-        const rootNodeId = firebaseDb.ref('nodes').push().key;
-        const firstNodeId = firebaseDb.ref('nodes').push().key;
-        const newUserPageId = firebaseDb.ref('userPages').push().key;
-        
-        createNewPageUpdates['nodes/' + rootNodeId] = nodeFactory(rootNodeId, null, [firstNodeId], '', state.auth.id);
-        createNewPageUpdates['nodes/' + firstNodeId] = nodeFactory(firstNodeId, rootNodeId, [], 'Your first node', state.auth.id);
-        createNewPageUpdates['userPages/' + state.auth.id + '/' + newUserPageId] = userPageFactory(newUserPageId, rootNodeId, state.auth.id, [rootNodeId, firstNodeId]);
+        let createNewPageUpdates = {},
+            appState = getState(),
+            rootNodeId = firebaseDb.ref('nodes').push().key,
+            firstNodeId = firebaseDb.ref('nodes').push().key,
+            newUserPageId = firebaseDb.ref('userPages').push().key;
 
-        firebaseDb.ref().update(createNewPageUpdates)
+        let newRootNode = nodeFactory(rootNodeId, null, [firstNodeId], '', appState.auth.id);
+        let newFirstNode = nodeFactory(firstNodeId, rootNodeId, [], 'Your first node', appState.auth.id);
+        let newUserPage = userPageFactory(newUserPageId, rootNodeId, appState.auth.id, [rootNodeId, firstNodeId]);
+
+        dbRepository.createUserPage(newUserPage, newRootNode, newFirstNode)
             .then(snapshot => {
                 dispatch(navigateToUserPage(newUserPageId));
             });
@@ -32,40 +33,45 @@ export function createNewUserPage(title){
 export function subscribeToUserPages(){
     return (dispatch, getState) => {
         let appState = getState();
-        console.debug(appState.auth.id);
-        firebaseDb.ref('userPages/' + appState.auth.id).once('value').then(function(snapshot) {
+        firebaseDb.ref('userPages/' + appState.auth.id).once('value').then(snapshot => {
 
-        console.debug('debug subscribe to user pages');
-            var userPages = snapshot.val();
+            var userPages = dictionaryToArray(snapshot.val());
             if(!userPages || userPages.length === 0){
                 dispatch(initializeUserHomePage());
             } else {
+                userPages.forEach(userPage => {
+                    dispatch(userPageCreated(userPage));
+                });
+                
+                dispatch(navigateToUserPage(userPages.find(u => u.isHome).id));
                 dispatch(nodeActions.subscribeToNodes());
-                dispatch(navigateToUserPage(dictionaryToArray(userPages).find(u => u.isHome).id));
             }
 
-            firebaseDb.ref('userPages/' + appState.auth.id).on('child_added', function(snapshot) {
+            firebaseDb.ref('userPages/' + appState.auth.id).on('child_added', snapshot => {
                 dispatch(userPageCreated(snapshot.val()));
             });
+
         });
     };
 }
 
 export function initializeUserHomePage(){
     return (dispatch, getState) => {
-        var initialAppStateUpdates = {};
-        const appState = getState();
-        const rootNodeId = firebaseDb.ref('nodes').push().key;
-        const firstNodeId = firebaseDb.ref('nodes').push().key;
-        const homeUserPageId = firebaseDb.ref('userPages').push().key;
-        initialAppStateUpdates['nodes/' + rootNodeId] = nodeFactory(rootNodeId, null, [firstNodeId], '', appState.auth.id);
-        initialAppStateUpdates['nodes/' + firstNodeId] = nodeFactory(firstNodeId, rootNodeId, [], 'Your first node', appState.auth.id);
-        initialAppStateUpdates['userPages/' + appState.auth.id + '/' + homeUserPageId] = userPageFactory(homeUserPageId, rootNodeId, appState.auth.id, [rootNodeId, firstNodeId], 'Home', true);
-        firebaseDb.ref().update(initialAppStateUpdates)
+        let initialAppStateUpdates = {},
+            appState = getState(),
+            rootNodeId = firebaseDb.ref('nodes').push().key,
+            firstNodeId = firebaseDb.ref('nodes').push().key,
+            homeUserPageId = firebaseDb.ref('userPages').push().key;
+
+        let newRootNode = nodeFactory(rootNodeId, null, [firstNodeId], '', appState.auth.id);
+        let newFirstNode = nodeFactory(firstNodeId, rootNodeId, [], 'Your first node', appState.auth.id);
+        let newUserPage = userPageFactory(homeUserPageId, rootNodeId, appState.auth.id, [rootNodeId, firstNodeId], 'Home', true);
+
+        dbRepository.createUserPage(newUserPage, newRootNode, newFirstNode)
             .then(snapshot => {
                 dispatch(navigateToUserPage(homeUserPageId));
                 dispatch(nodeActions.subscribeToNodes());
-            });
+            }); 
     };
 }
 
@@ -73,7 +79,11 @@ export function deleteUserPage(userPageId){
     return (dispatch, getState) => {
         if(confirm('Are you sure?')){
             const appState = getState();
-            firebaseDb.ref('userPages/' + appState.auth.id + '/' + userPageId).remove();
+            let userPage = appState.userPages[userPageId],
+                rootNode = appState.nodes[userPage.rootNodeId],
+                auth = appState.auth;
+
+            dbRepository.deleteUserPage(userPage, rootNode, auth);
             dispatch(navigateToUserPage(dictionaryToArray(appState.userPages).find(u => u.isHome).id));
             dispatch(userPageDeleted(userPageId));
         }
@@ -83,8 +93,7 @@ export function deleteUserPage(userPageId){
 export function updateUserPageName(userPageId, newUserPageName){
     return (dispatch, getState) => {
         const appState = getState();
-        firebaseDb.ref('userPages/' + appState.auth.id + '/' + userPageId).update({ title: newUserPageName });
-        dispatch(userPageNameUpdated(userPageId, newUserPageName));
+        dispatch(userPageNameUpdated(appState.userPages[userPageId], newUserPageName));
     };
 }
 

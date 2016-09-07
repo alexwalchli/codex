@@ -3,13 +3,14 @@ var webpack = require('webpack');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
-  devtool: 'cheap-module-eval-source-map',
+  debug: true,
+  devtool: '#source-map',
   entry: [
     'webpack-hot-middleware/client',
     './src/js/index'
   ],
   output: {
-    path: path.join(__dirname, 'build'),
+    path: path.join(__dirname, '/build'),
     filename: 'bundle.js',
     publicPath: '/'
   },
@@ -32,7 +33,10 @@ module.exports = {
           exclude: /node_modules/,
           loader: 'style!css!less'
       },
-      { test: /\.eot|\.ttf|\.svg|\.woff2?/, loader: 'file?name=[name].[ext]' }
+      { 
+        test: /\.eot|\.ttf|\.svg|\.woff2?/, 
+        exclude: /node_modules/,
+        loader: 'file?name=[name].[ext]' }
     ]
   }
 };

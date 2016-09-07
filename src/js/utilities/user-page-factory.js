@@ -5,6 +5,6 @@ export default function createUserPage(id, rootNodeId, createdById, allDescendan
         createdById,
         allDescendantIds,
         title: title,
-        isHome: false
+        isHome
     };
 }
