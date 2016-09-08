@@ -41,6 +41,9 @@ export function deleteNode(node, updatedParentChildIds, userId){
     dbUpdates['nodes/' + node.id + '/lastUpdatedById/'] = userId;
     dbUpdates['nodes/' + node.parentId + '/childIds/'] = updatedParentChildIds;
     dbUpdates['nodes/' + node.parentId + '/lastUpdatedById/'] = userId;
+
+    // TODO: decide if we should delete many to many indices
+
     //dbUpdates['node_users/' + node.id] = null;
 
     // allDescendantIds.forEach(descedantId => {
@@ -75,6 +78,20 @@ export function createUserPage(userPage, rootNode, firstNode){
 
             return firebaseDb.ref().update(manyToManyConnectionDbUpdates);
         });
+}
+
+export function reassignParentNode(nodeId, oldParentId, newParentId, updatedChildIdsForOldParent, updatedChildIdsForNewParent, userId){
+    let dbUpdates = {};
+    dbUpdates['nodes/' + nodeId + '/parentId'] = newParentId;
+    dbUpdates['nodes/' + nodeId + '/lastUpdatedById'] = userId;
+
+    dbUpdates['nodes/' + oldParentId + '/childIds'] = updatedChildIdsForOldParent;
+    dbUpdates['nodes/' + oldParentId + '/lastUpdatedById'] = userId;
+
+    dbUpdates['nodes/' + newParentId + '/childIds'] = updatedChildIdsForNewParent;
+    dbUpdates['nodes/' + newParentId + '/lastUpdatedById'] = userId;
+
+    return firebaseDb.ref().update(dbUpdates);
 }
 
 export function updateUserPageName(userPage, newUserPageName){

@@ -218,12 +218,7 @@ function generateEventsForReassignParentNode(nodeId, oldParentId, newParentId, a
     let updatedChildIdsForNewParent = getUpdatedChildIdsForAddition(newParentNode, nodeId, addAfterSiblingId, 1);
     optimisticEvents.push(childIdsUpdated(newParentId, updatedChildIdsForNewParent, updatedById));
 
-    const nodeParentIdRef = firebaseDb.ref('nodes/' + nodeId);
-    const nodeChildIdsRef = firebaseDb.ref('nodes/' + oldParentId);
-    const parentNodeRef = firebaseDb.ref('nodes/' + newParentId);
-    nodeChildIdsRef.update({ childIds: updatedChildIdsForOldParent, lastUpdatedById: updatedById });
-    parentNodeRef.update({ childIds: updatedChildIdsForNewParent, lastUpdatedById: updatedById });
-    nodeParentIdRef.update({ parentId: newParentId, lastUpdatedById: updatedById });
+    dbRepository.reassignParentNode(nodeId, oldParentId, newParentId, updatedChildIdsForOldParent, updatedChildIdsForNewParent, appState.auth.id);
 
     return optimisticEvents;
 }
