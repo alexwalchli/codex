@@ -35,12 +35,17 @@ export function updateNodeContent(nodeId, newContent, userId){
     return firebaseDb.ref().update(dbUpdates);
 }
 
-export function deleteNode(node, updatedParentChildIds, userId){
+export function deleteNode(node, updatedParentChildIds, allDescendantIdsOfNode, userId){
     let dbUpdates = {};
     dbUpdates['nodes/' + node.id + '/deleted'] = true;
     dbUpdates['nodes/' + node.id + '/lastUpdatedById/'] = userId;
     dbUpdates['nodes/' + node.parentId + '/childIds/'] = updatedParentChildIds;
     dbUpdates['nodes/' + node.parentId + '/lastUpdatedById/'] = userId;
+
+    allDescendantIdsOfNode.forEach(descedantId => {
+        dbUpdates['nodes/' + descedantId + '/deleted'] = true;
+        dbUpdates['nodes/' + descedantId + '/lastUpdatedById/'] = userId;
+    });
 
     // TODO: decide if we should delete many to many indices
 
@@ -81,6 +86,9 @@ export function createUserPage(userPage, rootNode, firstNode){
 }
 
 export function reassignParentNode(nodeId, oldParentId, newParentId, updatedChildIdsForOldParent, updatedChildIdsForNewParent, userId){
+    // NOTE: This is assuming that specific nodes within a userPage are not shared. If that happens this will need to account for other users having access
+    // to the new parent or not and updating the other many to many indices if necessary.
+
     let dbUpdates = {};
     dbUpdates['nodes/' + nodeId + '/parentId'] = newParentId;
     dbUpdates['nodes/' + nodeId + '/lastUpdatedById'] = userId;

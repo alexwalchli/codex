@@ -1,3 +1,4 @@
+import * as nodeActions from './node';
 
 ///////////////////
 // Action Creators 
@@ -8,11 +9,18 @@ export function togglePagesSidePanel(){
     };
 }
 
+export function navigateToUserPage(userPageId){
+    return (dispatch, getState) => {
+        dispatch(navigatedToUserPage(userPageId));
+        dispatch(nodeActions.subscribeToNodes());
+    };
+}
+
 ///////////////////
 // Actions 
 ///////////////////
 export const SIDE_PANEL_TOGGLED = 'SIDE_PANEL_TOGGLED';
-export const NAVIGATE_TO_USER_PAGE = 'NAVIGATE_TO_USER_PAGE';
+export const NAVIGATED_TO_USER_PAGE = 'NAVIGATED_TO_USER_PAGE';
 
 export function sidePanelToggled(){
     return {
@@ -20,9 +28,9 @@ export function sidePanelToggled(){
     };
 }
 
-export function navigateToUserPage(userPageId){
+export function navigatedToUserPage(userPageId){
     return {
-        type: NAVIGATE_TO_USER_PAGE,
+        type: NAVIGATED_TO_USER_PAGE,
         payload: {
             userPageId
         }

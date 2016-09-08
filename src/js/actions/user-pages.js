@@ -21,7 +21,7 @@ export function createNewUserPage(title){
 
         let newRootNode = nodeFactory(rootNodeId, null, [firstNodeId], '', appState.auth.id);
         let newFirstNode = nodeFactory(firstNodeId, rootNodeId, [], 'Your first node', appState.auth.id);
-        let newUserPage = userPageFactory(newUserPageId, rootNodeId, appState.auth.id, [rootNodeId, firstNodeId]);
+        let newUserPage = userPageFactory(newUserPageId, rootNodeId, appState.auth.id);
 
         dbRepository.createUserPage(newUserPage, newRootNode, newFirstNode)
             .then(snapshot => {
@@ -44,7 +44,6 @@ export function subscribeToUserPages(){
                 });
                 
                 dispatch(navigateToUserPage(userPages.find(u => u.isHome).id));
-                dispatch(nodeActions.subscribeToNodes());
             }
 
             firebaseDb.ref('userPages/' + appState.auth.id).on('child_added', snapshot => {
@@ -65,12 +64,11 @@ export function initializeUserHomePage(){
 
         let newRootNode = nodeFactory(rootNodeId, null, [firstNodeId], '', appState.auth.id);
         let newFirstNode = nodeFactory(firstNodeId, rootNodeId, [], 'Your first node', appState.auth.id);
-        let newUserPage = userPageFactory(homeUserPageId, rootNodeId, appState.auth.id, [rootNodeId, firstNodeId], 'Home', true);
+        let newUserPage = userPageFactory(homeUserPageId, rootNodeId, appState.auth.id, 'Home', true);
 
         dbRepository.createUserPage(newUserPage, newRootNode, newFirstNode)
             .then(snapshot => {
                 dispatch(navigateToUserPage(homeUserPageId));
-                dispatch(nodeActions.subscribeToNodes());
             }); 
     };
 }

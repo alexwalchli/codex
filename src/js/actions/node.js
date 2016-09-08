@@ -56,9 +56,12 @@ export function subscribeToNodes(){
                         // });
 
                         nodeRef.on('value', snapshot => {
-                            if(initialized){
-                                let appState = getState();
-                                let nodeWasNotChangedByCurrentUser = getPresentNodes(appState)[snapshot.key].lastUpdatedById !== appState.auth.id;
+                            const appState = getState(),
+                                  nodes = getPresentNodes(appState),
+                                  updatedNode = nodes[snapshot.key];
+
+                            if(initialized && updatedNode){
+                                let nodeWasNotChangedByCurrentUser = updatedNode.lastUpdatedById !== appState.auth.id;
                                 if(nodeWasNotChangedByCurrentUser){
                                     dispatch(nodeUpdated(unwrapNodeSnapshot(snapshot)));
                                 }
@@ -230,11 +233,11 @@ export function deleteNode(nodeId, parentId) {
             const appState = getState();
             let nodeToDelete = nodes[nodeId];
             let updatedParentChildIds = nodes[nodeToDelete.parentId].childIds.filter(id => id !== nodeId);
-
+            let descendantIdsOfNode = getAllDescendantIds(nodes, nodeId);
             dispatch(childIdsUpdated(nodeToDelete.parentId, updatedParentChildIds));
             dispatch(nodesDeleted([nodeId]));
 
-            dbRepository.deleteNode(nodeToDelete, updatedParentChildIds, appState.auth.id);
+            dbRepository.deleteNode(nodeToDelete, updatedParentChildIds, descendantIdsOfNode, appState.auth.id);
         }
     };
 }

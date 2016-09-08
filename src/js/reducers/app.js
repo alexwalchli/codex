@@ -1,4 +1,4 @@
-import { SIDE_PANEL_TOGGLED, NAVIGATE_TO_USER_PAGE } 
+import { SIDE_PANEL_TOGGLED, NAVIGATED_TO_USER_PAGE } 
     from '../actions/app';
 
 export function app(state = {}, action){
@@ -7,7 +7,7 @@ export function app(state = {}, action){
             return Object.assign({}, state, {
                 pagesSidePanelVisible: !state.pagesSidePanelVisible
             });
-        case NAVIGATE_TO_USER_PAGE:
+        case NAVIGATED_TO_USER_PAGE:
             return Object.assign({}, state, {
                 currentUserPageId: action.payload.userPageId
             });
