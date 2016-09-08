@@ -91,7 +91,8 @@ export function deleteUserPage(userPageId){
 export function updateUserPageName(userPageId, newUserPageName){
     return (dispatch, getState) => {
         const appState = getState();
-        dispatch(userPageNameUpdated(appState.userPages[userPageId], newUserPageName));
+        dbRepository.updateUserPageName(appState.userPages[userPageId], newUserPageName);
+        dispatch(userPageNameUpdated(userPageId, newUserPageName));
     };
 }
 
