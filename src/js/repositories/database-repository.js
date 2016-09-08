@@ -126,3 +126,7 @@ export function deleteUserPage(userPage, rootNode, auth){
         });
     }
 }
+
+export function shareUserPage(userPageId, emails){
+
+}

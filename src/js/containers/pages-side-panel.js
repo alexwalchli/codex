@@ -26,6 +26,13 @@ export class PagesSidePanel extends Component {
         this.editPageName(userPageId);
     }
 
+    onShareUserPageClicked(e, userPageId){
+        e.stopPropagation();
+        const { openShareUserPageDialog } = this.props;
+
+        openShareUserPageDialog(userPageId);
+    }
+
     onCancelEditPageNameClicked(e, userPageId){
         e.stopPropagation();
         this.setState({ currentlyEditingPageNameId : null });
@@ -47,10 +54,6 @@ export class PagesSidePanel extends Component {
     onClickCreateNewUserPage(){
         const { createNewUserPage } = this.props;
         createNewUserPage();
-    }
-
-    onClickEditPageNameClicked(e){
-        e.stopPropagation();
     }
 
     editPageName(userPageId){
@@ -75,7 +78,7 @@ export class PagesSidePanel extends Component {
                         return <div onClick={() => navigateToUserPage(item.id)} key={item.id} className="page">
                                     { item.id === currentlyEditingPageNameId ? 
                                         <div>
-                                            <input onClick={(e) => this.onClickEditPageNameClicked(e)} onKeyDown={(e) => this.onKeyDownEditPageName(e, item.id)} autoFocus={true} className="title" type="text" defaultValue={item.title} ref={'page-name-' + item.id} />
+                                            <input onClick={(e) => this.onEditPageNameClicked(e)} onKeyDown={(e) => this.onKeyDownEditPageName(e, item.id)} autoFocus={true} className="title" type="text" defaultValue={item.title} ref={'page-name-' + item.id} />
                                             <div onClick={(e) => this.onCancelEditPageNameClicked(e, item.id)} className="button edit-name icon dripicons-wrong"></div>
                                             <div onClick={(e) => this.onSavePageNameClicked(e, item.id)} className="button delete icon dripicons-return"></div>
                                         </div>
@@ -84,7 +87,7 @@ export class PagesSidePanel extends Component {
                                             <div className="title">{item.title}</div>
                                             <div onClick={(e) => this.onEditPageNameClicked(e, item.id)} className="button edit-name icon dripicons-pencil"></div>
                                             <div onClick={(e) => this.onDeleteClicked(e, item.id)} className="button delete icon dripicons-cross"></div>
-                                            <div className="button share icon dripicons-user-group"></div>
+                                            <div onClick={(e) => this.onShareUserPageClicked(e, item.id)} className="button share icon dripicons-user-group"></div>
                                         </div>
                                     }
                                 </div>
