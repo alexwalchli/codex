@@ -3,7 +3,7 @@ import * as nodeActions from './node';
 import { navigateToUserPage } from './app';
 import nodeFactory from '../utilities/node-factory';
 import userPageFactory from '../utilities/user-page-factory';
-import { dictionaryToArray } from '../utilities/tree-queries';
+import { dictionaryToArray, getAllDescendantIds, getPresentNodes } from '../utilities/tree-queries';
 import * as dbRepository from '../repositories/database-repository';
 
 ///////////////////
@@ -34,7 +34,6 @@ export function subscribeToUserPages(){
     return (dispatch, getState) => {
         let appState = getState();
         firebaseDb.ref('userPages/' + appState.auth.id).once('value').then(snapshot => {
-
             var userPages = dictionaryToArray(snapshot.val());
             if(!userPages || userPages.length === 0){
                 dispatch(initializeUserHomePage());
@@ -95,6 +94,20 @@ export function updateUserPageName(userPageId, newUserPageName){
         dispatch(userPageNameUpdated(userPageId, newUserPageName));
     };
 }
+
+export function shareUserPage(userPageId, emails){
+    if(!emails){
+        return;
+    }
+    
+    return (dispatch, getState) => {
+        const appState = getState();
+        let emailsArr = emails.split(',');
+        let userPage = appState.userPages[userPageId];
+        let allDescendantIds = getAllDescendantIds(getPresentNodes(appState), userPage.rootNodeId);
+        dbRepository.shareUserPage(userPage, allDescendantIds, emailsArr, appState.auth);
+    };
+}  
 
 ///////////////////
 // Actions 

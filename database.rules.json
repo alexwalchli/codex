@@ -14,8 +14,11 @@
         "userPages": {
             "$uid": {
                 // Only give access to userPages/$userId for the logged in user
-                ".read": "$uid === auth.uid",
-                ".write": "$uid === auth.uid"
+                ".read": "(auth != null) && $uid === auth.uid",
+                // Give write access if the uid matches the current user or this is a userPage getting created be someone sharing a node
+                "$userPageId": {
+                	".write": "$uid === auth.uid || root.child('node_users/' + newData.child('rootNodeId').val() + '/' + auth.uid).exists()"
+                }
             }
         },
         "node_users": {
@@ -26,7 +29,8 @@
                 // 3.) If a user has a nodeUsers/$nodeId/$userId, give them access to delete(but not create or update) nodeUsers/$nodeId 
                 //     (for when a node is deleted so there are no orphaned nodeUsers from nodes,
                 //      but we also don't want non-creators to be able to give node access to other users)
-                ".write": "(auth != null) && (root.child('nodes/' + $nodeId + '/createdById').val() === auth.uid || (newData.val() === null && root.child('nodeUsers/' + $nodeId + '/' + auth.uid).exists()))"
+                ".write": "(auth != null) && (root.child('nodes/' + $nodeId + '/createdById').val() === auth.uid || (newData.val() === null && root.child('node_users/' + $nodeId + '/' + auth.uid).exists()))",
+                ".read": "(auth != null) && (root.child('node_users/' + $nodeId).val() === auth.uid || root.child('node_users/' + $nodeId + '/' + auth.uid).exists())"
             }
         },
         "node_userPages_users": {
@@ -34,6 +38,10 @@
             ".write": "(auth != null)"
         },
         "userPage_users_nodes": {
+            ".read": "(auth != null)",
+            ".write": "(auth != null)"
+        },
+        "email_users": {
             ".read": "(auth != null)",
             ".write": "(auth != null)"
         }

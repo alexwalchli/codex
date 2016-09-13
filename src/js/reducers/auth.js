@@ -15,7 +15,8 @@ export function auth(state = {}, {payload, type}) {
                 initialCheck: true,
                 authenticated: !!payload,
                 id: payload ? payload.uid : null,
-                displayName: payload ? payload.displayName : null
+                displayName: payload ? payload.displayName : null,
+                email: payload ? payload.email : null
             });
         case SIGN_OUT_SUCCESS:
             return {

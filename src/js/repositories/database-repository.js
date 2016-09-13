@@ -1,4 +1,17 @@
 import { firebaseDb } from '../firebase';
+import userPageFactory from '../utilities/user-page-factory'; 
+
+function unwrapNodeSnapshot(nodeSnapshot){
+    let node = nodeSnapshot.val();
+    node.childIds = node.childIds || [];
+    return node;
+}
+
+export function getNodeSnapshot(nodeId){
+    return firebaseDb.ref('nodes/' + nodeId).once('value').then(snapshot => {
+        return unwrapNodeSnapshot(snapshot);
+    });
+}
 
 export function createNode(node, userPageId, updatedParentChildIds){
     firebaseDb.ref('node_userPages_users/' + node.parentId).once('value').then(parentNodeUserPagesUsersSnapshot => {
@@ -7,6 +20,7 @@ export function createNode(node, userPageId, updatedParentChildIds){
 
         nodeUpdates['nodes/' + node.id] = node;
         nodeUpdates['nodes/' + node.parentId + '/childIds'] = updatedParentChildIds;
+        nodeUpdates['nodes/' + node.parentId + '/lastUpdatedById'] = node.createdById;
         
         return firebaseDb.ref().update(nodeUpdates)
             .then(() => {
@@ -127,6 +141,66 @@ export function deleteUserPage(userPage, rootNode, auth){
     }
 }
 
-export function shareUserPage(userPageId, emails){
+export function shareUserPage(userPage, allDescendantIds, emails, auth){
+    let newUserPageUpdates = {},
+        manyToManyConnectionDbUpdates = {},
+        shareUserPagePromises = [];
 
+    if(!emails){
+        return;
+    }
+
+    emails.forEach(email => {
+        // for each user that matches with an entered email, create a userPage and records to connect to all descendants
+        let shareUserPagePromise = new Promise((resolve, reject) => {
+
+            firebaseDb.ref('email_users/' + escapeEmail(email)).once('value').then(snapshot => {
+                let userId = snapshot.val();
+
+                if(!userId || email === auth.email){ 
+                    return; 
+                }
+                
+                // TODO: ROOTNODEID and CREATEDBYID UNDEFINED
+
+                let newUserPageId = firebaseDb.ref('userPages/').push().key;
+                let newUserPage = userPageFactory(newUserPageId, userPage.rootNodeId, userPage.createdById, userPage.title, false);
+                newUserPageUpdates['userPages/' + userId + '/' + newUserPageId] = newUserPage;
+                manyToManyConnectionDbUpdates['userPage_users_nodes/' + newUserPageId + '/' + userId + '/' + userPage.rootNodeId] = true;
+                manyToManyConnectionDbUpdates['node_userPages_users/' + userPage.rootNodeId + '/' + newUserPageId + '/' + userId] = true;
+                manyToManyConnectionDbUpdates['node_users/' + userPage.rootNodeId + '/' + userId] = true;
+                allDescendantIds.forEach(descedantId => {
+                    manyToManyConnectionDbUpdates['userPage_users_nodes/' + newUserPageId + '/' + userId + '/' + descedantId] = true;
+                    manyToManyConnectionDbUpdates['node_userPages_users/' + descedantId + '/' + newUserPageId + '/' + userId] = true;
+                    manyToManyConnectionDbUpdates['node_users/' + descedantId + '/' + userId] = true;
+                });
+
+                resolve();
+            });
+
+        });
+
+        shareUserPagePromises.push(shareUserPagePromise);
+
+    });
+
+    return Promise.all(shareUserPagePromises).then(() => {
+        firebaseDb.ref().update(newUserPageUpdates).then(() => {
+                    firebaseDb.ref().update(manyToManyConnectionDbUpdates);
+                });
+    });
+}
+
+export function createEmailUser(email, userId){
+    let dbUpdates = {};
+    email  =  email.replace(/\./g, ",");
+    return firebaseDb.ref('email_users/' + email).set(userId);
+}
+
+function escapeEmail(email) {
+    return (email || '').replace('.', ',');
+}
+
+function unescapeEmail(email) {
+    return (email || '').replace(',', '.');
 }

@@ -15,8 +15,6 @@ export class App extends Component {
     }
 
     render() {
-        const { showShareUserPageDialog } = this.props.app;
-
         let currentUserPage = userPagesList(this.props.userPages).filter(u => u.id === this.props.app.currentUserPageId)[0];
         let appIsInitialized = isAuthenticated(this.props) && currentUserPage && this.props.tree.present[currentUserPage.rootNodeId];
         let userIsAuthenticated = isAuthenticated(this.props);
@@ -43,14 +41,7 @@ export class App extends Component {
                         : null }
                         <div id="tree-container">
                             <Node id={currentUserPage.rootNodeId} />
-                        </div> 
-
-                        { showShareUserPageDialog ? 
-                            <div>
-                                <h4>Share User Page</h4>
-                                <input type="text" />
-                            </div>
-                        : null }
+                        </div>
 
                     </div>  
                     :

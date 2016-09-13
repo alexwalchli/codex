@@ -1,5 +1,6 @@
 import { firebaseAuth } from '../firebase';
 import { subscribeToUserPages } from './user-pages';
+import * as dbRepository from '../repositories/database-repository';
 
 export const SUBSCRIBE_TO_AUTH_STATE_CHANGED = 'SUBSCRIBE_TO_AUTH_STATE_CHANGED';
 export const UPDATE_AUTH_STATE = 'UPDATE_AUTH_STATE';
@@ -21,6 +22,7 @@ export function subscribeToAuthStateChanged(dispatch) {
             user => {
                 dispatch(updateAuthState(user));
                 if(user){
+                    dbRepository.createEmailUser(user.email, user.uid);
                     dispatch(subscribeToUserPages());
                 }
             },

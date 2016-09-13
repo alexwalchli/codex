@@ -14,29 +14,30 @@ import * as dbRepository from '../repositories/database-repository';
 let initialized = false;
 export const NODE_TRANSACTION = 'NODE_TRANSACTION';
 
-///////////////////
-// Action Creators 
-// Always Returns functions that perform I/O and dispatch one or more events and are not not handled by Reducers.
-///////////////////
+/////////////////////
+// Action Creators //
+/////////////////////
 
 export function subscribeToNodes(){
     return (dispatch, getState) => {
-
         // do an initial load of the user's nodes based on the current user page's descendantIds
         // and then subscribe to changes on each node
-        let appState = getState();
-        let currentUserPage =  appState.userPages[appState.app.currentUserPageId];
-        let initialNodeState = {};
-        let initialNodePromises = [];
+        let appState = getState(),
+            currentUserPage =  appState.userPages[appState.app.currentUserPageId],
+            initialNodeState = {},
+            initialNodePromises = [];
 
-        // userPageNodes/$nodeIds
-
-        firebaseDb.ref('userPage_users_nodes/' + appState.app.currentUserPageId + '/' + appState.auth.id).once('value').then(userPageUsersNodesSnapshot => {
+        // collection of all node Ids for this userPage and user
+        let userPageUserNodesRef = firebaseDb.ref('userPage_users_nodes/' + appState.app.currentUserPageId + '/' + appState.auth.id);
+        userPageUserNodesRef.once('value').then(userPageUsersNodesSnapshot => {
             let nodeIds = Object.keys(userPageUsersNodesSnapshot.val());
 
+            dispatch(subscribeToUserPageUserNodes(appState.app.currentUserPageId));
+
+            // retrieve all nodes and then subscribe to each
             nodeIds.forEach(descendantId => {
-                let nodeRef = firebaseDb.ref('nodes/' + descendantId);
-                let nodePromise = new Promise((resolve, reject) => {
+                let nodeRef = firebaseDb.ref('nodes/' + descendantId),
+                nodePromise = new Promise((resolve, reject) => {
                     nodeRef.once('value').then(snapshot => {
                         let node = unwrapNodeSnapshot(snapshot);
 
@@ -47,33 +48,7 @@ export function subscribeToNodes(){
                         }
 
                         initialNodeState[descendantId] = node;
-
-                        // nodeRef.on('child_added', snapshot => {
-                        //     let nodeDoesNotExistsInAppState = !getPresentNodes(getState())[snapshot.key];
-                        //     if(initialized && nodeDoesNotExistsInAppState){
-                        //         dispatch(nodeCreated(unwrapNodeSnapshot(snapshot)));
-                        //     }
-                        // });
-
-                        nodeRef.on('value', snapshot => {
-                            const appState = getState(),
-                                  nodes = getPresentNodes(appState),
-                                  updatedNode = nodes[snapshot.key];
-
-                            if(initialized && updatedNode){
-                                let nodeWasNotChangedByCurrentUser = updatedNode.lastUpdatedById !== appState.auth.id;
-                                if(nodeWasNotChangedByCurrentUser){
-                                    dispatch(nodeUpdated(unwrapNodeSnapshot(snapshot)));
-                                }
-                            }
-                        });
-
-                        // nodeRef.on('child_removed', snapshot => {
-                        //     let nodeExistsInAppState = getPresentNodes(getState())[snapshot.key];
-                        //     if(initialized && nodeExistsInAppState){
-                        //         dispatch(nodesDeleted([snapshot.key]));
-                        //     }
-                        // });
+                        dispatch(subscribeToNode(node.id));
 
                         resolve();
                     });
@@ -94,19 +69,79 @@ export function subscribeToNodes(){
     };
 }
 
+export function subscribeToUserPageUserNodes(userPageId){
+    return (dispatch, getState) => {
+        const appState = getState();
+        const userPageUserNodesRef = firebaseDb.ref('userPage_users_nodes/' + appState.app.currentUserPageId + '/' + appState.auth.id);
+        
+        userPageUserNodesRef.on('child_added', snapshot => {
+            let nodeId = snapshot.key,
+                nodeDoesNotExistsInAppState = !getPresentNodes(getState())[nodeId];
+            if(initialized && nodeDoesNotExistsInAppState){
+                dbRepository.getNodeSnapshot(nodeId).then(node => {
+                    dispatch(subscribeToNode(nodeId));
+                    dispatch(nodeCreated(node));
+                });
+            }
+        });
+
+        userPageUserNodesRef.on('child_removed', snapshot => {
+            let nodeId = snapshot.key,
+                nodeDoesNotExistsInAppState = !getPresentNodes(getState())[nodeId];
+            if(initialized && nodeDoesNotExistsInAppState){
+                dispatch(nodesDeleted([nodeId]));
+            }
+        });
+    };
+}
+
+export function subscribeToNode(nodeId){
+    return (dispatch, getState) => {
+        const nodeRef = firebaseDb.ref('nodes/' + nodeId),
+              nodeChildIdsRef = firebaseDb.ref('nodes/' + nodeId + '/childIds');
+
+        nodeRef.on('value', snapshot => {
+            const appState = getState(),
+            nodes = getPresentNodes(appState),
+            updatedNode = unwrapNodeSnapshot(snapshot);
+
+            if(initialized && updatedNode){
+                let nodeWasNotChangedByCurrentUser = updatedNode.lastUpdatedById !== appState.auth.id;
+                if(nodeWasNotChangedByCurrentUser){
+                    dispatch(nodeUpdated(updatedNode));
+                }
+            }
+
+        });
+
+        nodeChildIdsRef.on('child_added', snapshot => {
+        
+        });
+
+        nodeChildIdsRef.on('child_removed', snapshot => {
+
+            let nodeExistsInAppState = getPresentNodes(getState())[snapshot.key];
+            if(initialized && nodeExistsInAppState){
+                dispatch(nodesDeleted([snapshot.key]));
+            }   
+
+        });
+    };
+}
+
 // optimistically creates a node in client state then pushes to persistence
 export function createNode(createdFromSiblingId, createdFromSiblingOffset, parentId, content) {
     return (dispatch, getState) => {
-        let appState = getState();
-        let nodes = getPresentNodes(appState);
-        let optimisticEvents = [];
-        let newNodeId = firebaseDb.ref('nodes').push().key;
-        let createdFromSiblingNode = getState().tree.present[createdFromSiblingId];
-         // if the node was created from a node with children, add the node to it, else add the node to created from node's parent
-        let addNewNodeToNodeId = createdFromSiblingNode.childIds.length === 0 ? parentId : createdFromSiblingId;
-        let addNewNodeToNode = getPresentNodes(getState())[addNewNodeToNodeId];
-        let newNode = nodeFactory(newNodeId, addNewNodeToNodeId, [], content, getState().auth.id);
-        let updatedParentChildIds = getUpdatedChildIdsForAddition(addNewNodeToNode, newNodeId, createdFromSiblingId, createdFromSiblingOffset);
+        let appState = getState(),
+            nodes = getPresentNodes(appState),
+            optimisticEvents = [],
+            newNodeId = firebaseDb.ref('nodes').push().key,
+            createdFromSiblingNode = getState().tree.present[createdFromSiblingId],
+            // if the node was created from a node with children, add the node to it, else add the node to created from node's parent
+            addNewNodeToNodeId = createdFromSiblingNode.childIds.length === 0 ? parentId : createdFromSiblingId,
+            addNewNodeToNode = getPresentNodes(getState())[addNewNodeToNodeId],
+            newNode = nodeFactory(newNodeId, addNewNodeToNodeId, [], content, getState().auth.id),
+            updatedParentChildIds = getUpdatedChildIdsForAddition(addNewNodeToNode, newNodeId, createdFromSiblingId, createdFromSiblingOffset);
         
         optimisticEvents.push(nodeCreated(newNode));
         optimisticEvents.push(childIdsUpdated(addNewNodeToNodeId, updatedParentChildIds, appState.auth.id));
@@ -339,10 +374,9 @@ export function updateNodeWidgetDataIfNecessary(nodeId, content){
     };
 }
 
-///////////////////
-// Actions 
-// Always return plain objects of facts that have happened via commands. They are handled by Reducers to update this clients state.
-///////////////////
+/////////////
+// Actions //
+/////////////
 
 export const NODE_CREATED = 'NODE_CREATED';
 export const NODE_UPDATED = 'NODE_UPDATED';

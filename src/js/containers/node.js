@@ -222,8 +222,12 @@ export class Node extends Component {
     }
 
     render() {
-        const { parentId, childIds, id, focused, inReadMode, externalList, collapsed, visible, selected, morphedContent, widgetDataUpdating } = this.props;
+        const { parentId, childIds, id, focused, inReadMode, externalList, collapsed, visible, selected, morphedContent, widgetDataUpdating, nodeInitialized } = this.props;
         const { content, suggestions } = this.state;
+
+        if(!nodeInitialized){
+            return (false);
+        }
 
         var bulletClasses = "item";
         if(focused){
@@ -296,9 +300,8 @@ export class Node extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-    var node = Object.assign({}, state.tree.present[ownProps.id]);
-
-    return node;
+    var nodeFromState = state.tree.present[ownProps.id];
+    return Object.assign({ nodeInitialized: !!nodeFromState }, nodeFromState);;
 }
 
 const ConnectedNode = connect(mapStateToProps, actions)(Node)

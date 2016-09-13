@@ -3,6 +3,7 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
 import { dictionaryToArray } from '../utilities/tree-queries';
+import ShareForm from '../containers/share-form';
 
 export class PagesSidePanel extends Component {
     constructor(props) {
@@ -28,9 +29,7 @@ export class PagesSidePanel extends Component {
 
     onShareUserPageClicked(e, userPageId){
         e.stopPropagation();
-        const { openShareUserPageDialog } = this.props;
-
-        openShareUserPageDialog(userPageId);
+        this.setState({ currentlySharingPageId : userPageId });
     }
 
     onCancelEditPageNameClicked(e, userPageId){
@@ -67,29 +66,60 @@ export class PagesSidePanel extends Component {
         this.editPageName(null);
     }
 
+    onShareCancel(e, userPageId){
+        e.stopPropagation();
+        this.setState({ currentlySharingPageId : null });
+    }
+
+    onPageClick(e, userPageId){
+        const { navigateToUserPage } = this.props;
+        const { currentlyEditingPageNameId, currentlySharingPageId } = this.state;
+
+        if(userPageId === currentlyEditingPageNameId || userPageId === currentlySharingPageId){
+            return;
+        }
+
+        navigateToUserPage(userPageId);
+    }
+
+    onShareSubmit(e, userPageId, emails){
+        e.stopPropagation();
+        const { shareUserPage } = this.props;
+
+        shareUserPage(userPageId, emails);
+    }
+
     render() {
         const { createNewUserPage, navigateToUserPage, deleteUserPage } = this.props;
-        const { currentlyEditingPageNameId } = this.state;
+        const { currentlyEditingPageNameId, currentlySharingPageId } = this.state;
         
         return (
            <div className="pages-side-panel">
                 <div className="pages">
                     {dictionaryToArray(this.props.userPages).map((item) => {
-                        return <div onClick={() => navigateToUserPage(item.id)} key={item.id} className="page">
-                                    { item.id === currentlyEditingPageNameId ? 
-                                        <div>
-                                            <input onClick={(e) => this.onEditPageNameClicked(e)} onKeyDown={(e) => this.onKeyDownEditPageName(e, item.id)} autoFocus={true} className="title" type="text" defaultValue={item.title} ref={'page-name-' + item.id} />
-                                            <div onClick={(e) => this.onCancelEditPageNameClicked(e, item.id)} className="button edit-name icon dripicons-wrong"></div>
-                                            <div onClick={(e) => this.onSavePageNameClicked(e, item.id)} className="button delete icon dripicons-return"></div>
-                                        </div>
+                        return <div onClick={(e) => this.onPageClick(e, item.id)} key={item.id} className="page">
+
+                                    { item.id === currentlySharingPageId ? 
+                                        <ShareForm userPageId={item.id} onShareCancel={(e, id) => this.onShareCancel(e, id)} onShareSubmit={(e, id, emails) => this.onShareSubmit(e, id, emails)}/>
                                     : 
                                         <div>
-                                            <div className="title">{item.title}</div>
-                                            <div onClick={(e) => this.onEditPageNameClicked(e, item.id)} className="button edit-name icon dripicons-pencil"></div>
-                                            <div onClick={(e) => this.onDeleteClicked(e, item.id)} className="button delete icon dripicons-cross"></div>
-                                            <div onClick={(e) => this.onShareUserPageClicked(e, item.id)} className="button share icon dripicons-user-group"></div>
+                                        { item.id === currentlyEditingPageNameId ? 
+                                            <div>
+                                                <input onClick={(e) => this.onEditPageNameClicked(e)} onKeyDown={(e) => this.onKeyDownEditPageName(e, item.id)} autoFocus={true} className="title" type="text" defaultValue={item.title} ref={'page-name-' + item.id} />
+                                                <div onClick={(e) => this.onCancelEditPageNameClicked(e, item.id)} className="button edit-name icon dripicons-wrong"></div>
+                                                <div onClick={(e) => this.onSavePageNameClicked(e, item.id)} className="button delete icon dripicons-return"></div>
+                                            </div>
+                                        : 
+                                            <div>
+                                                <div className="title">{item.title}</div>
+                                                <div onClick={(e) => this.onEditPageNameClicked(e, item.id)} className="button edit-name icon dripicons-pencil"></div>
+                                                <div onClick={(e) => this.onDeleteClicked(e, item.id)} className="button delete icon dripicons-cross"></div>
+                                                <div onClick={(e) => this.onShareUserPageClicked(e, item.id)} className="button share icon dripicons-user-group"></div>
+                                            </div>
+                                        }
                                         </div>
                                     }
+
                                 </div>
                     })}
                     <div onClick={() => this.onClickCreateNewUserPage()} className="page">
