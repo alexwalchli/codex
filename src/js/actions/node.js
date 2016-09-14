@@ -73,7 +73,7 @@ export function subscribeToUserPageUserNodes(userPageId){
     return (dispatch, getState) => {
         const appState = getState();
         const userPageUserNodesRef = firebaseDb.ref('userPage_users_nodes/' + appState.app.currentUserPageId + '/' + appState.auth.id);
-        
+
         userPageUserNodesRef.on('child_added', snapshot => {
             let nodeId = snapshot.key,
                 nodeDoesNotExistsInAppState = !getPresentNodes(getState())[nodeId];
@@ -176,11 +176,16 @@ export function updateContent(nodeId, newContent) {
 
 export function focusNode(nodeId){
     return (dispatch, getState) => {
-        let nodes = getPresentNodes(getState());
+        const appState = getState();
+        let nodes = getPresentNodes(appState);
         let nodeIdsToDeselect = getCurrentlySelectedNodeIds(nodes);
         let nodeIdToUnfocus = getCurrentlyFocusedNodeId(nodes);
         let events = [];
-        nodeIdsToDeselect.forEach(id => events.push(nodeDeselected(id)));
+        nodeIdsToDeselect.forEach(id => {
+            events.push(nodeDeselected(id));
+        });
+        dbRepository.updateNodeSelectedByUser(nodeIdToUnfocus, null, null);
+        dbRepository.updateNodeSelectedByUser(nodeId, appState.auth.id, appState.auth.displayName);
         events.push(nodeUnfocused(nodeIdToUnfocus));
         events.push(nodeFocused(nodeId));
         dispatch(nodeTransaction(events));

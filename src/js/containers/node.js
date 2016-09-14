@@ -222,7 +222,8 @@ export class Node extends Component {
     }
 
     render() {
-        const { parentId, childIds, id, focused, inReadMode, externalList, collapsed, visible, selected, morphedContent, widgetDataUpdating, nodeInitialized } = this.props;
+        const { parentId, childIds, id, focused, inReadMode, externalList, collapsed, visible, selected,
+                morphedContent, widgetDataUpdating, nodeInitialized, currentlySelectedBy, currentlySelectedById, auth } = this.props;
         const { content, suggestions } = this.state;
 
         if(!nodeInitialized){
@@ -248,52 +249,62 @@ export class Node extends Component {
             bulletClasses += ' collapsed';
         }
 
-        var showToggleExpansionIcon = childIds.length;
-        var childNodeClasses = 'children';
+        let currentlySelectedByAnotherUser = currentlySelectedById && currentlySelectedById !== auth.id;
+        let currentlySelectedCss = currentlySelectedById && currentlySelectedByAnotherUser ? 'currentlySelected' : null;
+        let showToggleExpansionIcon = childIds.length;
+        let childNodeClasses = 'children';
 
         return (
             <div className={bulletClasses} onKeyDown={this.handleOnKeyDown}>
             {typeof parentId !== 'undefined' ?
-                <div className="depth">
-                <div className="children-outline"></div>
-                <div className="bullet-container" onClick={this.handleBulletClick}>
-                    <div className="unordered-bullet">
-                        <div className="outer-circle"></div>
-                        <div className="inner-circle"></div>
+                <div className={`depth ${currentlySelectedCss}`}>
+                    <div className="children-outline"></div>
+                    <div className="bullet-container" onClick={this.handleBulletClick}>
+                        <div className="unordered-bullet">
+                            <div className="outer-circle"></div>
+                            <div className="inner-circle"></div>
+                        </div>
                     </div>
-                </div>
-                <div className="content" onClick={this.handleOnClick} onMouseEnter={this.handleOnMouseEnter} onMouseLeave={this.handleOnMouseLeave} onPaste={this.handlePaste}>
+                    <div className="content" onClick={this.handleOnClick} onMouseEnter={this.handleOnMouseEnter} onMouseLeave={this.handleOnMouseLeave} onPaste={this.handlePaste}>
                     
-                    <MentionsInput
-                        singleLine
-                        value={content}
-                        onChange={this.handleChange}
-                        style={ defaultStyle({ singleLine: true }) }
-                        placeholder={""}
-                        focused={this.props.focused}
-                        onSelect={this.onSelect}
-                        onBlur={this.handleOnBlur}>
+                        <MentionsInput
+                            singleLine
+                            value={content}
+                            onChange={this.handleChange}
+                            style={ defaultStyle({ singleLine: true }) }
+                            placeholder={""}
+                            focused={this.props.focused}
+                            onSelect={this.onSelect}
+                            onBlur={this.handleOnBlur}>
 
-                    <Mention onAdd={this.onAdd} onRemove={this.onRemove} data={ suggestions } style={defaultMentionStyle} />
-                    </MentionsInput>
+                        <Mention onAdd={this.onAdd} onRemove={this.onRemove} data={ suggestions } style={defaultMentionStyle} />
+                        </MentionsInput>
 
-                    {externalList ? 
-                    <ul className="external-data-children">
-                    {externalList.map((item) => {
-                        return <li>
-                            {item.title} <br/>
-                            <small>{item.points} | {item.author} | {item.numberOfComments} comments</small>
-                        </li>
-                    })}
-                    </ul>
-                    : null }
+                        {externalList ? 
+                        <ul className="external-data-children">
+                        {externalList.map((item) => {
+                            return <li>
+                                {item.title} <br/>
+                                <small>{item.points} | {item.author} | {item.numberOfComments} comments</small>
+                            </li>
+                        })}
+                        </ul>
+                        : null }
+                    </div>
+
+                    {currentlySelectedByAnotherUser ? 
+                        <div className="currentlySelectedBy">
+                            <span>{currentlySelectedBy}</span>
+                        </div>
+                    : null}
+
                 </div>
-                </div>:
+                :
                 null
             }
-            <div className="children">
-                {childIds.map(this.renderChild)}
-            </div>
+                <div className="children">
+                    {childIds.map(this.renderChild)}
+                </div>
             </div>
         )
     }
@@ -301,7 +312,7 @@ export class Node extends Component {
 
 const mapStateToProps = (state, ownProps) => {
     var nodeFromState = state.tree.present[ownProps.id];
-    return Object.assign({ nodeInitialized: !!nodeFromState }, nodeFromState);;
+    return Object.assign({ nodeInitialized: !!nodeFromState, auth: state.auth , ...ownProps }, nodeFromState);
 }
 
 const ConnectedNode = connect(mapStateToProps, actions)(Node)

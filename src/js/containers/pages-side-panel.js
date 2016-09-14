@@ -14,6 +14,19 @@ export class PagesSidePanel extends Component {
         };
     }
 
+    setHeight(){
+        this.refs.sidePanel.style.height = (window.innerHeight - 71) + 'px';
+    }
+
+    componentDidMount() {
+        this.setHeight();
+        window.addEventListener('resize', this.setHeight.bind(this));
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.setHeight.bind(this));
+    }
+
     onDeleteClicked(e, userPageId){
         e.stopPropagation();
 
@@ -94,7 +107,7 @@ export class PagesSidePanel extends Component {
         const { currentlyEditingPageNameId, currentlySharingPageId } = this.state;
         
         return (
-           <div className="pages-side-panel">
+           <div ref="sidePanel" className="pages-side-panel">
                 <div className="pages">
                     {dictionaryToArray(this.props.userPages).map((item) => {
                         return <div onClick={(e) => this.onPageClick(e, item.id)} key={item.id} className="page">

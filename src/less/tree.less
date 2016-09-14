@@ -1,4 +1,6 @@
-
+#tree-container{
+    overflow:hidden;
+}
 
 /* root node */
 #tree-container > .item{
@@ -10,6 +12,25 @@
 .item{
     width:100%;
     position:relative;
+
+    border:1px solid transparent;
+
+    .currentlySelected{
+        border:1px solid @secondary-color;
+    }
+
+    .currentlySelectedBy{
+        position:absolute;
+        left:0;
+        top:0;
+        background-color:@secondary-color;
+        color:#fff;
+        font-size:0.8em;
+        
+        > span {
+            padding:2px 4px 2px 4px;
+        }
+    }
 }
 
 .children-outline{

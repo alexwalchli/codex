@@ -41,6 +41,13 @@ export function createNode(node, userPageId, updatedParentChildIds){
     });
 }
 
+export function updateNodeSelectedByUser(nodeId, userId, userDisplayName){
+    let dbUpdates = {};
+    dbUpdates['nodes/' + nodeId + '/currentlySelectedById'] = userId;
+    dbUpdates['nodes/' + nodeId + '/currentlySelectedBy'] = userDisplayName;
+    return firebaseDb.ref().update(dbUpdates);
+}
+
 export function updateNodeContent(nodeId, newContent, userId){
     let dbUpdates = {};
     dbUpdates['nodes/' + nodeId + '/content'] = newContent;

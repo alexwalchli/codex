@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "codex-f90ff"
+    "default": "codex-f90ff",
+    "dev": "codex-f90ff"
   }
 }
