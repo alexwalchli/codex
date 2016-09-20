@@ -63,16 +63,29 @@
 
 .top-bar li .dropdown{
     position:absolute;
-    background-color:@top-bar-border-bottom-color;
+    background-color:@panel-bg-color;
     min-width:300px;
     right:0;
     border-radius:10px;
+    border:1px solid @panel-border-color;
     z-index:1;
 
     .dropdown-content {
         font-size:1em;
         color:@secondary-color;
         padding:10px;
+
+        label, p, i, input{
+            font-size:14px;
+        }
+
+        .btn{
+            padding:14px;
+        }
+    }
+
+    .share-form{
+        width:400px;
     }
 }
 

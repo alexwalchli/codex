@@ -20,7 +20,7 @@ export function createNewUserPage(title){
             newUserPageId = firebaseDb.ref('userPages').push().key;
 
         let newRootNode = nodeFactory(rootNodeId, null, [firstNodeId], '', appState.auth.id);
-        let newFirstNode = nodeFactory(firstNodeId, rootNodeId, [], 'Your first node', appState.auth.id);
+        let newFirstNode = nodeFactory(firstNodeId, rootNodeId, [], '', appState.auth.id);
         let newUserPage = userPageFactory(newUserPageId, rootNodeId, appState.auth.id);
 
         dbRepository.createUserPage(newUserPage, newRootNode, newFirstNode)
@@ -62,7 +62,7 @@ export function initializeUserHomePage(){
             homeUserPageId = firebaseDb.ref('userPages').push().key;
 
         let newRootNode = nodeFactory(rootNodeId, null, [firstNodeId], '', appState.auth.id);
-        let newFirstNode = nodeFactory(firstNodeId, rootNodeId, [], 'Your first node', appState.auth.id);
+        let newFirstNode = nodeFactory(firstNodeId, rootNodeId, [], '', appState.auth.id);
         let newUserPage = userPageFactory(homeUserPageId, rootNodeId, appState.auth.id, 'Home', true);
 
         dbRepository.createUserPage(newUserPage, newRootNode, newFirstNode)

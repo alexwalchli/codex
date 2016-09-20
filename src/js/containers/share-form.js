@@ -3,10 +3,16 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
 import { dictionaryToArray } from '../utilities/tree-queries';
+import { WithContext as ReactTags } from 'react-tag-input';
 
 export class ShareForm extends Component {
     constructor(props) {
         super(props);
+
+        this.state = { 
+            tags: [ {id: 1, text: "Apples"} ],
+            suggestions: ["Banana", "Mango", "Pear", "Apricot"]
+        };
     }
 
     onSubmit(e){
@@ -20,18 +26,47 @@ export class ShareForm extends Component {
         onShareCancel(e, userPage.id);
     }
 
+    handleDelete(i) {
+        let tags = this.state.tags;
+        tags.splice(i, 1);
+        this.setState({tags: tags});
+    }
+
+    handleAddition(tag) {
+        let tags = this.state.tags;
+        tags.push({
+            id: tags.length + 1,
+            text: tag
+        });
+        this.setState({tags: tags});
+    }
+
+    handleDrag(tag, currPos, newPos) {
+        let tags = this.state.tags;
+ 
+        // mutate array 
+        tags.splice(currPos, 1);
+        tags.splice(newPos, 0, tag);
+ 
+        // re-render 
+        this.setState({ tags: tags });
+    }
+
     render() {
+        const { tags, suggestions } = this.state;
         const { onShareCancel, userPage } = this.props;
 
         return (
             <form className="share-form" >
                 <h5>Share {userPage.title} with others</h5>
-                <label>Add people by email:</label>
                 <div>
-                    <input ref="emails" type="text" />
+                    <ReactTags tags={tags}
+                        suggestions={suggestions}
+                        handleDelete={() => this.handleDelete()}
+                        handleAddition={() => this.handleAddition()}
+                        handleDrag={() => this.handleDrag()}
+                        placeholder='Add someone by email' />
                 </div>
-
-                <p><i>Not currently shared with anyone</i></p>
 
                 <a className="btn" disabled="disabled" onClick={(e) => this.onSubmit(e)}>Share</a>
                 <a className="btn secondary-btn" onClick={(e) => this.onCancel(e)}>Cancel</a>
