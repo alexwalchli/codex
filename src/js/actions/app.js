@@ -1,4 +1,5 @@
 import * as nodeActions from './node';
+import * as firebaseSubscriptions from './firebase-subscriptions';
 
 ///////////////////
 // Action Creators 
@@ -13,7 +14,7 @@ export function togglePagesSidePanel(){
 export function navigateToUserPage(userPageId){
     return (dispatch, getState) => {
         dispatch(navigatedToUserPage(userPageId));
-        dispatch(nodeActions.subscribeToNodes());
+        dispatch(firebaseSubscriptions.subscribeToNodes());
     };
 }
 

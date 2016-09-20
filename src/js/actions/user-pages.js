@@ -4,7 +4,7 @@ import { navigateToUserPage } from './app';
 import nodeFactory from '../utilities/node-factory';
 import userPageFactory from '../utilities/user-page-factory';
 import { dictionaryToArray, getAllDescendantIds, getPresentNodes } from '../utilities/tree-queries';
-import * as dbRepository from '../repositories/database-repository';
+import * as firebaseActions from './firebase-actions';
 
 ///////////////////
 // Action Creators 
@@ -23,33 +23,10 @@ export function createNewUserPage(title){
         let newFirstNode = nodeFactory(firstNodeId, rootNodeId, [], '', appState.auth.id);
         let newUserPage = userPageFactory(newUserPageId, rootNodeId, appState.auth.id);
 
-        dbRepository.createUserPage(newUserPage, newRootNode, newFirstNode)
+        firebaseActions.createUserPage(newUserPage, newRootNode, newFirstNode)
             .then(snapshot => {
                 dispatch(navigateToUserPage(newUserPageId));
             });
-    };
-}
-
-export function subscribeToUserPages(){
-    return (dispatch, getState) => {
-        let appState = getState();
-        firebaseDb.ref('userPages/' + appState.auth.id).once('value').then(snapshot => {
-            var userPages = dictionaryToArray(snapshot.val());
-            if(!userPages || userPages.length === 0){
-                dispatch(initializeUserHomePage());
-            } else {
-                userPages.forEach(userPage => {
-                    dispatch(userPageCreated(userPage));
-                });
-                
-                dispatch(navigateToUserPage(userPages.find(u => u.isHome).id));
-            }
-
-            firebaseDb.ref('userPages/' + appState.auth.id).on('child_added', snapshot => {
-                dispatch(userPageCreated(snapshot.val()));
-            });
-
-        });
     };
 }
 
@@ -65,7 +42,7 @@ export function initializeUserHomePage(){
         let newFirstNode = nodeFactory(firstNodeId, rootNodeId, [], '', appState.auth.id);
         let newUserPage = userPageFactory(homeUserPageId, rootNodeId, appState.auth.id, 'Home', true);
 
-        dbRepository.createUserPage(newUserPage, newRootNode, newFirstNode)
+        firebaseActions.createUserPage(newUserPage, newRootNode, newFirstNode)
             .then(snapshot => {
                 dispatch(navigateToUserPage(homeUserPageId));
             }); 
@@ -80,7 +57,7 @@ export function deleteUserPage(userPageId){
                 rootNode = appState.nodes[userPage.rootNodeId],
                 auth = appState.auth;
 
-            dbRepository.deleteUserPage(userPage, rootNode, auth);
+            firebaseActions.deleteUserPage(userPage, rootNode, auth);
             dispatch(navigateToUserPage(dictionaryToArray(appState.userPages).find(u => u.isHome).id));
             dispatch(userPageDeleted(userPageId));
         }
@@ -90,7 +67,7 @@ export function deleteUserPage(userPageId){
 export function updateUserPageName(userPageId, newUserPageName){
     return (dispatch, getState) => {
         const appState = getState();
-        dbRepository.updateUserPageName(appState.userPages[userPageId], newUserPageName);
+        firebaseActions.updateUserPageName(appState.userPages[userPageId], newUserPageName);
         dispatch(userPageNameUpdated(userPageId, newUserPageName));
     };
 }
@@ -105,7 +82,7 @@ export function shareUserPage(userPageId, emails){
         let emailsArr = emails.split(',');
         let userPage = appState.userPages[userPageId];
         let allDescendantIds = getAllDescendantIds(getPresentNodes(appState), userPage.rootNodeId);
-        dbRepository.shareUserPage(userPage, allDescendantIds, emailsArr, appState.auth);
+        firebaseActions.shareUserPage(userPage, allDescendantIds, emailsArr, appState.auth);
     };
 }  
 

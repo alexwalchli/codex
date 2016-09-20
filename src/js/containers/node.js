@@ -258,6 +258,9 @@ export class Node extends Component {
             <div className={bulletClasses} onKeyDown={this.handleOnKeyDown}>
             {typeof parentId !== 'undefined' ?
                 <div className={`depth ${currentlySelectedCss}`}>
+                    {focused ? 
+                        <div className="menu-btn"><i className="icon dripicons-menu"></i></div>                        
+                    :null}
                     <div className="children-outline"></div>
                     <div className="bullet-container" onClick={this.handleBulletClick}>
                         <div className="unordered-bullet">

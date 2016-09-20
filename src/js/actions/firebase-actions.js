@@ -1,31 +1,6 @@
 import { firebaseDb } from '../firebase';
 import userPageFactory from '../utilities/user-page-factory'; 
 
-const queuedRequests = [];
-const executeRequest = (context, request, name, id) => {
-    console.info(name + ' ' + id);
-    request.apply(context)
-        .catch(() => {
-
-        })
-        .then((resp) => {
-            console.info(name + ' FINISHED ' + id);
-            if(queuedRequests.length > 0){
-                let nextRequest = queuedRequests.shift();
-                executeRequest(nextRequest.context, nextRequest.request, nextRequest.name, nextRequest.id);   
-            } else {
-                queuedRequests.splice(0, 1);
-            }
-        });
-};
-const enqueueRequest = (context, request, name, id) => {
-    queuedRequests.push({ context, request, name, id});
-
-    if(queuedRequests.length === 1){
-        return executeRequest(context, request, name, id);
-    }
-};
-
 function unwrapNodeSnapshot(nodeSnapshot){
     let node = nodeSnapshot.val();
     node.childIds = node.childIds || [];
@@ -269,4 +244,37 @@ function escapeEmail(email) {
 
 function unescapeEmail(email) {
     return (email || '').replace(',', '.');
+}
+
+const queuedRequests = [];
+
+function executeRequest(context, request, name, id){
+    console.info(name + ' ' + id);
+    request.apply(context)
+        .catch(() => {
+
+        })
+        .then((resp) => {
+            console.info(name + ' FINISHED ' + id);
+            if(queuedRequests.length > 0){
+                let nextRequest = queuedRequests.shift();
+                executeRequest(nextRequest.context, nextRequest.request, nextRequest.name, nextRequest.id);   
+            } else {
+                queuedRequests.splice(0, 1);
+            }
+        });
+}
+
+function enqueueRequest(context, request, name, id){
+    queuedRequests.push({ context, request, name, id});
+
+    if(queuedRequests.length === 1){
+        return executeRequest(context, request, name, id);
+    }
+}
+
+function unwrapNodeSnapshot(nodeSnapshot){
+    let node = nodeSnapshot.val();
+    node.childIds = node.childIds || [];
+    return node;
 }
