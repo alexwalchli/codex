@@ -41,12 +41,6 @@ export function subscribeToNodes(){
                     nodeRef.once('value').then(snapshot => {
                         let node = unwrapNodeSnapshot(snapshot);
 
-                        // TODO: should have a better filter. Potentially another index.
-                        if(node.deleted){
-                            resolve();
-                            return;
-                        }
-
                         initialNodeState[descendantId] = node;
                         dispatch(subscribeToNode(node.id));
 
@@ -106,8 +100,10 @@ export function subscribeToNode(nodeId){
             updatedNode = unwrapNodeSnapshot(snapshot);
 
             if(initialized && updatedNode){
-                let nodeWasNotChangedByCurrentUser = updatedNode.lastUpdatedById !== appState.auth.id;
-                if(nodeWasNotChangedByCurrentUser){
+                let nodeWasJustCreatedButNotByCurrentUser = updatedNode.lastUpdatedById === undefined && updatedNode.createdById !== appState.auth.id;
+                let nodeWasNotUpdatedByCurrentUser = updatedNode.lastUpdatedById !== appState.auth.id;
+                
+                if(nodeWasJustCreatedButNotByCurrentUser && nodeWasNotUpdatedByCurrentUser){
                     dispatch(nodeUpdated(updatedNode));
                 }
             }
@@ -184,11 +180,13 @@ export function focusNode(nodeId){
         nodeIdsToDeselect.forEach(id => {
             events.push(nodeDeselected(id));
         });
-        dbRepository.updateNodeSelectedByUser(nodeIdToUnfocus, null, null);
-        dbRepository.updateNodeSelectedByUser(nodeId, appState.auth.id, appState.auth.displayName);
+        
         events.push(nodeUnfocused(nodeIdToUnfocus));
         events.push(nodeFocused(nodeId));
         dispatch(nodeTransaction(events));
+
+        dbRepository.updateNodeSelectedByUser(nodeIdToUnfocus, null, null);
+        dbRepository.updateNodeSelectedByUser(nodeId, appState.auth.id, appState.auth.displayName);
     };
 }
 
@@ -218,7 +216,8 @@ export function focusNodeBelow(currentNodeId){
 export function demoteNode(nodeId, parentId){
     return (dispatch, getState) => {
         const appState = getState();
-        var siblingAbove = getSiblingNodeAbove(getPresentNodes(appState), nodeId, parentId);
+        const rootNodeId = getRootNodeId(appState);
+        var siblingAbove = getNextNodeThatIsVisible(rootNodeId, getPresentNodes(appState), nodeId, true);
         var addAfterLastChildOfSiblingAboveId = siblingAbove.childIds[siblingAbove.childIds.length - 1];
         dispatch(nodeTransaction(generateEventsForReassignParentNode(nodeId, parentId, siblingAbove.id, addAfterLastChildOfSiblingAboveId, appState)));
         dispatch(nodeFocused(nodeId));

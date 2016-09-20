@@ -30,6 +30,7 @@
 }
 
 .top-bar li{
+    position: relative;
     vertical-align: middle;
     outline:0;
     display:table-cell;
@@ -58,6 +59,21 @@
 
 .top-bar li i{
     font-size:24px;
+}
+
+.top-bar li .dropdown{
+    position:absolute;
+    background-color:@top-bar-border-bottom-color;
+    min-width:300px;
+    right:0;
+    border-radius:10px;
+    z-index:1;
+
+    .dropdown-content {
+        font-size:1em;
+        color:@secondary-color;
+        padding:10px;
+    }
 }
 
 .top-bar .logo{

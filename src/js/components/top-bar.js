@@ -3,6 +3,7 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
 import SearchInput from '../containers/search-input';
+import ShareForm from '../containers/share-form';
 
 export class Topbar extends Component {
     constructor(props) {
@@ -11,7 +12,7 @@ export class Topbar extends Component {
     }
 
     render() {
-        const { signOut, auth } = this.props;
+        const { signOut, auth, currentUserPage, toggleShareDropdown, app } = this.props;
         return (
             <nav className="top-bar clearfix">
                 <div className="top-bar-left">
@@ -22,7 +23,16 @@ export class Topbar extends Component {
                 </div>
                 <div className="top-bar-right">
                     <ul className="menu">
-                        <li><a><i className="icon dripicons-user-group"></i></a></li>
+                        <li>
+                            <a onClick={toggleShareDropdown}><i className="icon dripicons-user-group"></i></a>
+                            { app.shareDropdownVisible ? 
+                            <div className="dropdown">
+                                <div className="dropdown-content">
+                                    <ShareForm onShareCancel={toggleShareDropdown} userPageId={currentUserPage.id} />
+                                </div>
+                            </div>
+                            : null }
+                        </li>
                         <li><a><i className="icon dripicons-archive"></i></a></li>
                         <li><a><i className="icon dripicons-user"></i></a></li>
                     </ul>
@@ -33,7 +43,8 @@ export class Topbar extends Component {
 }
 
 function mapStateToProps(state, ownProps) {
-    return state;
+    const currentUserPage = state.userPages[state.app.currentUserPageId];
+    return {auth: state.auth,  currentUserPage, app: state.app, ...ownProps};
 }
 
 const ConnectedTopbar = connect(mapStateToProps, actions)(Topbar)

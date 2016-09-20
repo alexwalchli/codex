@@ -29,8 +29,11 @@
                 // 3.) If a user has a nodeUsers/$nodeId/$userId, give them access to delete(but not create or update) nodeUsers/$nodeId 
                 //     (for when a node is deleted so there are no orphaned nodeUsers from nodes,
                 //      but we also don't want non-creators to be able to give node access to other users)
-                ".write": "(auth != null) && (root.child('nodes/' + $nodeId + '/createdById').val() === auth.uid || (newData.val() === null && root.child('node_users/' + $nodeId + '/' + auth.uid).exists()))",
-                ".read": "(auth != null) && (root.child('node_users/' + $nodeId).val() === auth.uid || root.child('node_users/' + $nodeId + '/' + auth.uid).exists())"
+                //".write": "(auth != null) && (root.child('nodes/' + $nodeId + '/createdById').val() === auth.uid || (newData.val() === null && root.child('node_users/' + $nodeId + '/' + auth.uid).exists()))",
+                //".read": "(auth != null) && (root.child('node_users/' + $nodeId).val() === auth.uid || root.child('node_users/' + $nodeId + '/' + auth.uid).exists())"
+
+                ".read": "(auth != null)",
+                ".write": "(auth != null)"
             }
         },
         "node_userPages_users": {

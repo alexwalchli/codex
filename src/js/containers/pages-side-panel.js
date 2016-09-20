@@ -40,11 +40,6 @@ export class PagesSidePanel extends Component {
         this.editPageName(userPageId);
     }
 
-    onShareUserPageClicked(e, userPageId){
-        e.stopPropagation();
-        this.setState({ currentlySharingPageId : userPageId });
-    }
-
     onCancelEditPageNameClicked(e, userPageId){
         e.stopPropagation();
         this.setState({ currentlyEditingPageNameId : null });
@@ -79,11 +74,6 @@ export class PagesSidePanel extends Component {
         this.editPageName(null);
     }
 
-    onShareCancel(e, userPageId){
-        e.stopPropagation();
-        this.setState({ currentlySharingPageId : null });
-    }
-
     onPageClick(e, userPageId){
         const { navigateToUserPage } = this.props;
         const { currentlyEditingPageNameId, currentlySharingPageId } = this.state;
@@ -93,13 +83,6 @@ export class PagesSidePanel extends Component {
         }
 
         navigateToUserPage(userPageId);
-    }
-
-    onShareSubmit(e, userPageId, emails){
-        e.stopPropagation();
-        const { shareUserPage } = this.props;
-
-        shareUserPage(userPageId, emails);
     }
 
     render() {
@@ -127,7 +110,6 @@ export class PagesSidePanel extends Component {
                                                 <div className="title">{item.title}</div>
                                                 <div onClick={(e) => this.onEditPageNameClicked(e, item.id)} className="button edit-name icon dripicons-pencil"></div>
                                                 <div onClick={(e) => this.onDeleteClicked(e, item.id)} className="button delete icon dripicons-cross"></div>
-                                                <div onClick={(e) => this.onShareUserPageClicked(e, item.id)} className="button share icon dripicons-user-group"></div>
                                             </div>
                                         }
                                         </div>

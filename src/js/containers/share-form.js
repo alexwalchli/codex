@@ -25,8 +25,8 @@ export class ShareForm extends Component {
 
         return (
             <form className="share-form" >
-                <h2>{userPage.title}</h2>
-                <label>Add users by email:</label>
+                <h5>Share {userPage.title} with others</h5>
+                <label>Add people by email:</label>
                 <div>
                     <input ref="emails" type="text" />
                 </div>

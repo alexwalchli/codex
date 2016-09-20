@@ -1,6 +1,31 @@
 import { firebaseDb } from '../firebase';
 import userPageFactory from '../utilities/user-page-factory'; 
 
+const queuedRequests = [];
+const executeRequest = (context, request, name, id) => {
+    console.info(name + ' ' + id);
+    request.apply(context)
+        .catch(() => {
+
+        })
+        .then((resp) => {
+            console.info(name + ' FINISHED ' + id);
+            if(queuedRequests.length > 0){
+                let nextRequest = queuedRequests.shift();
+                executeRequest(nextRequest.context, nextRequest.request, nextRequest.name, nextRequest.id);   
+            } else {
+                queuedRequests.splice(0, 1);
+            }
+        });
+};
+const enqueueRequest = (context, request, name, id) => {
+    queuedRequests.push({ context, request, name, id});
+
+    if(queuedRequests.length === 1){
+        return executeRequest(context, request, name, id);
+    }
+};
+
 function unwrapNodeSnapshot(nodeSnapshot){
     let node = nodeSnapshot.val();
     node.childIds = node.childIds || [];
@@ -14,38 +39,48 @@ export function getNodeSnapshot(nodeId){
 }
 
 export function createNode(node, userPageId, updatedParentChildIds){
-    firebaseDb.ref('node_userPages_users/' + node.parentId).once('value').then(parentNodeUserPagesUsersSnapshot => {
-        let parentNodeUserPagesUsers = parentNodeUserPagesUsersSnapshot.val();
-        let nodeUpdates = {};
+    enqueueRequest(this, () => {
+        return firebaseDb.ref('node_userPages_users/' + node.parentId).once('value').then(parentNodeUserPagesUsersSnapshot => {
+            let parentNodeUserPagesUsers = parentNodeUserPagesUsersSnapshot.val();
+            let nodeUpdates = {};
 
-        nodeUpdates['nodes/' + node.id] = node;
-        nodeUpdates['nodes/' + node.parentId + '/childIds'] = updatedParentChildIds;
-        nodeUpdates['nodes/' + node.parentId + '/lastUpdatedById'] = node.createdById;
-        
-        return firebaseDb.ref().update(nodeUpdates)
-            .then(() => {
-                let manyToManyDbUpdates = {};
-                // give access to each user that has access to the new Node's parent 
-                Object.keys(parentNodeUserPagesUsers).forEach(userPageId => {
+            nodeUpdates['nodes/' + node.id] = node;
+            nodeUpdates['nodes/' + node.parentId + '/childIds'] = updatedParentChildIds;
+            nodeUpdates['nodes/' + node.parentId + '/lastUpdatedById'] = node.createdById;
+            
+            Object.keys(parentNodeUserPagesUsers).forEach(userPageId => {
 
-                    Object.keys(parentNodeUserPagesUsers[userPageId]).forEach(userId => {
-                        manyToManyDbUpdates['node_userPages_users/' + node.id + '/' + userPageId + '/' + userId] = true;
-                        manyToManyDbUpdates['userPage_users_nodes/' + userPageId + '/' + userId + '/' + node.id] = true;
-                        manyToManyDbUpdates['node_users/' + node.id + '/' + userId] = true;
-                    });
-
+                Object.keys(parentNodeUserPagesUsers[userPageId]).forEach(userId => {
+                    nodeUpdates['node_users/' + node.id + '/' + userId] = true;
+                    nodeUpdates['node_userPages_users/' + node.id + '/' + userPageId + '/' + userId] = true;
+                    nodeUpdates['userPage_users_nodes/' + userPageId + '/' + userId + '/' + node.id] = true;
                 });
-                
-                return firebaseDb.ref().update(manyToManyDbUpdates);
+
             });
-    });
+
+            return firebaseDb.ref().update(nodeUpdates).catch(() => {
+                debugger;
+            });
+        });
+    }, 'CREATENODE', node.id);
 }
 
 export function updateNodeSelectedByUser(nodeId, userId, userDisplayName){
     let dbUpdates = {};
     dbUpdates['nodes/' + nodeId + '/currentlySelectedById'] = userId;
     dbUpdates['nodes/' + nodeId + '/currentlySelectedBy'] = userDisplayName;
-    return firebaseDb.ref().update(dbUpdates);
+
+    enqueueRequest(this, () => {
+        return firebaseDb.ref('nodes/' + nodeId).once('value').then(snapshot => {
+            if(snapshot.val()){
+                return firebaseDb.ref().update(dbUpdates).catch(() => {
+                    debugger;
+                });
+            }
+
+            return Promise.resolve();
+        });
+    }, 'FOCUS', nodeId);
 }
 
 export function updateNodeContent(nodeId, newContent, userId){
@@ -53,7 +88,14 @@ export function updateNodeContent(nodeId, newContent, userId){
     dbUpdates['nodes/' + nodeId + '/content'] = newContent;
     dbUpdates['nodes/' + nodeId + '/lastUpdatedById'] = userId;
 
-    return firebaseDb.ref().update(dbUpdates);
+    enqueueRequest(this, () => {
+        return firebaseDb.ref('nodes/' + nodeId).once('value').then(snapshot => {
+            if(snapshot.val()){
+                return firebaseDb.ref().update(dbUpdates);
+            }
+            return Promise.resolve();
+        });
+    }, 'UPDATE', nodeId);
 }
 
 export function deleteNode(node, updatedParentChildIds, allDescendantIdsOfNode, userId){
@@ -83,7 +125,17 @@ export function deleteNode(node, updatedParentChildIds, allDescendantIdsOfNode, 
     //     dbUpdates['node_userPages_users/' + descedantId] = null;
     // });
 
-    return firebaseDb.ref().update(dbUpdates);
+    return enqueueRequest(this, () => {
+        return firebaseDb.ref('nodes/' + node.id).once('value').then(snapshot => {
+            if(snapshot.val()){
+                return firebaseDb.ref().update(dbUpdates).catch(() => {
+                    debugger;
+                });
+            }
+
+            return Promise.resolve();
+        });
+    }, 'DELETENODE', node.id);
 }
 
 export function createUserPage(userPage, rootNode, firstNode){
@@ -109,7 +161,6 @@ export function createUserPage(userPage, rootNode, firstNode){
 export function reassignParentNode(nodeId, oldParentId, newParentId, updatedChildIdsForOldParent, updatedChildIdsForNewParent, userId){
     // NOTE: This is assuming that specific nodes within a userPage are not shared. If that happens this will need to account for other users having access
     // to the new parent or not and updating the other many to many indices if necessary.
-
     let dbUpdates = {};
     dbUpdates['nodes/' + nodeId + '/parentId'] = newParentId;
     dbUpdates['nodes/' + nodeId + '/lastUpdatedById'] = userId;
@@ -120,7 +171,15 @@ export function reassignParentNode(nodeId, oldParentId, newParentId, updatedChil
     dbUpdates['nodes/' + newParentId + '/childIds'] = updatedChildIdsForNewParent;
     dbUpdates['nodes/' + newParentId + '/lastUpdatedById'] = userId;
 
-    return firebaseDb.ref().update(dbUpdates);
+    return enqueueRequest(this, () => {
+        return firebaseDb.ref('nodes/' + nodeId).once('value').then(snapshot => {
+            if(snapshot.val()){
+                return firebaseDb.ref().update(dbUpdates); 
+            }
+
+            return Promise.resolve();
+        });
+    }, 'REASSIGN', nodeId);
 }
 
 export function updateUserPageName(userPage, newUserPageName){
@@ -193,8 +252,8 @@ export function shareUserPage(userPage, allDescendantIds, emails, auth){
 
     return Promise.all(shareUserPagePromises).then(() => {
         firebaseDb.ref().update(newUserPageUpdates).then(() => {
-                    firebaseDb.ref().update(manyToManyConnectionDbUpdates);
-                });
+            firebaseDb.ref().update(manyToManyConnectionDbUpdates);
+        });
     });
 }
 

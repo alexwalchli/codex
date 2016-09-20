@@ -23,6 +23,13 @@ export function navigateToUserPage(userPageId){
 
 export const SIDE_PANEL_TOGGLED = 'SIDE_PANEL_TOGGLED';
 export const NAVIGATED_TO_USER_PAGE = 'NAVIGATED_TO_USER_PAGE';
+export const TOGGLE_SHARE_DROPDOWN = 'TOGGLE_SHARE_DROPDOWN';
+
+export function toggleShareDropdown(){
+    return {
+        type: TOGGLE_SHARE_DROPDOWN
+    };
+}
 
 export function sidePanelToggled(){
     return {

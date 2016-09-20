@@ -104,7 +104,8 @@ function handleAction(newState, action){
 
     if(action.type === NODES_DELETED){
         action.payload.forEach(nodeId => {
-            delete newState[nodeId];
+            newState[nodeId].deleted = true;
+            newState[nodeId].visible = false;
         });
     }
 
