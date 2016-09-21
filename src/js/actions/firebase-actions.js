@@ -1,5 +1,6 @@
 import { firebaseDb } from '../firebase';
 import userPageFactory from '../utilities/user-page-factory'; 
+import * as firebaseRequestQueueActions from './firebase-request-queue';
 
 function unwrapNodeSnapshot(nodeSnapshot){
     let node = nodeSnapshot.val();
@@ -14,103 +15,86 @@ export function getNodeSnapshot(nodeId){
 }
 
 export function createNode(node, userPageId, updatedParentChildIds){
-    enqueueRequest(this, () => {
-        return firebaseDb.ref('node_userPages_users/' + node.parentId).once('value').then(parentNodeUserPagesUsersSnapshot => {
-            let parentNodeUserPagesUsers = parentNodeUserPagesUsersSnapshot.val();
-            let nodeUpdates = {};
-
-            nodeUpdates['nodes/' + node.id] = node;
-            nodeUpdates['nodes/' + node.parentId + '/childIds'] = updatedParentChildIds;
-            nodeUpdates['nodes/' + node.parentId + '/lastUpdatedById'] = node.createdById;
-            
-            Object.keys(parentNodeUserPagesUsers).forEach(userPageId => {
-
-                Object.keys(parentNodeUserPagesUsers[userPageId]).forEach(userId => {
-                    nodeUpdates['node_users/' + node.id + '/' + userId] = true;
-                    nodeUpdates['node_userPages_users/' + node.id + '/' + userPageId + '/' + userId] = true;
-                    nodeUpdates['userPage_users_nodes/' + userPageId + '/' + userId + '/' + node.id] = true;
+    return dispatch => {
+        dispatch(firebaseRequestQueueActions.enqueueRequest(this, () => {
+            return firebaseDb.ref('node_userPages_users/' + node.parentId).once('value').then(parentNodeUserPagesUsersSnapshot => {
+                const parentNodeUserPagesUsers = parentNodeUserPagesUsersSnapshot.val();
+                const nodeUpdates = {
+                    [`nodes/${node.id}`] : node,
+                    [`nodes/${node.parentId}/childIds`]: updatedParentChildIds,
+                    [`nodes/${node.parentId}/lastUpdatedById`]: node.createdById
+                };
+                
+                Object.keys(parentNodeUserPagesUsers).forEach(userPageId => {
+                    Object.keys(parentNodeUserPagesUsers[userPageId]).forEach(userId => {
+                        nodeUpdates[`node_users/${node.id}/${userId}`] = true;
+                        nodeUpdates[`node_userPages_users/${node.id}/${userPageId}/${userId}`] = true;
+                        nodeUpdates[`userPage_users_nodes/${userPageId}/${userId}/${node.id}`] = true;
+                    });
                 });
 
+                return firebaseDb.ref().update(nodeUpdates);
             });
-
-            return firebaseDb.ref().update(nodeUpdates).catch(() => {
-                debugger;
-            });
-        });
-    }, 'CREATENODE', node.id);
+        }));
+    };
 }
 
 export function updateNodeSelectedByUser(nodeId, userId, userDisplayName){
-    let dbUpdates = {};
-    dbUpdates['nodes/' + nodeId + '/currentlySelectedById'] = userId;
-    dbUpdates['nodes/' + nodeId + '/currentlySelectedBy'] = userDisplayName;
+    let dbUpdates = {
+        [`nodes/${nodeId}/currentlySelectedById`] : userId,
+        [`nodes/${nodeId}/currentlySelectedBy`] : userDisplayName
+    };
 
     enqueueRequest(this, () => {
-        return firebaseDb.ref('nodes/' + nodeId).once('value').then(snapshot => {
+        return firebaseDb.ref(`nodes/${nodeId}`).once('value').then(snapshot => {
             if(snapshot.val()){
-                return firebaseDb.ref().update(dbUpdates).catch(() => {
-                    debugger;
-                });
+                return firebaseDb.ref().update(dbUpdates);
             }
 
             return Promise.resolve();
         });
-    }, 'FOCUS', nodeId);
+    });
 }
 
 export function updateNodeContent(nodeId, newContent, userId){
-    let dbUpdates = {};
-    dbUpdates['nodes/' + nodeId + '/content'] = newContent;
-    dbUpdates['nodes/' + nodeId + '/lastUpdatedById'] = userId;
+    let dbUpdates = {
+    [`nodes/${nodeId}/content`] : newContent,
+    [`nodes/${nodeId}/lastUpdatedById`] : userId
+    };
 
     enqueueRequest(this, () => {
-        return firebaseDb.ref('nodes/' + nodeId).once('value').then(snapshot => {
+        return firebaseDb.ref(`nodes/${nodeId}`).once('value').then(snapshot => {
             if(snapshot.val()){
                 return firebaseDb.ref().update(dbUpdates);
             }
             return Promise.resolve();
         });
-    }, 'UPDATE', nodeId);
+    });
 }
 
 export function deleteNode(node, updatedParentChildIds, allDescendantIdsOfNode, userId){
-    let dbUpdates = {};
-    dbUpdates['nodes/' + node.id + '/deleted'] = true;
-    dbUpdates['nodes/' + node.id + '/lastUpdatedById/'] = userId;
-    dbUpdates['nodes/' + node.parentId + '/childIds/'] = updatedParentChildIds;
-    dbUpdates['nodes/' + node.parentId + '/lastUpdatedById/'] = userId;
+    let dbUpdates = {
+        [`nodes/${node.id}/deleted`] : true,
+        [`nodes/${node.id}/lastUpdatedById/`] : userId,
+        [`nodes/${node.parentId}/childIds/`] : updatedParentChildIds,
+        [`nodes/${node.parentId}/lastUpdatedById/`] : userId
+    };
+    
 
     allDescendantIdsOfNode.forEach(descedantId => {
-        dbUpdates['nodes/' + descedantId + '/deleted'] = true;
-        dbUpdates['nodes/' + descedantId + '/lastUpdatedById/'] = userId;
+        dbUpdates[`nodes/${descedantId}/deleted`] = true;
+        dbUpdates[`nodes/${descedantId}/lastUpdatedById/`] = userId;
     });
 
-    // TODO: decide if we should delete many to many indices
-
-    //dbUpdates['node_users/' + node.id] = null;
-
-    // allDescendantIds.forEach(descedantId => {
-    //     // remove all many to many indices, node_userPages_users and userPage_users_nodes
-    //     firebaseDb.ref('node_userPages_users/' + descedantId).once('value').then(nodeUserPageUsersSnapshot => {
-    //         Object.keys(nodeUserPageUsersSnapshot.val()).forEach(userPageId => {
-    //             dbUpdates['userPage_users_nodes/' + userPageId] = null;
-    //         });
-    //     });
-
-    //     dbUpdates['node_userPages_users/' + descedantId] = null;
-    // });
-
     return enqueueRequest(this, () => {
-        return firebaseDb.ref('nodes/' + node.id).once('value').then(snapshot => {
+        return firebaseDb.ref(`nodes/${node.id}`).once('value').then(snapshot => {
             if(snapshot.val()){
-                return firebaseDb.ref().update(dbUpdates).catch(() => {
-                    debugger;
-                });
+                return firebaseDb.ref().update(dbUpdates);
             }
 
             return Promise.resolve();
         });
-    }, 'DELETENODE', node.id);
+    });
 }
 
 export function createUserPage(userPage, rootNode, firstNode){
@@ -248,14 +232,12 @@ function unescapeEmail(email) {
 
 const queuedRequests = [];
 
-function executeRequest(context, request, name, id){
-    console.info(name + ' ' + id);
+function executeRequest(context, request){
     request.apply(context)
         .catch(() => {
 
         })
         .then((resp) => {
-            console.info(name + ' FINISHED ' + id);
             if(queuedRequests.length > 0){
                 let nextRequest = queuedRequests.shift();
                 executeRequest(nextRequest.context, nextRequest.request, nextRequest.name, nextRequest.id);   

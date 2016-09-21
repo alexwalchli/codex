@@ -43,7 +43,7 @@ export function createNode(createdFromSiblingId, createdFromSiblingOffset, paren
         }
 
         dispatch(nodeTransaction(optimisticEvents));
-        firebaseActions.createNode(newNode, appState.app.currentUserPageId, updatedParentChildIds);
+        dispatch(firebaseActions.createNode(newNode, appState.app.currentUserPageId, updatedParentChildIds));
     };
 }
 

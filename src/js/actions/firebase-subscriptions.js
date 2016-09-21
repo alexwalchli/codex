@@ -3,6 +3,7 @@ import * as firebaseActions from './firebase-actions';
 import * as authActions from './auth';
 import * as userPageActions from './user-pages';
 import * as appActions from './app';
+import * as nodeActions from './node';
 import { dictionaryToArray, getPresentNodes } from '../utilities/tree-queries';
 
 let initialized = false;
@@ -102,7 +103,7 @@ export function subscribeToUserPageUserNodes(userPageId){
             if(initialized && nodeDoesNotExistsInAppState){
                 firebaseActions.getNodeSnapshot(nodeId).then(node => {
                     dispatch(subscribeToNode(nodeId));
-                    dispatch(nodeCreated(node));
+                    dispatch(nodeActions.nodeCreated(node));
                 });
             }
         });
@@ -111,7 +112,7 @@ export function subscribeToUserPageUserNodes(userPageId){
             let nodeId = snapshot.key,
                 nodeDoesNotExistsInAppState = !getPresentNodes(getState())[nodeId];
             if(initialized && nodeDoesNotExistsInAppState){
-                dispatch(nodesDeleted([nodeId]));
+                dispatch(nodeActions.nodesDeleted([nodeId]));
             }
         });
     };
@@ -132,7 +133,7 @@ export function subscribeToNode(nodeId){
                 let nodeWasNotUpdatedByCurrentUser = updatedNode.lastUpdatedById !== appState.auth.id;
                 
                 if(nodeWasJustCreatedButNotByCurrentUser && nodeWasNotUpdatedByCurrentUser){
-                    dispatch(nodeUpdated(updatedNode));
+                    dispatch(nodeActions.nodeUpdated(updatedNode));
                 }
             }
 
@@ -146,7 +147,7 @@ export function subscribeToNode(nodeId){
 
             let nodeExistsInAppState = getPresentNodes(getState())[snapshot.key];
             if(initialized && nodeExistsInAppState){
-                dispatch(nodesDeleted([snapshot.key]));
+                dispatch(nodeActions.nodesDeleted([snapshot.key]));
             }   
 
         });
