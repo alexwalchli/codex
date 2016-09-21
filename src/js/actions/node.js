@@ -57,7 +57,7 @@ function nodeTransaction(events){
 export function updateContent(nodeId, newContent) {
     return (dispatch, getState) => {
         const appState = getState();
-        firebaseActions.updateNodeContent(nodeId, newContent, appState.auth.id);
+        dispatch(firebaseActions.updateNodeContent(nodeId, newContent, appState.auth.id));
         dispatch(contentUpdated(nodeId, newContent));
     };
 }
@@ -77,8 +77,8 @@ export function focusNode(nodeId){
         events.push(nodeFocused(nodeId));
         dispatch(nodeTransaction(events));
 
-        firebaseActions.updateNodeSelectedByUser(nodeIdToUnfocus, null, null);
-        firebaseActions.updateNodeSelectedByUser(nodeId, appState.auth.id, appState.auth.displayName);
+        dispatch(firebaseActions.updateNodeSelectedByUser(nodeIdToUnfocus, null, null));
+        dispatch(firebaseActions.updateNodeSelectedByUser(nodeId, appState.auth.id, appState.auth.displayName));
     };
 }
 
@@ -111,7 +111,7 @@ export function demoteNode(nodeId, parentId){
         const rootNodeId = getRootNodeId(appState);
         var siblingAbove = getNextNodeThatIsVisible(rootNodeId, getPresentNodes(appState), nodeId, true);
         var addAfterLastChildOfSiblingAboveId = siblingAbove.childIds[siblingAbove.childIds.length - 1];
-        dispatch(nodeTransaction(generateEventsForReassignParentNode(nodeId, parentId, siblingAbove.id, addAfterLastChildOfSiblingAboveId, appState)));
+        dispatch(nodeTransaction(generateEventsForReassignParentNode(dispatch, nodeId, parentId, siblingAbove.id, addAfterLastChildOfSiblingAboveId, appState)));
         dispatch(nodeFocused(nodeId));
     };
 }
@@ -126,16 +126,16 @@ export function promoteNode(nodeId, parentId){
         var siblingIds = parentNode.childIds;
         for(let i = siblingIds.indexOf(nodeId) + 1; i < siblingIds.length; i++){
             let sibling = nodes[siblingIds[i]];
-            optimisticEvents.push(generateEventsForReassignParentNode(sibling.id, sibling.parentId, nodeId, appState));
+            optimisticEvents.push(generateEventsForReassignParentNode(dispatch, sibling.id, sibling.parentId, nodeId, appState));
         }
-        optimisticEvents = [ ...optimisticEvents, ...generateEventsForReassignParentNode(nodeId, parentId, parentNode.parentId, parentId, appState)];
+        optimisticEvents = [ ...optimisticEvents, ...generateEventsForReassignParentNode(dispatch, nodeId, parentId, parentNode.parentId, parentId, appState)];
         dispatch(nodeTransaction(optimisticEvents));
         dispatch(nodeFocused(nodeId));
     };
 }
 
 // attaches a node to a new parent node and optimistically updates local app store
-function generateEventsForReassignParentNode(nodeId, oldParentId, newParentId, addAfterSiblingId, appState){
+function generateEventsForReassignParentNode(dispatch, nodeId, oldParentId, newParentId, addAfterSiblingId, appState){
     let optimisticEvents = [];
     const updatedById = appState.auth.id;
     
@@ -152,7 +152,7 @@ function generateEventsForReassignParentNode(nodeId, oldParentId, newParentId, a
     let updatedChildIdsForNewParent = getUpdatedChildIdsForAddition(newParentNode, nodeId, addAfterSiblingId, 1);
     optimisticEvents.push(childIdsUpdated(newParentId, updatedChildIdsForNewParent, updatedById));
 
-    firebaseActions.reassignParentNode(nodeId, oldParentId, newParentId, updatedChildIdsForOldParent, updatedChildIdsForNewParent, appState.auth.id);
+    dispatch(firebaseActions.reassignParentNode(nodeId, oldParentId, newParentId, updatedChildIdsForOldParent, updatedChildIdsForNewParent, appState.auth.id));
 
     return optimisticEvents;
 }
@@ -168,7 +168,7 @@ export function deleteNode(nodeId, parentId) {
             dispatch(childIdsUpdated(nodeToDelete.parentId, updatedParentChildIds));
             dispatch(nodesDeleted([nodeId]));
 
-            firebaseActions.deleteNode(nodeToDelete, updatedParentChildIds, descendantIdsOfNode, appState.auth.id);
+            dispatch(firebaseActions.deleteNode(nodeToDelete, updatedParentChildIds, descendantIdsOfNode, appState.auth.id));
         }
     };
 }

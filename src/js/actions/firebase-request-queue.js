@@ -1,14 +1,14 @@
 // request statuses
 export const QUEUED_REQUEST_PENDING_STATUS = `PENDING`;
-export const QUEUED_REQUEST_COMPLETED_STATUS = `COMPLETED`;
+export const QUEUED_REQUEST_STARTED_STATUS = `STARTED`;
 export const QUEUED_REQUEST_FAILED_STATUS = `FAILED`;
 
 export function executeRequest(queuedRequest){
   return (dispatch, getState) => {
-    dispatch(queuedRequestStarted(queuedRequest.id));
-    
-    queueRequest.request.apply(context)
-      .catch((error) => dispatch(queuedRequestFailed(queuedRequest.id, error)))
+    dispatch(queuedRequestStarted(queuedRequest.requestId));
+
+    queuedRequest.request.apply(queuedRequest.context)
+      .catch((error) => dispatch(queuedRequestFailed(queuedRequest.requestId, error)))
       .then(() => {
         let queuedRequests = getState().queuedRequests;
         let pendingQueuedRequests = queuedRequests.filter(r => r.status === QUEUED_REQUEST_PENDING_STATUS);
@@ -24,12 +24,11 @@ export function executeRequest(queuedRequest){
 export function enqueueRequest(context, request){
   return (dispatch, getState) => {
     const queuedRequests = getState().queuedRequests;
-    const requestId = appState.requestQueue.requests.length + 1;
+    const requestId = queuedRequests.length + 1;
 
+    dispatch(queueRequest(requestId, context, request));
     if(queuedRequests.filter(r => r.status === QUEUED_REQUEST_PENDING_STATUS).length === 0){
       dispatch(executeRequest({requestId, context, request}));
-    } else {
-      dispatch(queueRequest(newRequestId, context, request));
     }
   }; 
 }
@@ -37,8 +36,8 @@ export function enqueueRequest(context, request){
 // queued request action types
 export const QUEUE_REQUEST = `QUEUE_REQUEST`;
 export const QUEUED_REQUEST_STARTED = `QUEUED_REQUEST_STARTED`;
+export const QUEUED_REQUEST_FAILED = `QUEUED_REQUEST_FAILED`;
 export const QUEUED_REQUEST_COMPLETED = `QUEUED_REQUEST_COMPLETED`;
-export const QUEUED_REQUEST_FAILED = `QUEUED_REQUEST_STARTED`;
 
 function queueRequest(requestId, context, request){
   return {

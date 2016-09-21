@@ -6,24 +6,23 @@ export const AuthState = {
   id: null
 };
 
-
 export function auth(state = {}, {payload, type}) {
-    switch (type) {
-        case UPDATE_AUTH_STATE:
-        case SIGN_IN_SUCCESS:
-            return  Object.assign(state, {
-                initialCheck: true,
-                authenticated: !!payload,
-                id: payload ? payload.uid : null,
-                displayName: payload ? payload.displayName : null,
-                email: payload ? payload.email : null
-            });
-        case SIGN_OUT_SUCCESS:
-            return {
-                authenticated: false,
-                id: null
-            };
-        default:
-            return state;
-    }
+  switch (type) {
+    case UPDATE_AUTH_STATE:
+    case SIGN_IN_SUCCESS:
+      return  Object.assign(state, {
+        initialCheck: true,
+        authenticated: !!payload,
+        id: payload ? payload.uid : null,
+        displayName: payload ? payload.displayName : null,
+        email: payload ? payload.email : null
+      });
+    case SIGN_OUT_SUCCESS:
+      return {
+        authenticated: false,
+        id: null
+      };
+    default:
+      return state;
+  }
 }
