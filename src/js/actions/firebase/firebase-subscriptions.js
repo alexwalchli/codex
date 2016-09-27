@@ -1,10 +1,11 @@
-import { firebaseAuth, firebaseDb } from '../firebase';
-import * as firebaseActions from './firebase-actions';
-import * as authActions from './auth';
-import * as userPageActions from './user-pages';
-import * as appActions from './app';
-import * as nodeActions from './node';
-import { dictionaryToArray, getPresentNodes } from '../utilities/tree-queries';
+import { firebaseAuth, firebaseDb } from '../../firebase';
+import * as firebaseNodeActions from './firebase-node-actions';
+import * as firebaseUserPageActions from './firebase-userpage-actions';
+import * as authActions from '../auth';
+import * as userPageActions from '../user-pages';
+import * as appActions from '../app';
+import * as nodeActions from '../node';
+import { dictionaryToArray, getPresentNodes } from '../../utilities/tree-queries';
 
 let initialized = false;
 export const INITIAL_NODE_STATE_LOADED = 'INITIAL_NODE_STATE_LOADED';
@@ -15,7 +16,7 @@ export function subscribeToAuthStateChanged(dispatch) {
             user => {
                 dispatch(authActions.updateAuthState(user));
                 if(user){
-                    firebaseActions.createEmailUser(user.email, user.uid);
+                    dispatch(firebaseUserPageActions.createEmailUser(user.email, user.uid));
                     dispatch(subscribeToUserPages());
                 }
             },
@@ -101,7 +102,7 @@ export function subscribeToUserPageUserNodes(userPageId){
             let nodeId = snapshot.key,
                 nodeDoesNotExistsInAppState = !getPresentNodes(getState())[nodeId];
             if(initialized && nodeDoesNotExistsInAppState){
-                firebaseActions.getNodeSnapshot(nodeId).then(node => {
+                firebaseNodeActions.getNodeSnapshot(nodeId).then(node => {
                     dispatch(subscribeToNode(nodeId));
                     dispatch(nodeActions.nodeCreated(node));
                 });

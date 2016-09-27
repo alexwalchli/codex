@@ -2,7 +2,7 @@ import { NODE_CREATED, NODE_FOCUSED, NODE_SHOWN, NODE_HIDDEN, NODE_EXPANDED, NOD
          CONTENT_UPDATED, CHILD_IDS_UPDATED, NODE_UNFOCUSED, NODES_DELETED, PARENT_UPDATED, NODE_SELECTED, NODE_DESELECTED, NODE_COMPLETE_TOGGLED,
          NODE_EXPANSION_TOGGLED, NODE_TRANSACTION, NODE_PARENT_UPDATED, NODE_UPDATED, NODES_SEARCHED, TOGGLE_NODE_MENU, CLOSE_ALL_NODE_MENUS } 
     from '../actions/node';
-import { INITIAL_NODE_STATE_LOADED } from '../actions/firebase-subscriptions';
+import { INITIAL_NODE_STATE_LOADED } from '../actions/firebase/firebase-subscriptions';
 import { dictionaryToArray } from '../utilities/tree-queries';
 
 function childIds(state, action) {

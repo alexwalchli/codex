@@ -4,7 +4,7 @@ import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import configureStore from './store/configure-store';
 import App from './components/app';
-import { subscribeToAuthStateChanged } from './actions/firebase-subscriptions';
+import { subscribeToAuthStateChanged } from './actions/firebase/firebase-subscriptions';
 
 let stylesheet = require('../less/app.less');
 

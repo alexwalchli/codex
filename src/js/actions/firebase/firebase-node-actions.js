@@ -1,4 +1,4 @@
-import { firebaseDb } from '../firebase';
+import { firebaseDb } from '../../firebase';
 import * as firebaseRequestQueueActions from './firebase-request-queue';
 
 function unwrapNodeSnapshot(nodeSnapshot){

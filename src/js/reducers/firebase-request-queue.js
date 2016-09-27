@@ -1,5 +1,5 @@
 import { QUEUE_REQUEST, QUEUED_REQUEST_STARTED, QUEUED_REQUEST_COMPLETED, QUEUED_REQUEST_FAILED,
-         QUEUED_REQUEST_PENDING_STATUS, QUEUED_REQUEST_STARTED_STATUS, QUEUED_REQUEST_FAILED_STATUS } from '../actions/firebase-request-queue';
+         QUEUED_REQUEST_PENDING_STATUS, QUEUED_REQUEST_STARTED_STATUS, QUEUED_REQUEST_FAILED_STATUS } from '../actions/firebase/firebase-request-queue';
 
 function queuedRequest(state, {payload, type}){
   switch (type) {
