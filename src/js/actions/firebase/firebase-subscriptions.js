@@ -16,7 +16,7 @@ export function subscribeToAuthStateChanged(dispatch) {
             user => {
                 dispatch(authActions.updateAuthState(user));
                 if(user){
-                    dispatch(firebaseUserPageActions.createEmailUser(user.email, user.uid));
+                    firebaseUserPageActions.createEmailUser(user.email, user.uid);
                     dispatch(subscribeToUserPages());
                 }
             },

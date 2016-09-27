@@ -1,4 +1,4 @@
-import { firebaseDb } from '../firebase';
+import { firebaseDb } from '../../firebase';
 import userPageFactory from '../../utilities/user-page-factory'; 
 
 export function createUserPage(userPage, rootNode, firstNode){
