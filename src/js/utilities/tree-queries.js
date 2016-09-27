@@ -16,12 +16,6 @@ export function getRootNodeId(appState){
     return dictionaryToArray(appState.userPages).find(up => up.id === currentUserPageId).rootNodeId;
 }
 
-// retrieves a node's index in the full, flattened, tree
-export function getNodeIndex(appState, nodeId){
-    const rootNodeId = getRootNodeId(appState);
-    return getAllNodeIdsOrdered(nodes, rootNodeId).indexOf(nodeId);
-}
-
 // retrieves a flattened ordered list of all node IDs starting under startNodeId
 export function getAllNodeIdsOrdered(nodes, startNodeId){
     let allOrderedChildIds = getAllDescendantIds(nodes, startNodeId);
