@@ -9,13 +9,13 @@ import { dictionaryToArray, getPresentNodes, getRootNodeId, getAllDescendantIds,
          getCurrentlySelectedAndFocusedNodes, getCurrentlySelectedNodeIds, getCurrentlyFocusedNodeId, getAllUncollapsedDescedantIds } 
     from '../utilities/tree-queries';
 import treeDiffer from '../utilities/tree-differ';
-import * as firebaseActions from './firebase-actions';
+import * as firebaseActions from './firebase/';
 
 export const NODE_TRANSACTION = 'NODE_TRANSACTION';
 
-/////////////////////
-// Action Creators //
-/////////////////////
+/////////////
+// Actions //
+/////////////
 
 // optimistically creates a node in client state then pushes to persistence
 export function createNode(createdFromSiblingId, createdFromSiblingOffset, parentId, content) {
@@ -270,9 +270,35 @@ export function updateNodeWidgetDataIfNecessary(nodeId, content){
     };
 }
 
-/////////////
-// Actions //
-/////////////
+export function toggleNodeMenu(nodeId){
+    return dispatch => {
+        dispatch(closeAllNodeMenus());
+        dispatch({
+            type: TOGGLE_NODE_MENU,
+            undoable: false,
+            nodeId
+        });
+    };
+}
+
+export function toggleNodeComplete(nodeId){
+  return (dispatch, getState) => {
+    const node = getPresentNodes(getState())[nodeId];
+    dispatch(nodeCompleteToggled(nodeId));
+    dispatch(firebaseActions.updateNodeComplete(nodeId, !node.completed));
+  };
+}
+
+export function updateNodeNotes(nodeId, notes){
+  return dispatch => {
+    dispatch(nodeNotesUpdated(nodeId, notes));
+    dispatch(firebaseActions.updateNodeNotes(nodeId, notes));
+  };
+}
+
+/////////////////////
+// Action Creators //
+/////////////////////
 
 export const NODE_CREATED = 'NODE_CREATED';
 export const NODE_UPDATED = 'NODE_UPDATED';
@@ -292,6 +318,10 @@ export const NODE_DESELECTED = 'NODE_DESELECTED';
 export const NODES_SEARCHED = 'NODES_SEARCHED';
 export const NODE_WIDGETS_UPDATED = "NODE_WIDGETS_UPDATED"; // signifies a node that has had its widget data updated
 export const NODE_WIDGETS_UPDATING = "NODE_WIDGETS_UPDATING"; // signifies a node that is having its widget data updated
+export const TOGGLE_NODE_MENU = "TOGGLE_NODE_MENU";
+export const CLOSE_ALL_NODE_MENUS = "CLOSE_ALL_NODE_MENUS";
+export const NODE_COMPLETE_TOGGLED = `NODE_COMPLETE_TOGGLED`;
+export const NODE_NOTES_UPDATED = `NODE_NOTES_UPDATED`;
 
 export function nodeCreated(newNode){
     return {
@@ -400,6 +430,7 @@ export function nodeParentUpdated(nodeId, newParentId, updatedById){
 export function nodesSearched(nodeIds){
     return {
         type: NODES_SEARCHED,
+        undoable: false,
         payload: {
             resultingNodeIds: nodeIds
         }
@@ -419,6 +450,30 @@ export function nodeWidgetDataUpdating(nodeId){
         type: NODE_WIDGETS_UPDATING,
         nodeId
     };
+}
+
+export function closeAllNodeMenus(){
+    return {
+        type: CLOSE_ALL_NODE_MENUS,
+        undoable: false,
+    };
+}
+
+export function nodeCompleteToggled(nodeId){
+  return {
+    type: NODE_COMPLETE_TOGGLED,
+    nodeId
+  };
+}
+
+export function nodeNotesUpdated(nodeId, notes){
+  return {
+    type: NODE_COMPLETE_TOGGLED,
+    nodeId,
+    payload: {
+      notes
+    }
+  };
 }
 
 ///////////////////////

@@ -221,9 +221,34 @@ export class Node extends Component {
         }
     }
 
+    onBulletMenuBtnClicked(e){
+        const{ id, toggleNodeMenu } = this.props;
+        e.stopPropagation();
+        toggleNodeMenu(id);
+    }
+
+    onCompleteBulletClicked(e){
+        const{ id, toggleNodeComplete, toggleNodeMenu } = this.props;
+        e.stopPropagation();
+        toggleNodeComplete(id);
+        toggleNodeMenu(id);
+    }
+
+    onDeleteBulletClicked(e){
+        const{ id, parentId, deleteNode } = this.props;
+        e.stopPropagation();
+        deleteNode(id, parentId);
+    }
+
+    onNotesInputBlur(e){
+        const{id, updateNodeNotes} = this.props;
+        const notes = this.refs['notesInput'].value;
+        updateNodeNotes(id, notes);
+    }
+
     render() {
-        const { parentId, childIds, id, focused, inReadMode, externalList, collapsed, visible, selected,
-                morphedContent, widgetDataUpdating, nodeInitialized, currentlySelectedBy, currentlySelectedById, auth } = this.props;
+        const { parentId, childIds, id, focused, inReadMode, externalList, collapsed, visible, selected, completeNode, completed, notes,
+                morphedContent, widgetDataUpdating, nodeInitialized, currentlySelectedBy, currentlySelectedById, auth, toggleNodeMenu, menuVisible } = this.props;
         const { content, suggestions } = this.state;
 
         if(!nodeInitialized){
@@ -248,6 +273,9 @@ export class Node extends Component {
         if(collapsed){
             bulletClasses += ' collapsed';
         }
+        if(completed){
+            bulletClasses += ' completed';
+        }
 
         let currentlySelectedByAnotherUser = currentlySelectedById && currentlySelectedById !== auth.id;
         let currentlySelectedCss = currentlySelectedById && currentlySelectedByAnotherUser ? 'currentlySelected' : null;
@@ -258,8 +286,19 @@ export class Node extends Component {
             <div className={bulletClasses} onKeyDown={this.handleOnKeyDown}>
             {typeof parentId !== 'undefined' ?
                 <div className={`depth ${currentlySelectedCss}`}>
-                    {focused ? 
-                        <div className="menu-btn"><i className="icon dripicons-menu"></i></div>                        
+                    <div className="menu-btn" onClick={(e) => this.onBulletMenuBtnClicked(e)}><i className="icon dripicons-menu"></i></div>
+                    {menuVisible ?
+                        <div className="bullet-menu" onMouseLeave={() => toggleNodeMenu()}>
+                            <ul>
+                                <li><i className="icon dripicons-document"></i>Add note</li>
+                                <li onClick={(e) => this.onCompleteBulletClicked(e)}><i className="icon dripicons-checkmark"></i>
+                                    {completed ?
+                                    'Re-open'
+                                    :'Complete'}
+                                </li>
+                                <li onClick={(e) => this.onDeleteBulletClicked(e)}><i className="icon dripicons-cross"></i>Delete</li>
+                            </ul>
+                        </div>
                     :null}
                     <div className="children-outline"></div>
                     <div className="bullet-container" onClick={this.handleBulletClick}>
@@ -294,7 +333,9 @@ export class Node extends Component {
                         </ul>
                         : null }
                     </div>
-
+                    <div className="notes">
+                        <textarea ref="notesInput" value={notes} onBlur={() => this.onNotesInputBlur()} />
+                    </div>
                     {currentlySelectedByAnotherUser ? 
                         <div className="currentlySelectedBy">
                             <span>{currentlySelectedBy}</span>

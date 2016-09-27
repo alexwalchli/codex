@@ -15,6 +15,12 @@ export class App extends Component {
         super(props);
     }
 
+    onClick(e){
+        const { closeAllNodeMenus } = this.props;
+
+        closeAllNodeMenus();
+    }
+
     render() {
         const { togglePagesSidePanel } = this.props;
         const { pagesSidePanelVisible } = this.props.app;
@@ -28,7 +34,7 @@ export class App extends Component {
         let pagesSidePanelCss = `side-panel-toggle ${toggledCss}`;
 
         return (
-            <div id="app">
+            <div id="app" onClick={(e) => this.onClick(e)}>
                 { showSignIn ? 
                     <SignIn />
                     : null    

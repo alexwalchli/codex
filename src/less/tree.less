@@ -12,8 +12,14 @@
 .item{
     width:100%;
     position:relative;
-
     border:1px solid transparent;
+
+    &.completed {
+        > .depth .content .view-mode-content, > .depth .content input{
+            color:lighten(@secondary-color, 80%);
+            text-decoration: line-through;
+        }
+    }
 
     .currentlySelected{
         border:1px solid @secondary-color;
@@ -32,16 +38,41 @@
         }
     }
 
+    &:hover > .depth > .menu-btn > i{
+        visibility:visible;
+    }
+
+    .notes {
+        textarea {
+            color:lighten(@secondary-color, 50%);
+            background: transparent;
+            resize: none;
+            border: 0 none;
+            width: 100%;
+            outline: none;
+            height: 100%;
+            font-family: @base-font-face;
+        }
+    }
+
     .children{
         .menu-btn{
+            width:30px;
             position: absolute;
             top: 24px;
             left: -30px;
             color: #ccc;
             cursor:pointer;
             font-size:20px;
+            cursor:pointer;
 
+            > i {
+                 visibility:hidden;
+            }
             &:hover{
+                > i {
+                     visibility:visible;
+                }
                 color:#aaa;
             }
         }
@@ -162,6 +193,12 @@
     margin-left:40px;
 }
 
+.children .item .notes {
+    margin-left:40px;
+
+    textarea{ font-size: 1em; }
+}
+
 .children .item .content input, .item .content .view-mode-content{
     line-height: 60px;
     // font-size:28px;
@@ -182,6 +219,12 @@
 .children .children .content {
     height:36px;
     margin-left:34px;
+}
+
+.children .children .notes {
+    margin-left:34px;
+
+    textarea{ font-size: .95em; }
 }
 
 .children .children .children-outline{
@@ -238,6 +281,13 @@
 .children .children .children .content {
     height:36px;
     margin-left:30px;
+}
+
+.children .children .children .notes {
+    margin-left:30px;
+    textarea {
+        font-size:.85em;
+    }
 }
 
 .children .children .children .children-outline{

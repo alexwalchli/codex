@@ -1,0 +1,28 @@
+.bullet-menu{
+  position:absolute;
+  background-color:@panel-bg-color;
+  width:200px;
+  z-index:1;
+  color:@panel-font-color;
+  border-radius:6px;
+  border: 1px solid @panel-border-color;
+
+  ul{
+    padding:0;
+    margin:0;
+    li{
+      list-style: none;
+      padding:10px;
+      font-size: 14px;
+      cursor:pointer;
+
+      i{
+        margin-top:4px;
+      }
+
+      &:hover{
+        background-color:@panel-item-hover-color;
+      }
+    }
+  }
+}

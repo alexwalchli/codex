@@ -4,7 +4,7 @@ import { navigateToUserPage } from './app';
 import nodeFactory from '../utilities/node-factory';
 import userPageFactory from '../utilities/user-page-factory';
 import { dictionaryToArray, getAllDescendantIds, getPresentNodes } from '../utilities/tree-queries';
-import * as firebaseActions from './firebase-actions';
+import * as firebaseActions from './firebase/';
 
 ///////////////////
 // Action Creators 

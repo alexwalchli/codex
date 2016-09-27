@@ -1,5 +1,5 @@
 import * as nodeActions from './node';
-import * as firebaseSubscriptions from './firebase-subscriptions';
+import * as firebaseSubscriptions from './firebase/firebase-subscriptions';
 
 ///////////////////
 // Action Creators 
