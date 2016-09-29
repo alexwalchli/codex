@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../actions/node';
@@ -28,15 +29,26 @@ export class Node extends Component {
 
         this.state = { 
             tags: [],
-            content: props.content
+            content: props.content,
+            notes: props.notes,
+            bulletInputFocused: this.props.focused
         };
     }
 
     componentWillReceiveProps(newProps){
         this.setState({ 
             externalData: newProps.externalData,
-            content: newProps.content
+            content: newProps.content,
+            notes: newProps.notes,
+            bulletInputFocused: newProps.focused,
+            editingNotes: false
         });
+    }
+
+    componentDidUpdate(){
+        if(this.state.editingNotes){
+            this.refs.notesInput.focus();
+        }
     }
 
     handleChange(e, value) {
@@ -242,14 +254,48 @@ export class Node extends Component {
 
     onNotesInputBlur(e){
         const{id, updateNodeNotes} = this.props;
-        const notes = this.refs['notesInput'].value;
+        const notes = this.refs.notesInput.value;
         updateNodeNotes(id, notes);
+    }
+
+    onNotesInputKeyDown(e){
+        if(e.key === 'Enter'){
+            e.stopPropagation();
+        }
+        else if(e.key === 'Backspace' && !this.refs.notesInput.value){
+            e.stopPropagation();
+            this.setState({
+                editingNotes: false,
+                bulletInputFocused: true
+            });
+        } else {
+            this.setState({
+                editingNotes: true,
+                bulletInputFocused: false
+            });
+        }
+    }
+
+    onNotesInputClick(e){
+        this.setState({
+            editingNotes: true,
+            bulletInputFocused: false
+        });
+    }
+
+    onAddNoteClicked(e){
+        const{id, toggleNodeMenu} = this.props;
+        e.stopPropagation();
+        toggleNodeMenu(id);
+        this.setState({
+            editingNotes: true
+        });
     }
 
     render() {
         const { parentId, childIds, id, focused, inReadMode, externalList, collapsed, visible, selected, completeNode, completed, notes,
                 morphedContent, widgetDataUpdating, nodeInitialized, currentlySelectedBy, currentlySelectedById, auth, toggleNodeMenu, menuVisible } = this.props;
-        const { content, suggestions } = this.state;
+        const { content, suggestions, editingNotes } = this.state;
 
         if(!nodeInitialized){
             return (false);
@@ -277,20 +323,26 @@ export class Node extends Component {
             bulletClasses += ' completed';
         }
 
+        let notesCssClasses = 'notes';
+        if(!notes && !editingNotes){
+            notesCssClasses += ' hidden';
+        }
+
         let currentlySelectedByAnotherUser = currentlySelectedById && currentlySelectedById !== auth.id;
         let currentlySelectedCss = currentlySelectedById && currentlySelectedByAnotherUser ? 'currentlySelected' : null;
         let showToggleExpansionIcon = childIds.length;
         let childNodeClasses = 'children';
+        let showNotesInput = notes || editingNotes;
 
         return (
-            <div className={bulletClasses} onKeyDown={this.handleOnKeyDown}>
+            <div className={bulletClasses}>
             {typeof parentId !== 'undefined' ?
                 <div className={`depth ${currentlySelectedCss}`}>
                     <div className="menu-btn" onClick={(e) => this.onBulletMenuBtnClicked(e)}><i className="icon dripicons-menu"></i></div>
                     {menuVisible ?
                         <div className="bullet-menu" onMouseLeave={() => toggleNodeMenu()}>
                             <ul>
-                                <li><i className="icon dripicons-document"></i>Add note</li>
+                                <li onClick={(e) => this.onAddNoteClicked(e)}><i className="icon dripicons-document"></i>Add note</li>
                                 <li onClick={(e) => this.onCompleteBulletClicked(e)}><i className="icon dripicons-checkmark"></i>
                                     {completed ?
                                     'Re-open'
@@ -315,9 +367,10 @@ export class Node extends Component {
                             onChange={this.handleChange}
                             style={ defaultStyle({ singleLine: true }) }
                             placeholder={""}
-                            focused={this.props.focused}
+                            focused={this.state.bulletInputFocused}
                             onSelect={this.onSelect}
-                            onBlur={this.handleOnBlur}>
+                            onBlur={this.handleOnBlur}
+                            onKeyDown={this.handleOnKeyDown} >
 
                         <Mention onAdd={this.onAdd} onRemove={this.onRemove} data={ suggestions } style={defaultMentionStyle} />
                         </MentionsInput>
@@ -333,8 +386,12 @@ export class Node extends Component {
                         </ul>
                         : null }
                     </div>
-                    <div className="notes">
-                        <textarea ref="notesInput" value={notes} onBlur={() => this.onNotesInputBlur()} />
+                    <div className={notesCssClasses}>
+                        <textarea ref="notesInput" 
+                            defaultValue={notes} 
+                            onBlur={() => this.onNotesInputBlur()} 
+                            onKeyDown={(e) => this.onNotesInputKeyDown(e)}
+                            onClick={(e) => this.onNotesInputClick(e)} />
                     </div>
                     {currentlySelectedByAnotherUser ? 
                         <div className="currentlySelectedBy">

@@ -64,10 +64,14 @@ export function updateContent(nodeId, newContent) {
 
 export function focusNode(nodeId){
     return (dispatch, getState) => {
-        const appState = getState();
-        let nodes = getPresentNodes(appState);
-        let nodeIdsToDeselect = getCurrentlySelectedNodeIds(nodes);
-        let nodeIdToUnfocus = getCurrentlyFocusedNodeId(nodes);
+        const appState = getState(),
+            nodes = getPresentNodes(appState),
+            nodeIdToUnfocus = getCurrentlyFocusedNodeId(nodes);
+        if(nodeIdToUnfocus === nodeId){
+            return;
+        }
+
+        const nodeIdsToDeselect = getCurrentlySelectedNodeIds(nodes);
         let events = [];
         nodeIdsToDeselect.forEach(id => {
             events.push(nodeDeselected(id));
@@ -77,7 +81,9 @@ export function focusNode(nodeId){
         events.push(nodeFocused(nodeId));
         dispatch(nodeTransaction(events));
 
-        dispatch(firebaseActions.updateNodeSelectedByUser(nodeIdToUnfocus, null, null));
+        if(nodeIdToUnfocus){
+            dispatch(firebaseActions.updateNodeSelectedByUser(nodeIdToUnfocus, null, null));
+        }
         dispatch(firebaseActions.updateNodeSelectedByUser(nodeId, appState.auth.id, appState.auth.displayName));
     };
 }
@@ -468,7 +474,7 @@ export function nodeCompleteToggled(nodeId){
 
 export function nodeNotesUpdated(nodeId, notes){
   return {
-    type: NODE_COMPLETE_TOGGLED,
+    type: NODE_NOTES_UPDATED,
     nodeId,
     payload: {
       notes

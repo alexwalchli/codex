@@ -97,7 +97,7 @@ describe('getAllDescendantIds', () =>{
 
 describe('getAllUncollapsedDescedantIds', () =>{
   it('should return a flattened, ordered, list of all children node Ids under a start node ' +
-     'that are not collapsed under a parent and not include the start node Id', () => {
+     'that are not collapsed under a parent and does not include the start node Id', () => {
     const appState = {
       nodes: {
         aaa: { id: 'aaa', childIds: ['bbb', 'ccc'], parentId: null},
