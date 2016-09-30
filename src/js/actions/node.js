@@ -290,17 +290,27 @@ export function toggleNodeMenu(nodeId){
 
 export function toggleNodeComplete(nodeId){
 	return (dispatch, getState) => {
-		const node = getPresentNodes(getState())[nodeId];
+    const appState = getState(),
+		      node = getPresentNodes(appState)[nodeId];
 		dispatch(nodeCompleteToggled(nodeId));
-		dispatch(firebaseActions.updateNodeComplete(nodeId, !node.completed));
+		dispatch(firebaseActions.updateNodeComplete(nodeId, !node.completed, appState.auth.id));
 	};
 }
 
 export function updateNodeNotes(nodeId, notes){
-	return dispatch => {
+	return (dispatch, getState) => {
+    const appState = getState();
 		dispatch(nodeNotesUpdated(nodeId, notes));
-		dispatch(firebaseActions.updateNodeNotes(nodeId, notes));
+		dispatch(firebaseActions.updateNodeNotes(nodeId, notes, appState.auth.id));
 	};
+}
+
+export function updateNodeDisplayMode(nodeId, mode){
+  return (dispatch, getState) => {
+    const appState = getState();
+    dispatch(nodeDisplayModeUpdated(nodeId, mode));
+    dispatch(firebaseActions.updateNodeDisplayMode(nodeId, mode, appState.auth.id));
+  };
 }
 
 /////////////////////
@@ -323,12 +333,13 @@ export const NODE_UNFOCUSED = 'NODE_UNFOCUSED';
 export const NODE_SELECTED = 'NODE_SELECTED';
 export const NODE_DESELECTED = 'NODE_DESELECTED';
 export const NODES_SEARCHED = 'NODES_SEARCHED';
-export const NODE_WIDGETS_UPDATED = "NODE_WIDGETS_UPDATED"; // signifies a node that has had its widget data updated
-export const NODE_WIDGETS_UPDATING = "NODE_WIDGETS_UPDATING"; // signifies a node that is having its widget data updated
-export const TOGGLE_NODE_MENU = "TOGGLE_NODE_MENU";
-export const CLOSE_ALL_NODE_MENUS = "CLOSE_ALL_NODE_MENUS";
+export const NODE_WIDGETS_UPDATED = `NODE_WIDGETS_UPDATED`; // signifies a node that has had its widget data updated
+export const NODE_WIDGETS_UPDATING = `NODE_WIDGETS_UPDATING`; // signifies a node that is having its widget data updated
+export const TOGGLE_NODE_MENU = `TOGGLE_NODE_MENU`;
+export const CLOSE_ALL_NODE_MENUS = `CLOSE_ALL_NODE_MENUS`;
 export const NODE_COMPLETE_TOGGLED = `NODE_COMPLETE_TOGGLED`;
 export const NODE_NOTES_UPDATED = `NODE_NOTES_UPDATED`;
+export const NODE_DISPLAY_MODE_UPDATED = `NODE_DISPLAY_MODE_UPDATED`;
 
 export function nodeCreated(newNode){
 		return {
@@ -487,6 +498,16 @@ export function nodeNotesUpdated(nodeId, notes){
 			notes
 		}
 	};
+}
+
+export function nodeDisplayModeUpdated(nodeId, mode){
+  return {
+    type: NODE_DISPLAY_MODE_UPDATED,
+    nodeId,
+    payload: {
+      mode
+    }
+  };
 }
 
 ///////////////////////

@@ -38,21 +38,34 @@ export function createNode(node, userPageId, updatedParentChildIds){
   };
 }
 
-export function updateNodeComplete(nodeId, complete){
+export function updateNodeComplete(nodeId, complete, userId){
   return dispatch => {
     dispatch(firebaseRequestQueueActions.enqueueRequest(this, () => {
       return firebaseDb.ref().update({
-        [`nodes/${nodeId}/completed`] : complete
+        [`nodes/${nodeId}/completed`] : complete,
+        [`nodes/${nodeId}/lastUpdatedById`] : userId
       });
     }));
   }; 
 }
 
-export function updateNodeNotes(nodeId, notes){
+export function updateNodeNotes(nodeId, notes, userId){
   return dispatch => {
     dispatch(firebaseRequestQueueActions.enqueueRequest(this, () => {
       return firebaseDb.ref().update({
-        [`nodes/${nodeId}/notes`] : notes
+        [`nodes/${nodeId}/notes`] : notes,
+        [`nodes/${nodeId}/lastUpdatedById`] : userId
+      });
+    }));
+  }; 
+}
+
+export function updateNodeDisplayMode(nodeId, mode, userId){
+  return dispatch => {
+    dispatch(firebaseRequestQueueActions.enqueueRequest(this, () => {
+      return firebaseDb.ref().update({
+        [`nodes/${nodeId}/displayMode`] : mode,
+        [`nodes/${nodeId}/lastUpdatedById`] : userId
       });
     }));
   }; 

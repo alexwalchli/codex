@@ -296,9 +296,17 @@ export class Node extends Component {
     });
 	}
 
+  onChangeDisplayModeClicked(e){
+    const{id, updateNodeDisplayMode, toggleNodeMenu, displayMode} = this.props,
+          newDisplayMode = displayMode && displayMode === 'unordered' ? 'ordered' : 'unordered';
+    e.stopPropagation();
+    toggleNodeMenu(id);
+    updateNodeDisplayMode(id, newDisplayMode);
+  }
+
 	render() {
-		const { parentId, childIds, id, focused, notesFocused, inReadMode, externalList, collapsed, visible, selected, completeNode, completed, notes,
-				morphedContent, widgetDataUpdating, nodeInitialized, currentlySelectedBy, currentlySelectedById, auth, toggleNodeMenu, menuVisible } = this.props;
+		const { parentId, childIds, id, focused, notesFocused, inReadMode, externalList, collapsed, visible, selected, completeNode, completed, notes, positionInOrderedList,
+				morphedContent, widgetDataUpdating, nodeInitialized, currentlySelectedBy, currentlySelectedById, auth, toggleNodeMenu, menuVisible, displayMode } = this.props;
 		const { content, suggestions, editingNotes } = this.state;
 
 		if(!nodeInitialized){
@@ -352,16 +360,31 @@ export class Node extends Component {
 									'Re-open'
 									:'Complete'}
 								</li>
+                {childIds.length > 0 ?
+                <li onClick={(e) => this.onChangeDisplayModeClicked(e)}>
+                  <i className="icon dripicons-list"></i>
+                  {displayMode === 'unordered' ?
+                  <span>Numbered List</span>
+                  : <span>Unordered List</span>}
+                </li>
+                :null}
 								<li onClick={(e) => this.onDeleteBulletClicked(e)}><i className="icon dripicons-cross"></i>Delete</li>
 							</ul>
 						</div>
 					:null}
 					<div className="children-outline"></div>
 					<div className="bullet-container" onClick={this.handleBulletClick}>
-						<div className="unordered-bullet">
+            {positionInOrderedList ?
+            <div className="ordered-bullet">
+							<div className="outer-circle"></div>
+							<div className="number">{positionInOrderedList}.</div>
+						</div>
+            :
+            <div className="unordered-bullet">
 							<div className="outer-circle"></div>
 							<div className="inner-circle"></div>
 						</div>
+            }
 					</div>
 					<div className="content" onMouseEnter={this.handleOnMouseEnter} onMouseLeave={this.handleOnMouseLeave} onPaste={this.handlePaste}>
 					
@@ -417,8 +440,15 @@ export class Node extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-	var nodeFromState = state.tree.present[ownProps.id];
-	return Object.assign({ nodeInitialized: !!nodeFromState, auth: state.auth , ...ownProps }, nodeFromState);
+	const nodeFromState = state.tree.present[ownProps.id],
+        parentNode = state.tree.present[ownProps.parentId];
+
+  let positionInOrderedList;
+  if(parentNode && parentNode.displayMode === 'ordered'){
+    positionInOrderedList = parentNode.childIds.indexOf(ownProps.id) + 1;
+  }
+
+	return Object.assign({ nodeInitialized: !!nodeFromState, auth: state.auth, positionInOrderedList, ...ownProps }, nodeFromState);
 }
 
 const ConnectedNode = connect(mapStateToProps, actions)(Node)

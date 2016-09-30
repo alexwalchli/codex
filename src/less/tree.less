@@ -150,13 +150,27 @@
     background-color:@bullet-color !important;
 }
 
-.children .item.has-children.collapsed > .depth > .bullet-container .inner-circle{
-    background-color:@background-color !important;
-    z-index:1;
+.children .item.has-children.collapsed > .depth > .bullet-container {
+    .inner-circle{
+        background-color:@background-color !important;
+        z-index:1;
+    }
+    .number{
+        color:#fff;
+    }
 }
 
-.children .item.has-children .bullet-container .outer-circle{
-    display:block;
+.children .item.has-children > .depth > .bullet-container {
+    .outer-circle{
+        display:block;
+    }
+
+    .ordered-bullet {
+         .number{
+            top:13px;
+            font-size:.95em;
+         }
+    }
 }
 
 .children .item.no-children .bullet-container .outer-circle{
@@ -176,6 +190,15 @@
     position:absolute;
     top:29px;
     left:7px;
+}
+
+.children .item .bullet-container .number{
+    color:@base-color;
+    font-size:20px;
+    font-weight:bold;
+    top: 5px;
+    left: 5px;
+    position: absolute;
 }
 
 .children .item .bullet-container .outer-circle{
@@ -322,6 +345,10 @@
     position:absolute;
     top:16px;
     left:5px;
+}
+
+.children .children .children .item .bullet-container .number{
+    font-size:18px;
 }
 
 .children .children .children .item .bullet-container .outer-circle{
