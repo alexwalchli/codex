@@ -256,15 +256,25 @@ export class Node extends Component {
 	}
 
 	onNotesInputKeyDown(e){
+    const {id, focusNode, focusNodeBelow} = this.props;
 		if(e.key === 'Enter'){
 			e.stopPropagation();
-		}
-		else if(e.key === 'Backspace' && !this.refs.notesInput.value){
+		} 
+    else if(e.key === 'Backspace' && !this.refs.notesInput.value){
 			e.stopPropagation();
 			this.setState({
 				editingNotes: false
 			});
-		} else {
+		} 
+    else if(e.key === 'ArrowDown'){
+			e.preventDefault();
+			focusNodeBelow(id);
+		}
+		else if(e.key === 'ArrowUp'){
+			e.preventDefault();
+			focusNode(id);
+		} 
+    else {
 			this.setState({
 				editingNotes: true
 			});
