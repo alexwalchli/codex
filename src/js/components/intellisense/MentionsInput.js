@@ -73,6 +73,7 @@ const MentionsInput = React.createClass({
     onSelect: PropTypes.func,
     onBlur: PropTypes.func,
     onChange: PropTypes.func,
+    onClick: PropTypes.func,
 
     children: PropTypes.oneOfType([
       PropTypes.element,
@@ -132,6 +133,7 @@ const MentionsInput = React.createClass({
 
       ...(!readOnly && !disabled && {
         onChange: this.handleChange,
+        onClick: this.handleClick,
         onSelect: this.handleSelect,
         onKeyDown: this.handleKeyDown,
         onBlur: this.handleBlur,
@@ -152,7 +154,7 @@ const MentionsInput = React.createClass({
   },
 
   renderInput: function(props) {
-    const { onBlur, onChange, onKeyDown, onSelect, placeholder, style, value } = props;
+    const { onBlur, onChange, onClick, onKeyDown, onSelect, placeholder, style, value } = props;
 
     return (
       <input
@@ -160,6 +162,7 @@ const MentionsInput = React.createClass({
         ref="input"
         onBlur={onBlur}
         onChange={onChange}
+        onClick={onClick}
         onKeyDown={onKeyDown}
         onSelect={onSelect}
         placeholder={placeholder}
@@ -299,6 +302,10 @@ const MentionsInput = React.createClass({
     var eventMock = { target: { value: newValue } };
     // this.props.onChange.call(this, eventMock, newValue, newPlainTextValue, mentions);
     this.executeOnChange(eventMock, newValue, newPlainTextValue, mentions);
+  },
+
+  handleClick: function(ev){
+    this.props.onClick(ev);
   },
 
   // Handle input element's select event

@@ -122,6 +122,10 @@ describe('getCurrentlyFocusedNodeId', () =>{
   it('should return the current node that is focused', () => {
     
   });
+
+  it('should return the current node that has its notes focused', () => {
+    
+  });
 });
 
 describe('getSiblingNodeAbove', () =>{

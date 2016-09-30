@@ -17,11 +17,13 @@ function node(state, action) {
         return Object.assign({}, action.payload);
     case NODE_FOCUSED:
         return Object.assign({}, state, {
-            focused: true
+            focused: !action.payload.focusNotes,
+            notesFocused: action.payload.focusNotes
         });
     case NODE_UNFOCUSED:
         return Object.assign({}, state, {
-            focused: false
+            focused: false,
+            notesFocused: false
         });
     case NODE_SELECTED:
         return Object.assign({}, state, {
@@ -130,8 +132,8 @@ function handleAction(newState, action){
     }
 
     if(action.type === CLOSE_ALL_NODE_MENUS){
-        dictionaryToArray(newState).forEach((n) =>{
-            if(newState[n.id].menuVisible){
+        dictionaryToArray(newState).forEach((n) => {
+            if(n.id !== action.payload.excludeNodeId && newState[n.id].menuVisible){
                 newState[n.id] = node(n, { type: TOGGLE_NODE_MENU });
             }
         });
