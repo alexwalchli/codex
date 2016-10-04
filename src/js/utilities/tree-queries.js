@@ -56,31 +56,22 @@ export function getCurrentlyFocusedNodeId(nodes){
   return focusedNode ? focusedNode.id : null;
 }
 
-// retrieves the silbing node directly above the nodeId
-export function getSiblingNodeAbove(nodes, nodeId, parentId){
-  var parentNode = nodes[parentId];
-  var siblingNodeAboveId = parentNode.childIds[parentNode.childIds.indexOf(nodeId) - 1];
-
-  return nodes[siblingNodeAboveId];
-}
-
 // retrieves the next node above or below that is visible
 export function getNextNodeThatIsVisible(rootNodeId, nodes, currentNodeId, searchAbove = true){
-  let allNodeIdsOrdered = getAllNodeIdsOrdered(nodes, rootNodeId);
-  let currentNodeIndex = allNodeIdsOrdered.indexOf(currentNodeId);
-  let bound = searchAbove ? 0 : nodes.length;
+  const allNodeIdsOrdered = getAllNodeIdsOrdered(nodes, rootNodeId),
+        currentNodeIndex = allNodeIdsOrdered.indexOf(currentNodeId);
 
   if(searchAbove){
     for(let j = currentNodeIndex - 1; j > 0; j--){
       let node = nodes[allNodeIdsOrdered[j]];
-      if(node.visible){
+      if(node.visible && !node.deleted){
         return node;
       }
     }
   } else {
     for(let k = currentNodeIndex + 1; k < allNodeIdsOrdered.length; k++){
       let node = nodes[allNodeIdsOrdered[k]];
-      if(node.visible){
+      if(node.visible && !node.deleted){
         return node;
       }
     }

@@ -1,6 +1,6 @@
 import { NODE_CREATED, NODE_FOCUSED, NODE_SHOWN, NODE_HIDDEN, NODE_EXPANDED, NODE_COLLAPSED, NODE_NOTES_UPDATED, NODE_DISPLAY_MODE_UPDATED,
          CONTENT_UPDATED, CHILD_IDS_UPDATED, NODE_UNFOCUSED, NODES_DELETED, PARENT_UPDATED, NODE_SELECTED, NODE_DESELECTED, NODE_COMPLETE_TOGGLED,
-         NODE_EXPANSION_TOGGLED, NODE_TRANSACTION, NODE_PARENT_UPDATED, NODE_UPDATED, NODES_SEARCHED, TOGGLE_NODE_MENU, CLOSE_ALL_NODE_MENUS } 
+         NODE_EXPANSION_TOGGLED, NODE_TRANSACTION, NODE_PARENT_UPDATED, NODE_UPDATED, NODES_SEARCHED, NODE_MENU_TOGGLED, CLOSE_ALL_NODE_MENUS } 
     from '../actions/node';
 import { INITIAL_NODE_STATE_LOADED } from '../actions/firebase/firebase-subscriptions';
 import { dictionaryToArray } from '../utilities/tree-queries';
@@ -64,7 +64,7 @@ function node(state, action) {
         return Object.assign({}, state, {
             collapsed: false
         });
-    case TOGGLE_NODE_MENU:
+    case NODE_MENU_TOGGLED:
         return Object.assign({}, state, {
             menuVisible: !state.menuVisible
         });
@@ -138,7 +138,7 @@ function handleAction(newState, action){
     if(action.type === CLOSE_ALL_NODE_MENUS){
         dictionaryToArray(newState).forEach((n) => {
             if(n.id !== action.payload.excludeNodeId && newState[n.id].menuVisible){
-                newState[n.id] = node(n, { type: TOGGLE_NODE_MENU });
+                newState[n.id] = node(n, { type: NODE_MENU_TOGGLED });
             }
         });
     }
