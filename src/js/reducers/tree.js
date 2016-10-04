@@ -135,6 +135,14 @@ function handleAction(newState, action){
         });
     }
 
+    if(action.type === NODE_FOCUSED){
+        Object.keys(newState).forEach(nodeId => {
+            if(action.nodeId !== nodeId){
+                newState[nodeId] = node(newState[nodeId], { type: NODE_UNFOCUSED, nodeId });
+            }
+        });
+    }
+
     if(action.type === CLOSE_ALL_NODE_MENUS){
         dictionaryToArray(newState).forEach((n) => {
             if(n.id !== action.payload.excludeNodeId && newState[n.id].menuVisible){
