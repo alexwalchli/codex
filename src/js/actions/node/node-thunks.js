@@ -130,8 +130,8 @@ export const focusNode = (nodeId, focusNotes) =>
       events.push(nodeDeselected(id));
     });
     
-    events.push(nodeUnfocused(nodeIdToUnfocus));
-    events.push(nodeFocused(nodeId, focusNotes));
+    events.push(nodeActions.nodeUnfocused(nodeIdToUnfocus));
+    events.push(nodeActions.nodeFocused(nodeId, focusNotes));
     dispatch(nodeTransaction(events));
 
     if(nodeIdToUnfocus){
@@ -148,7 +148,7 @@ export const focusNodeAbove = (currentNodeId) =>
           nodeToFocus = getNextNodeThatIsVisible(rootNodeId, getPresentNodes(state), currentNodeId, true);
 
     if(nodeToFocus){
-      dispatch(nodeActions.focusNode(nodeToFocus.id));
+      dispatch(nodeActions.nodeFocused(nodeToFocus.id));
     }
 };
 
@@ -159,7 +159,7 @@ export const focusNodeBelow = (currentNodeId) =>
           nodeToFocus = getNextNodeThatIsVisible(rootNodeId, getPresentNodes(state), currentNodeId, false);
 
     if(nodeToFocus){
-      dispatch(nodeActions.focusNode(nodeToFocus.id));
+      dispatch(nodeActions.nodeFocused(nodeToFocus.id));
     }
 };
 

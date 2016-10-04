@@ -38,10 +38,6 @@
         }
     }
 
-    &:hover > .depth > .menu-btn > i{
-        visibility:visible;
-    }
-
     .notes {
         textarea {
             color:lighten(@secondary-color, 50%);
@@ -55,6 +51,14 @@
         }
     }
 
+    .depth > .menu-btn > i {
+        visibility:hidden;
+    }
+
+    .depth:hover > .menu-btn > i{
+        visibility:visible;
+    }
+
     .children{
         .menu-btn{
             width:30px;
@@ -65,16 +69,6 @@
             cursor:pointer;
             font-size:20px;
             cursor:pointer;
-
-            > i {
-                 visibility:hidden;
-            }
-            &:hover{
-                > i {
-                     visibility:visible;
-                }
-                color:#aaa;
-            }
         }
 
         .children{
