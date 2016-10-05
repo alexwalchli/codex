@@ -6,11 +6,17 @@ import * as actions from '../actions/node';
 export class AppContextMenu extends Component {
     constructor(props) {
         super(props);
-        this.handleOnClick = this.handleOnClick.bind(this);
     }
 
-    handleOnClick(){
+    onDeleteClick(e){
         const { deleteNodes, tree } = this.props;
+        e.stopPropagation();
+        deleteNodes(nodeList(tree.present).filter(item => item.selected).map(node => node.id));
+    }
+
+    onCompleteClick(e){
+        const { deleteNodes, tree } = this.props;
+        e.stopPropagation();
         deleteNodes(nodeList(tree.present).filter(item => item.selected).map(node => node.id));
     }
 
@@ -24,7 +30,7 @@ export class AppContextMenu extends Component {
 
         return (
             <div id="app-context-menu" className={cssClasses}>
-                <button onClick={this.handleOnClick}>Delete</button> or <button>Complete</button> {itemsSelected.length} items
+                <button onClick={(e) => this.onDeleteClick(e)}>Delete</button> or <button onClick={(e) => this.onCompleteClick(e)}>Complete</button> {itemsSelected.length} items
             </div>
         )
     }

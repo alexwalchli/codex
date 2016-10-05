@@ -1,6 +1,6 @@
 import { NODE_CREATED, NODE_FOCUSED, NODE_SHOWN, NODE_HIDDEN, NODE_EXPANDED, NODE_COLLAPSED, NODE_NOTES_UPDATED, NODE_DISPLAY_MODE_UPDATED,
          CONTENT_UPDATED, CHILD_IDS_UPDATED, NODE_UNFOCUSED, NODES_DELETED, PARENT_UPDATED, NODE_SELECTED, NODE_DESELECTED, NODE_COMPLETE_TOGGLED,
-         NODE_EXPANSION_TOGGLED, NODE_TRANSACTION, NODE_PARENT_UPDATED, NODE_UPDATED, NODES_SEARCHED, NODE_MENU_TOGGLED, CLOSE_ALL_NODE_MENUS } 
+         NODE_EXPANSION_TOGGLED, NODE_TRANSACTION, NODE_PARENT_UPDATED, NODE_UPDATED, NODES_SEARCHED, NODE_MENU_TOGGLED, CLOSE_ALL_NODE_MENUS_AND_DESELECT_ALL_NODES } 
     from '../actions/node';
 import { INITIAL_NODE_STATE_LOADED } from '../actions/firebase/firebase-subscriptions';
 import { dictionaryToArray } from '../utilities/tree-queries';
@@ -125,6 +125,7 @@ function handleAction(newState, action){
         action.payload.forEach(nodeId => {
             newState[nodeId].deleted = true;
             newState[nodeId].visible = false;
+            newState[nodeId].selected = false;
         });
     }
 
@@ -143,8 +144,9 @@ function handleAction(newState, action){
         });
     }
 
-    if(action.type === CLOSE_ALL_NODE_MENUS){
+    if(action.type === CLOSE_ALL_NODE_MENUS_AND_DESELECT_ALL_NODES){
         dictionaryToArray(newState).forEach((n) => {
+            newState[n.id] = node(n, { type: NODE_DESELECTED });
             if(n.id !== action.payload.excludeNodeId && newState[n.id].menuVisible){
                 newState[n.id] = node(n, { type: NODE_MENU_TOGGLED });
             }

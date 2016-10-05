@@ -83,22 +83,22 @@ export const nodeTransaction = (events) => {
 };
 
 // optimistically creates a node in client state then pushes to persistence
-export const createNode = (createdFromSiblingId, createdFromSiblingOffset, parentId, content) =>
+export const createNode = (originNodeId, originOffset, content) =>
   (dispatch, getState) => {
-    let appState = getState(),
+    console.log(firebaseDb);
+    const appState = getState(),
         nodes = getPresentNodes(appState),
-        optimisticEvents = [],
-        newNodeId = firebaseDb.ref('nodes').push().key,
-        createdFromSiblingNode = getState().tree.present[createdFromSiblingId],
+        originNode = nodes[originNodeId],
+        parentOfNewNode = nodes[originNode.childIds.length === 0 ? originNode.parentId : originNodeId],
+        newNodeId = firebaseDb.ref('nodes').push().key;
+    let optimisticEvents = [],
         // if the node was created from a node with children, add the node to it, else add the node to created from node's parent
-        addNewNodeToNodeId = createdFromSiblingNode.childIds.length === 0 ? parentId : createdFromSiblingId,
-        addNewNodeToNode = getPresentNodes(getState())[addNewNodeToNodeId],
-        newNode = nodeFactory(newNodeId, addNewNodeToNodeId, [], content, getState().auth.id),
-        updatedParentChildIds = getUpdatedChildIdsForAddition(addNewNodeToNode, newNodeId, createdFromSiblingId, createdFromSiblingOffset);
+        newNode = nodeFactory(newNodeId, parentOfNewNode.id, [], content, getState().auth.id),
+        updatedParentChildIds = getUpdatedChildIdsForAddition(parentOfNewNode, newNodeId, originNodeId, originOffset);
     
     optimisticEvents.push(nodeActions.nodeCreated(newNode));
-    optimisticEvents.push(nodeActions.childIdsUpdated(addNewNodeToNodeId, updatedParentChildIds, appState.auth.id));
-    if(createdFromSiblingOffset > 0){
+    optimisticEvents.push(nodeActions.childIdsUpdated(parentOfNewNode.id, updatedParentChildIds, appState.auth.id));
+    if(originOffset > 0){
       // if we're adding the new node below the current then focus on the new node, else stay focused on the current node
       let nodeIdsToDeselect = getCurrentlySelectedNodeIds(nodes),
           nodeIdToUnfocus = getCurrentlyFocusedNodeId(nodes);
@@ -127,7 +127,7 @@ export const focusNode = (nodeId, focusNotes) =>
 
     const nodeIdsToDeselect = getCurrentlySelectedNodeIds(nodes);
     nodeIdsToDeselect.forEach(id => {
-      events.push(nodeDeselected(id));
+      events.push(nodeActions.nodeDeselected(id));
     });
     
     events.push(nodeActions.nodeUnfocused(nodeIdToUnfocus));
@@ -192,7 +192,7 @@ export const promoteNode = (nodeId, parentId) =>
     dispatch(nodeActions.nodeFocused(nodeId));
 };
 
-export const deleteNode = (nodeId, parentId) =>
+export const deleteNode = (nodeId) =>
   (dispatch, getState) => {
     let nodes = getPresentNodes(getState());
     if(Object.keys(nodes).length > 2){
@@ -205,6 +205,27 @@ export const deleteNode = (nodeId, parentId) =>
         dispatch(nodeActions.nodesDeleted([nodeId]));
         dispatch(firebaseActions.deleteNode(nodeToDelete, updatedParentChildIds, descendantIdsOfNode, appState.auth.id));
     }
+};
+
+export const deleteNodes = (nodeIds) => (dispatch, getState) => {
+  const appState = getState(),
+    nodes = getPresentNodes(appState);
+
+  let reducerTransaction = [];
+  let nodesToDeleteFromDatabase = [];
+
+  if(Object.keys(nodes).length > 2){
+    nodeIds.forEach(nodeId => {
+      let nodeToDelete = nodes[nodeId],
+        updatedParentChildIds = nodes[nodeToDelete.parentId].childIds.filter(id => id !== nodeId),
+        descendantIdsOfNode = getAllDescendantIds(nodes, nodeId);
+      nodesToDeleteFromDatabase.push({nodeId, parentId: nodeToDelete.parentId, updatedParentChildIds, allDescendentIds: descendantIdsOfNode});
+      reducerTransaction.push(nodeActions.childIdsUpdated(nodeToDelete.parentId, updatedParentChildIds));
+    }); 
+  }
+  reducerTransaction.push(nodeActions.nodesDeleted(nodeIds));
+  dispatch(nodeTransaction(reducerTransaction));
+  dispatch(firebaseActions.deleteNodes(nodesToDeleteFromDatabase, appState.auth.id));
 };
 
 export const toggleNodeExpansion = (nodeId, forceToggleChildrenExpansion) =>
@@ -301,7 +322,7 @@ export const updateNodeWidgetDataIfNecessary = (nodeId, content) =>
 
 export const toggleNodeMenu = (nodeId) =>
   dispatch => {
-    dispatch(nodeActions.closeAllNodeMenus(nodeId));
+    dispatch(nodeActions.closeAllMenusAndDeselectAllNodes(nodeId));
     dispatch(nodeActions.nodeMenuToggled(nodeId));
 };
 

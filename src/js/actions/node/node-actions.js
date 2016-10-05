@@ -17,7 +17,7 @@ export const NODES_SEARCHED = 'NODES_SEARCHED';
 export const NODE_WIDGETS_UPDATED = `NODE_WIDGETS_UPDATED`; // signifies a node that has had its widget data updated
 export const NODE_WIDGETS_UPDATING = `NODE_WIDGETS_UPDATING`; // signifies a node that is having its widget data updated
 export const TOGGLE_NODE_MENU = `TOGGLE_NODE_MENU`;
-export const CLOSE_ALL_NODE_MENUS = `CLOSE_ALL_NODE_MENUS`;
+export const CLOSE_ALL_NODE_MENUS_AND_DESELECT_ALL_NODES = `CLOSE_ALL_NODE_MENUS_AND_DESELECT_ALL_NODES`;
 export const NODE_COMPLETE_TOGGLED = `NODE_COMPLETE_TOGGLED`;
 export const NODE_NOTES_UPDATED = `NODE_NOTES_UPDATED`;
 export const NODE_DISPLAY_MODE_UPDATED = `NODE_DISPLAY_MODE_UPDATED`;
@@ -155,9 +155,9 @@ export const nodeWidgetDataUpdating = (nodeId) => {
   };
 };
 
-export const closeAllNodeMenus = (excludeNodeId) => {
+export const closeAllMenusAndDeselectAllNodes = (excludeNodeId) => {
   return {
-    type: CLOSE_ALL_NODE_MENUS,
+    type: CLOSE_ALL_NODE_MENUS_AND_DESELECT_ALL_NODES,
     undoable: false,
     payload: {
       excludeNodeId

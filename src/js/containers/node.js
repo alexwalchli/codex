@@ -104,7 +104,7 @@ export class Node extends Component {
 		else if(e.key === 'Backspace' && !this.state.content){
 			e.preventDefault();
 			focusNodeAbove(id);
-			deleteNode(id, parentId);
+			deleteNode(id);
 		}
 		else if(e.key === 'ArrowDown'){
 			e.preventDefault();
@@ -244,9 +244,9 @@ export class Node extends Component {
 	}
 
 	onDeleteBulletClicked(e){
-		const{ id, parentId, deleteNode } = this.props;
+		const{ id, deleteNode } = this.props;
 		e.stopPropagation();
-		deleteNode(id, parentId);
+		deleteNode(id);
 	}
 
 	onNotesInputBlur(e){

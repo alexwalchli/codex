@@ -134,6 +134,27 @@ export function deleteNode(node, updatedParentChildIds, allDescendantIdsOfNode, 
   };
 }
 
+export function deleteNodes(nodesToDelete = [], userId){
+  return dispatch => {
+    let dbUpdates = {};
+    nodesToDelete.forEach(nodeToDelete => {
+      dbUpdates[`nodes/${nodeToDelete.id}/deleted`] = true;
+      dbUpdates[`nodes/${nodeToDelete.id}/lastUpdatedById/`] = userId;
+      dbUpdates[`nodes/${nodeToDelete.parentId}/childIds/`] = nodeToDelete.updatedParentChildIds;
+      dbUpdates[`nodes/${nodeToDelete.parentId}/lastUpdatedById/`] = userId;
+
+      nodeToDelete.allDescendentIds.forEach(descedantId => {
+        dbUpdates[`nodes/${descedantId}/deleted`] = true;
+        dbUpdates[`nodes/${descedantId}/lastUpdatedById/`] = userId;
+      });
+    });
+
+    return dispatch(firebaseRequestQueueActions.enqueueRequest(this, () => {
+      return firebaseDb.ref().update(dbUpdates);
+    }));
+  };
+}
+
 export function reassignParentNode(nodeId, oldParentId, newParentId, updatedChildIdsForOldParent, updatedChildIdsForNewParent, userId){
   return dispatch => {
     // NOTE: This is assuming that specific nodes within a userPage are not shared. If that happens this will need to account for other users having access

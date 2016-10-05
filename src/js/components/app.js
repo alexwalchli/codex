@@ -16,9 +16,8 @@ export class App extends Component {
     }
 
     onClick(e){
-        const { closeAllNodeMenus } = this.props;
-
-        closeAllNodeMenus();
+        const { closeAllMenusAndDeselectAllNodes } = this.props;
+        closeAllMenusAndDeselectAllNodes();
     }
 
     render() {

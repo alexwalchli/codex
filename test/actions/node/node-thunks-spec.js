@@ -1,37 +1,8 @@
 import * as firebaseActions from '../../../src/js/actions/firebase/firebase-node-actions';
 import * as nodeActions from '../../../src/js/actions/node/node-actions';
 import * as treeQueries from '../../../src/js/utilities/tree-queries';
-
 import * as nodeThunks from '../../../src/js/actions/node/node-thunks';
-
-// describe('createNode', () => {
-//   let getState;
-//   let dispatch;
-
-//   beforeEach(() => {
-//     getState = () => {};
-//     dispatch = () => {};
-//   });
-
-//   it('should create and dispatch optimistic actions', () => {
-//     //nodeThunks.createNode(1, 2, 3, 'content')(getState, dispatch);
-//   });
-//   it('should create the node as a child if the currently selected node is a parent', () => {
-
-//   });
-//   it('should create the node as a sibling if the currently selected node is not a parent', () => {
-
-//   });
-//   it('should focus the new node if the createdFromSiblingOffset is greater than 0', () => {
-
-//   });
-//   it('should not focus the new node if the createdFromSiblingOffset is equal to or less than 0', () => {
-
-//   });
-//   it('should not focus the new node if the createdFromSiblingOffset is equal to or less than 0', () => {
-
-//   });
-// });
+console.log(firebaseDb);
 
 describe('node-thunks', () => {
   const nodes = {
@@ -58,6 +29,9 @@ describe('node-thunks', () => {
   beforeEach(() => {
     getState = () => {
       return {
+        app: {
+          currentUserPageId: 54321
+        },
         tree: {
           present: nodes,
         },
@@ -65,6 +39,38 @@ describe('node-thunks', () => {
       };
     };
     dispatch = jasmine.createSpy();
+  });
+
+  describe('createNode', () => {
+    it('should create and dispatch optimistic actions', () => {
+      // console.log(firebaseDb);
+      // spyOn(firebaseDb, 'ref').and.callFake(() => {
+      //   return {
+      //     push: () => { return '123456'; } // new node ID
+      //   };
+      // });
+      // // const nodeRef = firebase.database().ref().child('nodes');
+      // // spyOn(nodeRef, 'ref');
+
+      // nodeThunks.createNode('123', 1, 'some content')(dispatch, getState);
+
+      // expect(firebaseDb.ref).toHaveBeenCalledWith('nodes');
+    });
+    it('should create the node as a child if the currently selected node is a parent', () => {
+
+    });
+    it('should create the node as a sibling if the currently selected node is not a parent', () => {
+
+    });
+    it('should focus the new node if the createdFromSiblingOffset is greater than 0', () => {
+
+    });
+    it('should not focus the new node if the createdFromSiblingOffset is equal to or less than 0', () => {
+
+    });
+    it('should not focus the new node if the createdFromSiblingOffset is equal to or less than 0', () => {
+
+    });
   });
 
   describe('updateContent', () => {
@@ -140,14 +146,14 @@ describe('node-thunks', () => {
   });
 
   describe('toggleNodeMenu', () => {
-    it('should dispatch closeAllNodeMenus and toggleNodeMenu', () => {
+    it('should dispatch closeAllMenusAndDeselectAllNodes and toggleNodeMenu', () => {
       const nodeId = '123';
-      spyOn(nodeActions, 'closeAllNodeMenus');
+      spyOn(nodeActions, 'closeAllMenusAndDeselectAllNodes');
       spyOn(nodeActions, 'nodeMenuToggled');
 
       nodeThunks.toggleNodeMenu(nodeId)(dispatch, getState);
 
-      expect(nodeActions.closeAllNodeMenus).toHaveBeenCalledWith(nodeId);
+      expect(nodeActions.closeAllMenusAndDeselectAllNodes).toHaveBeenCalledWith(nodeId);
       expect(nodeActions.nodeMenuToggled).toHaveBeenCalledWith(nodeId);
     });
   });
