@@ -2,7 +2,7 @@ import * as firebaseActions from '../../../src/js/actions/firebase/firebase-node
 import * as nodeActions from '../../../src/js/actions/node/node-actions';
 import * as treeQueries from '../../../src/js/utilities/tree-queries';
 import * as nodeThunks from '../../../src/js/actions/node/node-thunks';
-console.log(firebaseDb);
+
 
 describe('node-thunks', () => {
   const nodes = {

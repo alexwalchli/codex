@@ -217,10 +217,9 @@ export const deleteNodes = (nodeIds) => (dispatch, getState) => {
   if(Object.keys(nodes).length > 2){
     nodeIds.forEach(nodeId => {
       let nodeToDelete = nodes[nodeId],
-        updatedParentChildIds = nodes[nodeToDelete.parentId].childIds.filter(id => id !== nodeId),
         descendantIdsOfNode = getAllDescendantIds(nodes, nodeId);
-      nodesToDeleteFromDatabase.push({nodeId, parentId: nodeToDelete.parentId, updatedParentChildIds, allDescendentIds: descendantIdsOfNode});
-      reducerTransaction.push(nodeActions.childIdsUpdated(nodeToDelete.parentId, updatedParentChildIds));
+      nodesToDeleteFromDatabase.push({id: nodeId, parentId: nodeToDelete.parentId, allDescendentIds: descendantIdsOfNode});
+      reducerTransaction.push(nodeActions.removeChildNode(nodeToDelete.parentId, nodeId));
     }); 
   }
   reducerTransaction.push(nodeActions.nodesDeleted(nodeIds));
@@ -286,13 +285,31 @@ export const redo = () =>
 export const selectNode = (nodeId) =>
   (dispatch, getState) => {
     // TODO: let other collaborators know this user has selected this node
-    dispatch(nodeActions.nodeSelected(nodeId));
+    const appState = getState(),
+      allDescendentIds = getAllDescendantIds(getPresentNodes(appState), nodeId);
+    let reducerTransaction = [];
+
+    reducerTransaction.push(nodeActions.nodeSelected(nodeId));
+    allDescendentIds.forEach(descedentId => {
+      reducerTransaction.push(nodeActions.nodeSelected(descedentId));
+    });
+
+    dispatch(nodeTransaction(reducerTransaction));
 };
 
 export const deselectNode = (nodeId) =>
   (dispatch, getState) => {
     // TODO: let other collaborators know this user has deselected this node
-    dispatch(nodeActions.nodeDeselected(nodeId));
+    const appState = getState(),
+      allDescendentIds = getAllDescendantIds(getPresentNodes(appState), nodeId);
+    let reducerTransaction = [];
+
+    reducerTransaction.push(nodeActions.nodeDeselected(nodeId));
+    allDescendentIds.forEach(descedentId => {
+      reducerTransaction.push(nodeActions.nodeDeselected(descedentId));
+    });
+
+    dispatch(nodeTransaction(reducerTransaction));
 };
 
 export const updateNodeWidgetDataIfNecessary = (nodeId, content) =>

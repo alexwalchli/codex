@@ -22,6 +22,7 @@ export const NODE_COMPLETE_TOGGLED = `NODE_COMPLETE_TOGGLED`;
 export const NODE_NOTES_UPDATED = `NODE_NOTES_UPDATED`;
 export const NODE_DISPLAY_MODE_UPDATED = `NODE_DISPLAY_MODE_UPDATED`;
 export const NODE_MENU_TOGGLED = `TOGGLE_NODE_MENU`;
+export const REMOVE_CHILD_NODE = `REMOVE_CHILD_NODE`;
 
 export const nodeCreated = (newNode) => {
   return {
@@ -197,5 +198,15 @@ export const nodeMenuToggled = (nodeId) => {
     type: NODE_MENU_TOGGLED,
     nodeId,
     undoable: false
+  };
+};
+
+export const removeChildNode = (nodeId, childId) => {
+  return {
+    type: REMOVE_CHILD_NODE,
+    nodeId,
+    payload: {
+      childId
+    }
   };
 };

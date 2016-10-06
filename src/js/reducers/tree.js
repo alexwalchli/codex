@@ -1,12 +1,17 @@
 import { NODE_CREATED, NODE_FOCUSED, NODE_SHOWN, NODE_HIDDEN, NODE_EXPANDED, NODE_COLLAPSED, NODE_NOTES_UPDATED, NODE_DISPLAY_MODE_UPDATED,
-         CONTENT_UPDATED, CHILD_IDS_UPDATED, NODE_UNFOCUSED, NODES_DELETED, PARENT_UPDATED, NODE_SELECTED, NODE_DESELECTED, NODE_COMPLETE_TOGGLED,
+         CONTENT_UPDATED, CHILD_IDS_UPDATED, NODE_UNFOCUSED, NODES_DELETED, PARENT_UPDATED, NODE_SELECTED, NODE_DESELECTED, NODE_COMPLETE_TOGGLED, REMOVE_CHILD_NODE,
          NODE_EXPANSION_TOGGLED, NODE_TRANSACTION, NODE_PARENT_UPDATED, NODE_UPDATED, NODES_SEARCHED, NODE_MENU_TOGGLED, CLOSE_ALL_NODE_MENUS_AND_DESELECT_ALL_NODES } 
     from '../actions/node';
 import { INITIAL_NODE_STATE_LOADED } from '../actions/firebase/firebase-subscriptions';
 import { dictionaryToArray } from '../utilities/tree-queries';
 
 function childIds(state, action) {
-    return Object.assign([], action.payload.newChildIds);
+    switch(action.type){
+        case CHILD_IDS_UPDATED:
+            return Object.assign([], action.payload.newChildIds);
+        case REMOVE_CHILD_NODE:
+            return Object.assign([], state.filter(id => id !== action.payload.childId));
+    }
 }
 
 function node(state, action) {
@@ -39,6 +44,11 @@ function node(state, action) {
             lastUpdatedById: action.payload.updatedById
         });
     case CHILD_IDS_UPDATED:
+        return Object.assign({}, state, {
+            childIds: childIds(state.childIds, action),
+            lastUpdatedById: action.payload.updatedById
+        });
+    case REMOVE_CHILD_NODE:
         return Object.assign({}, state, {
             childIds: childIds(state.childIds, action),
             lastUpdatedById: action.payload.updatedById

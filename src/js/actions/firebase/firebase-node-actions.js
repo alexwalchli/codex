@@ -140,7 +140,7 @@ export function deleteNodes(nodesToDelete = [], userId){
     nodesToDelete.forEach(nodeToDelete => {
       dbUpdates[`nodes/${nodeToDelete.id}/deleted`] = true;
       dbUpdates[`nodes/${nodeToDelete.id}/lastUpdatedById/`] = userId;
-      dbUpdates[`nodes/${nodeToDelete.parentId}/childIds/`] = nodeToDelete.updatedParentChildIds;
+      dbUpdates[`nodes/${nodeToDelete.parentId}/childIds/${nodeToDelete.id}`] = null;
       dbUpdates[`nodes/${nodeToDelete.parentId}/lastUpdatedById/`] = userId;
 
       nodeToDelete.allDescendentIds.forEach(descedantId => {

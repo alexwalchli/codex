@@ -13,7 +13,6 @@ import defaultMentionStyle from "./defaultMentionStyle";
 export class Node extends Component {
 	constructor(props) {
 		super(props);
-		this.handleAddChildClick = this.handleAddChildClick.bind(this);
 		this.handleOnKeyDown = this.handleOnKeyDown.bind(this);
 		this.handleBulletClick = this.handleBulletClick.bind(this);
 		this.handlePaste = this.handlePaste.bind(this);
@@ -98,8 +97,8 @@ export class Node extends Component {
 			e.preventDefault();
 			this.submitContent();
 			// if cursor is add the beginning of the input, add new node at current position, else below
-			const fromSilbingOffset = e.target.selectionEnd === 0 && e.target.value ? 0 : 1;
-			createNode(id, fromSilbingOffset, parentId);
+			const offset = e.target.selectionEnd === 0 && e.target.value ? 0 : 1;
+			createNode(id, offset, '');
 		}
 		else if(e.key === 'Backspace' && !this.state.content){
 			e.preventDefault();
@@ -141,14 +140,6 @@ export class Node extends Component {
 		}
 	}
 
-	handleAddChildClick(e) {
-		e.preventDefault();
-
-		const { addChild, createNode, id } = this.props;
-		const childId = createNode(id, 1, id).nodeId;
-		addChild(id, childId);
-	}
-
 	handlePaste(e) {
 		const { parentId, id, createNode, addChild, focusNode } = this.props;
 
@@ -162,7 +153,7 @@ export class Node extends Component {
 				if(s[0] === '-'){
 					s = s.slice(1, s.length);
 				}
-				var newSiblingId = createNode(id, 1, parentId, s).nodeId;
+				var newSiblingId = createNode(id, 1, s).nodeId;
 				addChild(parentId, newSiblingId, id);
 				focusNode(newSiblingId);
 			});

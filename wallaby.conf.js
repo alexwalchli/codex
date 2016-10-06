@@ -3,6 +3,7 @@ module.exports = (wallaby) => {
     files: [
       'src/js/utilities/*.js',
       'src/js/actions/**/*.js',
+      'src/js/reducers/**/*.js',
       'src/js/widgets/**/*.js',
       'src/js/firebase/**/*.js'
     ],
@@ -28,7 +29,7 @@ module.exports = (wallaby) => {
     testFramework: 'jasmine',
     debug: true,
     delays: {
-      run: 500
+      run: 1000
     }
   };
 };
