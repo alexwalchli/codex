@@ -1,7 +1,24 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Codex</title>
+    <title>codex</title>
+    <noscript>
+      <style>
+        noscript{
+          text-align:center;
+        }
+        div{
+          margin-top:200px;
+          font-size:3em;
+          font-family:'Lora', sans-serif;
+          color:#2185C5;
+        }
+        p{
+          font-size:1.5em;
+          font-family:'Lato', sans-serif;
+        }
+      </style>
+    </noscript>
     <link href="https://fonts.googleapis.com/css?family=Lato:300" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Lora" rel="stylesheet">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -12,6 +29,14 @@
     <meta name="theme-color" content="#ffffff">
   </head>
   <body>
+    <noscript>
+      <div>codex</div>
+      <p>
+          Hi, it looks like your browser doesn't support scripts or you have them disabled. Codex will not work without scripts.
+          <br />Please either enable scripts or switch to a different browser.
+      </p>
+    </noscript>
+
     <div id="root"></div>
     <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase-auth.js"></script>
