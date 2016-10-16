@@ -65,7 +65,7 @@
 /******/ 	}
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "ed18e46e7a0ea83c5a18"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "482db212fd363abe2d4f"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
 /******/ 	
@@ -15184,6 +15184,7 @@
 	exports.updateNodeContent = updateNodeContent;
 	exports.deleteNode = deleteNode;
 	exports.deleteNodes = deleteNodes;
+	exports.completeNodes = completeNodes;
 	exports.reassignParentNode = reassignParentNode;
 	
 	var _firebase = __webpack_require__(79);
@@ -15344,7 +15345,7 @@
 	    nodesToDelete.forEach(function (nodeToDelete) {
 	      dbUpdates['nodes/' + nodeToDelete.id + '/deleted'] = true;
 	      dbUpdates['nodes/' + nodeToDelete.id + '/lastUpdatedById/'] = userId;
-	      dbUpdates['nodes/' + nodeToDelete.parentId + '/childIds/' + nodeToDelete.id] = null;
+	      dbUpdates['nodes/' + nodeToDelete.parentId + '/childIds/'] = nodesToDelete.parentNode;
 	      dbUpdates['nodes/' + nodeToDelete.parentId + '/lastUpdatedById/'] = userId;
 	
 	      nodeToDelete.allDescendentIds.forEach(function (descedantId) {
@@ -15359,8 +15360,23 @@
 	  };
 	}
 	
-	function reassignParentNode(nodeId, oldParentId, newParentId, updatedChildIdsForOldParent, updatedChildIdsForNewParent, userId) {
+	function completeNodes(nodeIds, userId) {
 	  var _this9 = this;
+	
+	  return function (dispatch) {
+	    var dbUpdates = {};
+	    nodeIds.forEach(function (nodeId) {
+	      dbUpdates['nodes/' + nodeId + '/completed'] = true;
+	    });
+	
+	    return dispatch(firebaseRequestQueueActions.enqueueRequest(_this9, function () {
+	      return _firebase.firebaseDb.ref().update(dbUpdates);
+	    }));
+	  };
+	}
+	
+	function reassignParentNode(nodeId, oldParentId, newParentId, updatedChildIdsForOldParent, updatedChildIdsForNewParent, userId) {
+	  var _this10 = this;
 	
 	  return function (dispatch) {
 	    // NOTE: This is assuming that specific nodes within a userPage are not shared. If that happens this will need to account for other users having access
@@ -15375,7 +15391,7 @@
 	    dbUpdates['nodes/' + newParentId + '/childIds'] = updatedChildIdsForNewParent;
 	    dbUpdates['nodes/' + newParentId + '/lastUpdatedById'] = userId;
 	
-	    return dispatch(firebaseRequestQueueActions.enqueueRequest(_this9, function () {
+	    return dispatch(firebaseRequestQueueActions.enqueueRequest(_this10, function () {
 	      return _firebase.firebaseDb.ref('nodes/' + nodeId).once('value').then(function (snapshot) {
 	        if (snapshot.val()) {
 	          return _firebase.firebaseDb.ref().update(dbUpdates);
@@ -15679,6 +15695,7 @@
 	var TOGGLE_NODE_MENU = exports.TOGGLE_NODE_MENU = 'TOGGLE_NODE_MENU';
 	var CLOSE_ALL_NODE_MENUS_AND_DESELECT_ALL_NODES = exports.CLOSE_ALL_NODE_MENUS_AND_DESELECT_ALL_NODES = 'CLOSE_ALL_NODE_MENUS_AND_DESELECT_ALL_NODES';
 	var NODE_COMPLETE_TOGGLED = exports.NODE_COMPLETE_TOGGLED = 'NODE_COMPLETE_TOGGLED';
+	var NODES_COMPLETED = exports.NODES_COMPLETED = 'NODES_COMPLETED';
 	var NODE_NOTES_UPDATED = exports.NODE_NOTES_UPDATED = 'NODE_NOTES_UPDATED';
 	var NODE_DISPLAY_MODE_UPDATED = exports.NODE_DISPLAY_MODE_UPDATED = 'NODE_DISPLAY_MODE_UPDATED';
 	var NODE_MENU_TOGGLED = exports.NODE_MENU_TOGGLED = 'TOGGLE_NODE_MENU';
@@ -15725,7 +15742,9 @@
 	var nodesDeleted = exports.nodesDeleted = function nodesDeleted(nodeIds) {
 	  return {
 	    type: NODES_DELETED,
-	    payload: nodeIds
+	    payload: {
+	      nodeIds: nodeIds
+	    }
 	  };
 	};
 	
@@ -15830,6 +15849,15 @@
 	  return {
 	    type: NODE_COMPLETE_TOGGLED,
 	    nodeId: nodeId
+	  };
+	};
+	
+	var nodesCompleted = exports.nodesCompleted = function nodesCompleted(nodeIds) {
+	  return {
+	    type: NODES_COMPLETED,
+	    payload: {
+	      nodeIds: nodeIds
+	    }
 	  };
 	};
 	
@@ -16241,11 +16269,11 @@
 	        key: 'onCompleteClick',
 	        value: function onCompleteClick(e) {
 	            var _props2 = this.props;
-	            var deleteNodes = _props2.deleteNodes;
+	            var completeNodes = _props2.completeNodes;
 	            var tree = _props2.tree;
 	
 	            e.stopPropagation();
-	            deleteNodes(nodeList(tree.present).filter(function (item) {
+	            completeNodes(nodeList(tree.present).filter(function (item) {
 	                return item.selected;
 	            }).map(function (node) {
 	                return node.id;
@@ -43265,7 +43293,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.updateNodeDisplayMode = exports.updateNodeNotes = exports.toggleNodeComplete = exports.toggleNodeMenu = exports.updateNodeWidgetDataIfNecessary = exports.deselectNode = exports.selectNode = exports.redo = exports.undo = exports.searchNodes = exports.toggleNodeExpansion = exports.deleteNodes = exports.deleteNode = exports.promoteNode = exports.demoteNode = exports.focusNodeBelow = exports.focusNodeAbove = exports.focusNode = exports.updateContent = exports.createNode = exports.nodeTransaction = exports.NODE_TRANSACTION = exports.generateEventsForReassignParentNode = undefined;
+	exports.updateNodeDisplayMode = exports.updateNodeNotes = exports.completeNodes = exports.toggleNodeComplete = exports.toggleNodeMenu = exports.updateNodeWidgetDataIfNecessary = exports.deselectNode = exports.selectNode = exports.redo = exports.undo = exports.searchNodes = exports.toggleNodeExpansion = exports.deleteNodes = exports.deleteNode = exports.promoteNode = exports.demoteNode = exports.focusNodeBelow = exports.focusNodeAbove = exports.focusNode = exports.updateContent = exports.createNode = exports.nodeTransaction = exports.NODE_TRANSACTION = exports.generateEventsForReassignParentNode = undefined;
 	
 	var _urlWidget = __webpack_require__(257);
 	
@@ -43520,17 +43548,26 @@
 	    var appState = getState(),
 	        nodes = (0, _treeQueries.getPresentNodes)(appState);
 	
-	    var reducerTransaction = [];
-	    var nodesToDeleteFromDatabase = [];
+	    var reducerTransaction = [],
+	        nodesToDeleteFromDatabase = [],
+	        updatedParentNodeChildIds = {};
 	
 	    if (Object.keys(nodes).length > 2) {
 	      nodeIds.forEach(function (nodeId) {
 	        var nodeToDelete = nodes[nodeId],
+	            parentNode = nodes[nodeToDelete.parentId],
+	            parentNodeUpdatedChildIds = updatedParentNodeChildIds[nodeToDelete.parentId],
 	            descendantIdsOfNode = (0, _treeQueries.getAllDescendantIds)(nodes, nodeId);
-	        nodesToDeleteFromDatabase.push({ id: nodeId, parentId: nodeToDelete.parentId, allDescendentIds: descendantIdsOfNode });
+	
+	        if (!parentNodeUpdatedChildIds) {
+	          parentNodeUpdatedChildIds = parentNode.childIds;
+	        }
+	        parentNodeUpdatedChildIds.remove(nodeToDelete.id);
+	        nodesToDeleteFromDatabase.push({ id: nodeId, parentId: nodeToDelete.parentId, parentChildIds: parentNodeUpdatedChildIds, allDescendentIds: descendantIdsOfNode });
 	        reducerTransaction.push(nodeActions.removeChildNode(nodeToDelete.parentId, nodeId));
 	      });
 	    }
+	    // TODO: /childIds gets set wrong
 	    reducerTransaction.push(nodeActions.nodesDeleted(nodeIds));
 	    dispatch(nodeTransaction(reducerTransaction));
 	    dispatch(firebaseActions.deleteNodes(nodesToDeleteFromDatabase, appState.auth.id));
@@ -43668,6 +43705,14 @@
 	        node = (0, _treeQueries.getPresentNodes)(appState)[nodeId];
 	    dispatch(nodeActions.nodeCompleteToggled(nodeId));
 	    dispatch(firebaseActions.updateNodeComplete(nodeId, !node.completed, appState.auth.id));
+	  };
+	};
+	
+	var completeNodes = exports.completeNodes = function completeNodes(nodeIds) {
+	  return function (dispatch, getState) {
+	    dispatch(nodeActions.nodesCompleted(nodeIds));
+	    dispatch(firebaseActions.completeNodes(nodeIds));
+	    dispatch(nodeActions.closeAllMenusAndDeselectAllNodes());
 	  };
 	};
 	
@@ -46821,10 +46866,16 @@
 	    }
 	
 	    if (action.type === _node.NODES_DELETED) {
-	        action.payload.forEach(function (nodeId) {
+	        action.payload.nodeIds.forEach(function (nodeId) {
 	            newState[nodeId].deleted = true;
 	            newState[nodeId].visible = false;
 	            newState[nodeId].selected = false;
+	        });
+	    }
+	
+	    if (action.type === _node.NODES_COMPLETED) {
+	        action.payload.nodeIds.forEach(function (nodeId) {
+	            newState[nodeId].completed = true;
 	        });
 	    }
 	
