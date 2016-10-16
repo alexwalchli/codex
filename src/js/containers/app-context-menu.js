@@ -15,9 +15,9 @@ export class AppContextMenu extends Component {
     }
 
     onCompleteClick(e){
-        const { deleteNodes, tree } = this.props;
+        const { completeNodes, tree } = this.props;
         e.stopPropagation();
-        deleteNodes(nodeList(tree.present).filter(item => item.selected).map(node => node.id));
+        completeNodes(nodeList(tree.present).filter(item => item.selected).map(node => node.id));
     }
 
     render() {

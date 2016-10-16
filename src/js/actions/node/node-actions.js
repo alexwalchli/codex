@@ -19,6 +19,7 @@ export const NODE_WIDGETS_UPDATING = `NODE_WIDGETS_UPDATING`; // signifies a nod
 export const TOGGLE_NODE_MENU = `TOGGLE_NODE_MENU`;
 export const CLOSE_ALL_NODE_MENUS_AND_DESELECT_ALL_NODES = `CLOSE_ALL_NODE_MENUS_AND_DESELECT_ALL_NODES`;
 export const NODE_COMPLETE_TOGGLED = `NODE_COMPLETE_TOGGLED`;
+export const NODES_COMPLETED = `NODES_COMPLETED`;
 export const NODE_NOTES_UPDATED = `NODE_NOTES_UPDATED`;
 export const NODE_DISPLAY_MODE_UPDATED = `NODE_DISPLAY_MODE_UPDATED`;
 export const NODE_MENU_TOGGLED = `TOGGLE_NODE_MENU`;
@@ -65,7 +66,9 @@ export const childIdsUpdated = (nodeId, newChildIds, updatedById) => {
 export const nodesDeleted = (nodeIds) => {
   return {
     type: NODES_DELETED,
-    payload: nodeIds
+    payload: {
+      nodeIds
+    }
   };
 };
 
@@ -170,6 +173,15 @@ export const nodeCompleteToggled = (nodeId) => {
 	return {
 		type: NODE_COMPLETE_TOGGLED,
 		nodeId
+	};
+};
+
+export const nodesCompleted = (nodeIds) => {
+	return {
+		type: NODES_COMPLETED,
+    payload: {
+      nodeIds
+    }
 	};
 };
 

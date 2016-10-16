@@ -211,17 +211,26 @@ export const deleteNodes = (nodeIds) => (dispatch, getState) => {
   const appState = getState(),
     nodes = getPresentNodes(appState);
 
-  let reducerTransaction = [];
-  let nodesToDeleteFromDatabase = [];
+  let reducerTransaction = [],
+      nodesToDeleteFromDatabase = [],
+      updatedParentNodeChildIds = {};
 
   if(Object.keys(nodes).length > 2){
     nodeIds.forEach(nodeId => {
       let nodeToDelete = nodes[nodeId],
-        descendantIdsOfNode = getAllDescendantIds(nodes, nodeId);
-      nodesToDeleteFromDatabase.push({id: nodeId, parentId: nodeToDelete.parentId, allDescendentIds: descendantIdsOfNode});
+          parentNode = nodes[nodeToDelete.parentId],
+          parentNodeUpdatedChildIds = updatedParentNodeChildIds[nodeToDelete.parentId],
+          descendantIdsOfNode = getAllDescendantIds(nodes, nodeId);
+
+      if(!parentNodeUpdatedChildIds){
+        parentNodeUpdatedChildIds = parentNode.childIds;
+      }
+      parentNodeUpdatedChildIds.remove(nodeToDelete.id);
+      nodesToDeleteFromDatabase.push({id: nodeId, parentId: nodeToDelete.parentId, parentChildIds: parentNodeUpdatedChildIds, allDescendentIds: descendantIdsOfNode});
       reducerTransaction.push(nodeActions.removeChildNode(nodeToDelete.parentId, nodeId));
     }); 
   }
+  // TODO: /childIds gets set wrong
   reducerTransaction.push(nodeActions.nodesDeleted(nodeIds));
   dispatch(nodeTransaction(reducerTransaction));
   dispatch(firebaseActions.deleteNodes(nodesToDeleteFromDatabase, appState.auth.id));
@@ -349,6 +358,13 @@ export const toggleNodeComplete = (nodeId) =>
 		      node = getPresentNodes(appState)[nodeId];
 		dispatch(nodeActions.nodeCompleteToggled(nodeId));
 		dispatch(firebaseActions.updateNodeComplete(nodeId, !node.completed, appState.auth.id));
+};
+
+export const completeNodes = (nodeIds) =>
+  (dispatch, getState) => {
+    dispatch(nodeActions.nodesCompleted(nodeIds));
+    dispatch(firebaseActions.completeNodes(nodeIds));
+    dispatch(nodeActions.closeAllMenusAndDeselectAllNodes());
 };
 
 export const updateNodeNotes = (nodeId, notes) =>

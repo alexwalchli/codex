@@ -140,13 +140,26 @@ export function deleteNodes(nodesToDelete = [], userId){
     nodesToDelete.forEach(nodeToDelete => {
       dbUpdates[`nodes/${nodeToDelete.id}/deleted`] = true;
       dbUpdates[`nodes/${nodeToDelete.id}/lastUpdatedById/`] = userId;
-      dbUpdates[`nodes/${nodeToDelete.parentId}/childIds/${nodeToDelete.id}`] = null;
+      dbUpdates[`nodes/${nodeToDelete.parentId}/childIds/`] = nodesToDelete.parentNode;
       dbUpdates[`nodes/${nodeToDelete.parentId}/lastUpdatedById/`] = userId;
 
       nodeToDelete.allDescendentIds.forEach(descedantId => {
         dbUpdates[`nodes/${descedantId}/deleted`] = true;
         dbUpdates[`nodes/${descedantId}/lastUpdatedById/`] = userId;
       });
+    });
+
+    return dispatch(firebaseRequestQueueActions.enqueueRequest(this, () => {
+      return firebaseDb.ref().update(dbUpdates);
+    }));
+  };
+}
+
+export function completeNodes(nodeIds, userId){
+  return dispatch => {
+    let dbUpdates = {};
+    nodeIds.forEach(nodeId => {
+      dbUpdates[`nodes/${nodeId}/completed`] = true;
     });
 
     return dispatch(firebaseRequestQueueActions.enqueueRequest(this, () => {

@@ -1,5 +1,5 @@
 import { NODE_CREATED, NODE_FOCUSED, NODE_SHOWN, NODE_HIDDEN, NODE_EXPANDED, NODE_COLLAPSED, NODE_NOTES_UPDATED, NODE_DISPLAY_MODE_UPDATED,
-         CONTENT_UPDATED, CHILD_IDS_UPDATED, NODE_UNFOCUSED, NODES_DELETED, PARENT_UPDATED, NODE_SELECTED, NODE_DESELECTED, NODE_COMPLETE_TOGGLED, REMOVE_CHILD_NODE,
+         CONTENT_UPDATED, CHILD_IDS_UPDATED, NODE_UNFOCUSED, NODES_DELETED, PARENT_UPDATED, NODE_SELECTED, NODE_DESELECTED, NODE_COMPLETE_TOGGLED, NODES_COMPLETED, REMOVE_CHILD_NODE,
          NODE_EXPANSION_TOGGLED, NODE_TRANSACTION, NODE_PARENT_UPDATED, NODE_UPDATED, NODES_SEARCHED, NODE_MENU_TOGGLED, CLOSE_ALL_NODE_MENUS_AND_DESELECT_ALL_NODES } 
     from '../actions/node';
 import { INITIAL_NODE_STATE_LOADED } from '../actions/firebase/firebase-subscriptions';
@@ -132,10 +132,16 @@ function handleAction(newState, action){
     } 
 
     if(action.type === NODES_DELETED){
-        action.payload.forEach(nodeId => {
+        action.payload.nodeIds.forEach(nodeId => {
             newState[nodeId].deleted = true;
             newState[nodeId].visible = false;
             newState[nodeId].selected = false;
+        });
+    }
+
+    if(action.type === NODES_COMPLETED){
+        action.payload.nodeIds.forEach(nodeId => {
+            newState[nodeId].completed = true;
         });
     }
 
