@@ -26,7 +26,7 @@ module.exports = (wallaby) => {
       console.log('Current worker id: ' + wallaby.workerId);
       console.log('Current session id: ' + wallaby.sessionId);
     },
-    testFramework: 'jasmine',
+    testFramework: 'mocha',
     debug: true,
     delays: {
       run: 1000

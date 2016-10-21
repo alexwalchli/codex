@@ -1,21 +1,18 @@
-import { combineReducers } from 'redux';
-import { externalDataCache, selectedDataSource } from './external-data-cache';
-import { app } from './app';
-import { search } from './search';
-import { tree } from './tree';
-import { auth } from './auth';
-import { userPages } from './user-page';
-import { queuedRequests } from './firebase-request-queue';
-import undoable, { excludeAction } from 'redux-undo';
-import {  FOCUS_NODE, FOCUS_NODE_ABOVE, FOCUS_NODE_BELOW, UNFOCUS_NODE, SEARCH_NODES, SHOW_SEARCH_RESULTS, 
-          UPDATE_WIDGET_DATA_IF_NECESSARY, SELECT_NODE, DESELECT_NODE, NODE_WIDGETS_UPDATING, NODE_WIDGETS_UPDATED, REMOVE_CHILD, ADD_CHILD } 
-    from '../actions';
+import { combineReducers } from 'redux'
+import { externalDataCache, selectedDataSource } from './external-data-cache'
+import { app } from './app'
+import { search } from './search'
+import { tree } from './tree'
+import { auth } from './auth'
+import { userPages } from './user-page'
+import { queuedRequests } from './firebase-request-queue'
+import undoable from 'redux-undo'
 
 const undoableTree = undoable(tree, {
   filter: (action) => {
-    return action.undoable !== false;
+    return action.undoable !== false
   }
-});
+})
 const rootReducer = combineReducers({
   app,
   auth,
@@ -25,6 +22,6 @@ const rootReducer = combineReducers({
   search,
   userPages,
   queuedRequests
-});
+})
 
-export default rootReducer;
+export default rootReducer

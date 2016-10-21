@@ -1,81 +1,81 @@
-export function dictionaryToArray(dictionary){
-  if(!dictionary){
-    return null;
+export function dictionaryToArray (dictionary) {
+  if (!dictionary) {
+    return null
   }
-  return Object.keys(dictionary).map(key => dictionary[key]);
+  return Object.keys(dictionary).map(key => dictionary[key])
 }
 
 // retrieves the current state of nodes
-export function getPresentNodes(appState){
-  let presentNodes = Object.assign({}, appState.tree.present);
+export function getPresentNodes (appState) {
+  let presentNodes = Object.assign({}, appState.tree.present)
 
   Object.keys(presentNodes).forEach(nodeId => {
-    if(presentNodes[nodeId].deleted){
-        delete presentNodes[nodeId];
+    if (presentNodes[nodeId].deleted) {
+      delete presentNodes[nodeId]
     }
-  });
+  })
 
-  return presentNodes;
+  return presentNodes
 }
 
 // retrieves the root node ID of the current page
-export function getRootNodeId(appState){
-  let currentUserPageId = appState.app.currentUserPageId;
-  return dictionaryToArray(appState.userPages).find(up => up.id === currentUserPageId).rootNodeId;
+export function getRootNodeId (appState) {
+  let currentUserPageId = appState.app.currentUserPageId
+  return dictionaryToArray(appState.userPages).find(up => up.id === currentUserPageId).rootNodeId
 }
 
 // retrieves a flattened ordered list of all node IDs starting under startNodeId
-export function getAllNodeIdsOrdered(nodes, startNodeId){
-  let allOrderedChildIds = getAllDescendantIds(nodes, startNodeId);
-  return [ startNodeId, ...allOrderedChildIds ];
+export function getAllNodeIdsOrdered (nodes, startNodeId) {
+  let allOrderedChildIds = getAllDescendantIds(nodes, startNodeId)
+  return [ startNodeId, ...allOrderedChildIds ]
 }
 
 // recursively retrieves, and flattens, all node IDs under the startNodeId
-export function getAllDescendantIds(nodes, startNodeId) {
+export function getAllDescendantIds (nodes, startNodeId) {
   return nodes[startNodeId].childIds.reduce((acc, childId) => (
     [ ...acc, childId, ...getAllDescendantIds(nodes, childId) ]
-  ), []);
+  ), [])
 }
 
 // recursively retrieves, and flattens, all node Ids excluding children of collapsed nodes, except children of the start node
-export function getAllUncollapsedDescedantIds(rootNodeId, nodes, startNodeId) {
+export function getAllUncollapsedDescedantIds (rootNodeId, nodes, startNodeId) {
   return nodes[startNodeId].childIds.reduce((acc, childId) => {
-    if(rootNodeId !== startNodeId && nodes[nodes[childId].parentId].collapsed){
-      return acc;
+    if (rootNodeId !== startNodeId && nodes[nodes[childId].parentId].collapsed) {
+      return acc
     }
-    return [ ...acc, childId, ...getAllUncollapsedDescedantIds(rootNodeId, nodes, childId) ];
-  }, []);
+    return [ ...acc, childId, ...getAllUncollapsedDescedantIds(rootNodeId, nodes, childId) ]
+  }, [])
 }
 
-export function getCurrentlySelectedNodeIds(nodes){
-  return dictionaryToArray(nodes).filter(n => n.selected).map(n => n.id);
+export function getCurrentlySelectedNodeIds (nodes) {
+  return dictionaryToArray(nodes).filter(n => n.selected).map(n => n.id)
 }
 
-export function getCurrentlyFocusedNodeId(nodes){
-  let focusedNode = dictionaryToArray(nodes).find(n => n.focused || n.notesFocused);
-  return focusedNode ? focusedNode.id : null;
+export function getCurrentlyFocusedNodeId (nodes) {
+  let focusedNode = dictionaryToArray(nodes).find(n => n.focused || n.notesFocused)
+  return focusedNode ? focusedNode.id : null
 }
 
 // retrieves the next node above or below that is visible
-export function getNextNodeThatIsVisible(rootNodeId, nodes, currentNodeId, searchAbove = true){
-  const allNodeIdsOrdered = getAllNodeIdsOrdered(nodes, rootNodeId),
-        currentNodeIndex = allNodeIdsOrdered.indexOf(currentNodeId);
+export function getNextNodeThatIsVisible (rootNodeId, nodes, currentNodeId, searchAbove = true) {
+  const allNodeIdsOrdered = getAllNodeIdsOrdered(nodes, rootNodeId)
+  const currentNodeIndex = allNodeIdsOrdered.indexOf(currentNodeId)
 
-  if(searchAbove){
-    for(let j = currentNodeIndex - 1; j > 0; j--){
-      let node = nodes[allNodeIdsOrdered[j]];
-      if(node.visible && !node.deleted){
-        return node;
+  if (searchAbove) {
+    for (let j = currentNodeIndex - 1; j > 0; j--) {
+      let node = nodes[allNodeIdsOrdered[j]]
+      if (node.visible && !node.deleted) {
+        return node
       }
     }
   } else {
-    for(let k = currentNodeIndex + 1; k < allNodeIdsOrdered.length; k++){
-      let node = nodes[allNodeIdsOrdered[k]];
-      if(node.visible && !node.deleted){
-        return node;
+    for (let k = currentNodeIndex + 1; k < allNodeIdsOrdered.length; k++) {
+      let node = nodes[allNodeIdsOrdered[k]]
+      if (node.visible && !node.deleted) {
+        return node
       }
     }
   }
 
-  return null;
+  return null
 }

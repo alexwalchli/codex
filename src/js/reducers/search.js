@@ -1,14 +1,14 @@
 import {
   SEARCH_NODES
-} from '../actions';
+} from '../actions'
 
-export function search(state = { }, action) {
+export function search (state = { }, action) {
   switch (action.type) {
     case SEARCH_NODES:
-        return Object.assign({}, state, {
-            query: action.query
-        });
+      return Object.assign({}, state, {
+        query: action.query
+      })
     default:
-      return state;
+      return state
   }
 }
