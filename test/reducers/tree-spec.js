@@ -35,7 +35,7 @@ describe('tree reducer', () => {
 
       const newTreeState = treeReducer.tree({}, initialNodeStateLoaded)
 
-      expect(newTreeState).toEqual(initialNodeState)
+      expect(newTreeState).to.deep.equal(initialNodeState)
     })
   })
 
@@ -49,10 +49,10 @@ describe('tree reducer', () => {
 
       const newTreeState = treeReducer.tree(treeState, action)
 
-      expect(newTreeState['111'].id).toEqual(newNodeId)
-      expect(newTreeState['111'].parentId).toEqual(parentId)
-      expect(newTreeState['111'].childIds).toEqual(childIds)
-      expect(newTreeState['111'].content).toEqual(content)
+      expect(newTreeState['111'].id).to.equal(newNodeId)
+      expect(newTreeState['111'].parentId).to.equal(parentId)
+      expect(newTreeState['111'].childIds).to.equal(childIds)
+      expect(newTreeState['111'].content).to.equal(content)
     })
   })
 
@@ -63,12 +63,12 @@ describe('tree reducer', () => {
 
       const newTreeState = treeReducer.tree(treeState, action)
 
-      expect(newTreeState['123'].deleted).toEqual(true)
-      expect(newTreeState['123'].visible).toEqual(false)
-      expect(newTreeState['123'].selected).toEqual(false)
-      expect(newTreeState['321'].deleted).toEqual(true)
-      expect(newTreeState['321'].visible).toEqual(false)
-      expect(newTreeState['321'].selected).toEqual(false)
+      expect(newTreeState['123'].deleted).to.equal(true)
+      expect(newTreeState['123'].visible).to.equal(false)
+      expect(newTreeState['123'].selected).to.equal(false)
+      expect(newTreeState['321'].deleted).to.equal(true)
+      expect(newTreeState['321'].visible).to.equal(false)
+      expect(newTreeState['321'].selected).to.equal(false)
     })
   })
 })

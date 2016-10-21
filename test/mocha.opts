@@ -1,3 +1,4 @@
---require babel-register
 --recursive
 --reporter spec
+--require babel-register
+--require test/common

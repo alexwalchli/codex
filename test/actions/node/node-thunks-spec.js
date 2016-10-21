@@ -2,9 +2,8 @@ import * as firebaseActions from '../../../src/js/actions/firebase/firebase-node
 import * as nodeActions from '../../../src/js/actions/node/node-actions'
 import * as treeQueries from '../../../src/js/utilities/tree-queries'
 import * as nodeThunks from '../../../src/js/actions/node/node-thunks'
-import { describe, it, spyOn, beforeEach } from 'mocha'
-import { expect } from 'chai'
-import * as sinon from 'sinon'
+
+import { expect, describe, it, beforeEach, sinon } from '../../common'
 
 describe('node-thunks', () => {
   const nodes = {
@@ -46,13 +45,13 @@ describe('node-thunks', () => {
   describe('createNode', () => {
     it('should create and dispatch optimistic actions', () => {
       // console.log(firebaseDb);
-      // spyOn(firebaseDb, 'ref').and.callFake(() => {
+      // sinon.spy(firebaseDb, 'ref').and.callFake(() => {
       //   return {
       //     push: () => { return '123456'; } // new node ID
       //   };
       // });
       // // const nodeRef = firebase.database().ref().child('nodes');
-      // // spyOn(nodeRef, 'ref');
+      // // sinon.spy(nodeRef, 'ref');
 
       // nodeThunks.createNode('123', 1, 'some content')(dispatch, getState);
 
@@ -79,96 +78,101 @@ describe('node-thunks', () => {
     it('should dispatch actions to firebase and reducer', () => {
       const nodeId = '123'
       const newContent = 'new content'
-      spyOn(firebaseActions, 'updateNodeContent')
-      spyOn(nodeActions, 'contentUpdated')
+      const updateNodeContentSpy = sinon.spy(firebaseActions, 'updateNodeContent')
+      const contentUpdatedSpy = sinon.spy(nodeActions, 'contentUpdated')
 
       nodeThunks.updateContent(nodeId, newContent)(dispatch, getState)
 
-      expect(firebaseActions.updateNodeContent).toHaveBeenCalledWith(nodeId, newContent, userId)
-      expect(nodeActions.contentUpdated).toHaveBeenCalledWith(nodeId, newContent)
+      expect(updateNodeContentSpy.calledWith(nodeId, newContent, userId))
+      expect(contentUpdatedSpy.calledWith(nodeId, newContent))
     })
   })
 
-  describe('toggleNodeExpansion', () => {
+  describe('toggleNodeExpansion', function () {
     const nodeId = '123'
+    const getAllDescendantIdsSpy = sinon.spy(treeQueries, 'getAllDescendantIds')
+    const getAllUncollapsedDescedantIdsSpy = sinon.spy(treeQueries, 'getAllUncollapsedDescedantIds')
+    const nodeExpandedSpy = sinon.spy(nodeActions, 'nodeExpanded')
+    const nodeCollapsedSpy = sinon.spy(nodeActions, 'nodeCollapsed')
 
-    beforeEach(() => {
-      spyOn(treeQueries, 'getAllDescendantIds')
-      spyOn(treeQueries, 'getAllUncollapsedDescedantIds')
-      spyOn(nodeActions, 'nodeExpanded')
-      spyOn(nodeActions, 'nodeCollapsed')
+    beforeEach(function () {
+      getAllDescendantIdsSpy.reset()
+      getAllUncollapsedDescedantIdsSpy.reset()
+      nodeExpandedSpy.reset()
+      nodeCollapsedSpy.reset()
     })
 
     it('should dispatch get all descendents if forceToggleChildrenExpansion = true', () => {
       nodeThunks.toggleNodeExpansion(nodeId, true)(dispatch, getState)
 
-      expect(treeQueries.getAllDescendantIds).toHaveBeenCalledWith(nodes, nodeId)
-      expect(treeQueries.getAllUncollapsedDescedantIds.calls.count()).toEqual(0)
+      expect(getAllDescendantIdsSpy).to.have.been.calledWith(nodes, nodeId)
+      expect(getAllDescendantIdsSpy.callCount).to.equal(1)
     })
     it('should dispatch get all uncollapsed descendents if forceToggleChildrenExpansion = false', () => {
       nodeThunks.toggleNodeExpansion(nodeId, false)(dispatch, getState)
 
-      expect(treeQueries.getAllUncollapsedDescedantIds).toHaveBeenCalledWith(nodeId, nodes, nodeId)
-      expect(treeQueries.getAllDescendantIds.calls.count()).toEqual(0)
+      expect(getAllUncollapsedDescedantIdsSpy).to.have.been.calledWith(nodeId, nodes, nodeId)
+      expect(getAllDescendantIdsSpy.callCount).to.equal(0)
     })
     it('should dispatch nodeExpanded if node is collapsed', () => {
       nodeThunks.toggleNodeExpansion(nodeId, false)(dispatch, getState)
 
-      expect(nodeActions.nodeExpanded).toHaveBeenCalledWith(nodeId, undefined)
-      expect(nodeActions.nodeCollapsed.calls.count()).toEqual(0)
+      expect(nodeExpandedSpy).to.have.been.calledWith(nodeId, [])
+      expect(nodeCollapsedSpy.callCount).to.equal(0)
     })
     it('should dispatch nodeCollapsed if node is expanded', () => {
       nodeThunks.toggleNodeExpansion('321', true)(dispatch, getState)
 
-      expect(nodeActions.nodeCollapsed).toHaveBeenCalledWith('321', undefined)
-      expect(nodeActions.nodeExpanded.calls.count()).toEqual(0)
+      expect(nodeCollapsedSpy).to.have.been.calledWith('321', [])
+      expect(nodeExpandedSpy.callCount).equal(0)
     })
   })
 
   describe('selectNode', () => {
     it('should dispatch nodeSelected', () => {
       const nodeId = '123'
-      spyOn(nodeActions, 'nodeSelected')
+      const nodeSelectedSpy = sinon.spy(nodeActions, 'nodeSelected')
 
       nodeThunks.selectNode(nodeId)(dispatch, getState)
 
-      expect(nodeActions.nodeSelected).toHaveBeenCalledWith(nodeId)
+      expect(nodeSelectedSpy).to.have.been.calledWith(nodeId)
     })
   })
 
   describe('deselectNode', () => {
     it('should dispatch nodeDeselected', () => {
       const nodeId = '123'
-      spyOn(nodeActions, 'nodeDeselected')
+      const nodeDeselectedSpy = sinon.spy(nodeActions, 'nodeDeselected')
 
       nodeThunks.deselectNode(nodeId)(dispatch, getState)
 
-      expect(nodeActions.nodeDeselected).toHaveBeenCalledWith(nodeId)
+      expect(nodeDeselectedSpy).to.have.been.calledWith(nodeId)
     })
   })
 
   describe('toggleNodeMenu', () => {
     it('should dispatch closeAllMenusAndDeselectAllNodes and toggleNodeMenu', () => {
       const nodeId = '123'
-      spyOn(nodeActions, 'closeAllMenusAndDeselectAllNodes')
-      spyOn(nodeActions, 'nodeMenuToggled')
+      const closeAllMenusAndDeselectAllNodesSpy = sinon.spy(nodeActions, 'closeAllMenusAndDeselectAllNodes')
+      const nodeMenuToggledSpy = sinon.spy(nodeActions, 'nodeMenuToggled')
 
       nodeThunks.toggleNodeMenu(nodeId)(dispatch, getState)
 
-      expect(nodeActions.closeAllMenusAndDeselectAllNodes).toHaveBeenCalledWith(nodeId)
-      expect(nodeActions.nodeMenuToggled).toHaveBeenCalledWith(nodeId)
+      expect(closeAllMenusAndDeselectAllNodesSpy).to.have.been.calledWith(nodeId)
+      expect(nodeMenuToggledSpy).to.have.been.calledWith(nodeId)
     })
   })
 
   describe('toggleNodeComplete', () => {
     it('should dispatch nodeCompleteToggled and updateNodeComplete', () => {
       const nodeId = '123'
-      spyOn(nodeActions, 'nodeCompleteToggled')
-      spyOn(firebaseActions, 'updateNodeComplete')
+      const nodeCompleteToggledSpy = sinon.spy(nodeActions, 'nodeCompleteToggled')
+      const updateNodeCompleteSpy = sinon.spy(firebaseActions, 'updateNodeComplete')
+
       nodeThunks.toggleNodeComplete(nodeId)(dispatch, getState)
 
-      expect(nodeActions.nodeCompleteToggled).toHaveBeenCalledWith(nodeId)
-      expect(firebaseActions.updateNodeComplete).toHaveBeenCalledWith(nodeId, false, userId)
+      expect(nodeCompleteToggledSpy).to.have.been.calledWith(nodeId)
+      expect(updateNodeCompleteSpy).to.have.been.calledWith(nodeId, false, userId)
     })
   })
 
@@ -176,13 +180,13 @@ describe('node-thunks', () => {
     it('should dispatch nodeNotesUpdated and updateNodeNotes', () => {
       const nodeId = '123'
       const notes = 'some notes'
-      spyOn(nodeActions, 'nodeNotesUpdated')
-      spyOn(firebaseActions, 'updateNodeNotes')
+      const nodeNotesUpdatedSpy = sinon.spy(nodeActions, 'nodeNotesUpdated')
+      const updateNodeNotesSpy = sinon.spy(firebaseActions, 'updateNodeNotes')
 
       nodeThunks.updateNodeNotes(nodeId, notes)(dispatch, getState)
 
-      expect(nodeActions.nodeNotesUpdated).toHaveBeenCalledWith(nodeId, notes)
-      expect(firebaseActions.updateNodeNotes).toHaveBeenCalledWith(nodeId, notes, userId)
+      expect(nodeNotesUpdatedSpy).to.have.been.calledWith(nodeId, notes)
+      expect(updateNodeNotesSpy).to.have.been.calledWith(nodeId, notes, userId)
     })
   })
 
@@ -190,13 +194,13 @@ describe('node-thunks', () => {
     it('should dispatch nodeDisplayModeUpdated and updateNodeDisplayMode', () => {
       const nodeId = '123'
       const mode = 'ordered'
-      spyOn(nodeActions, 'nodeDisplayModeUpdated')
-      spyOn(firebaseActions, 'updateNodeDisplayMode')
+      const nodeDisplayModeUpdatedSpy = sinon.spy(nodeActions, 'nodeDisplayModeUpdated')
+      const updateNodeDisplayModeSpy = sinon.spy(firebaseActions, 'updateNodeDisplayMode')
 
       nodeThunks.updateNodeDisplayMode(nodeId, mode)(dispatch, getState)
 
-      expect(nodeActions.nodeDisplayModeUpdated).toHaveBeenCalledWith(nodeId, mode)
-      expect(firebaseActions.updateNodeDisplayMode).toHaveBeenCalledWith(nodeId, mode, userId)
+      expect(nodeDisplayModeUpdatedSpy).to.have.been.calledWith(nodeId, mode)
+      expect(updateNodeDisplayModeSpy).to.have.been.calledWith(nodeId, mode, userId)
     })
   })
 })

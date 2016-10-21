@@ -15,7 +15,8 @@
     "url": "https://github.com/alexwalchli/codex.git"
   },
   "standard": {
-    "parser": "babel-eslint"
+    "parser": "babel-eslint",
+    "globals": ["mocha", "sinonChai"]
   },
   "homepage": "http://codex.com",
   "dependencies": {
@@ -59,6 +60,7 @@
     "less-loader": "^2.2.3",
     "mocha": "^3.1.2",
     "sinon": "^1.17.6",
+    "sinon-chai": "^2.8.0",
     "standard": "^8.4.0",
     "style-loader": "^0.13.1",
     "webpack": "^1.13.2",

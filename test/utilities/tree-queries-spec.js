@@ -19,7 +19,7 @@ describe('getPresentNodes', () => {
 
     var presentNodes = treeQueries.getPresentNodes(appState)
 
-    expect(presentNodes).toEqual({ abc: { id: 1 } })
+    expect(presentNodes).to.deep.equal({ abc: { id: 1 } })
   })
 })
 
@@ -34,7 +34,7 @@ describe('getRootNodeId', () => {
       }
     }
 
-    expect(treeQueries.getRootNodeId(appState)).toEqual('456')
+    expect(treeQueries.getRootNodeId(appState)).to.equal('456')
   })
 })
 
@@ -48,7 +48,7 @@ describe('getAllNodeIdsOrdered', () => {
       }
     }
 
-    expect(treeQueries.getAllNodeIdsOrdered(appState.nodes, 'abc')).toEqual(['abc', 'def', 'ghi'])
+    expect(treeQueries.getAllNodeIdsOrdered(appState.nodes, 'abc')).to.deep.equal(['abc', 'def', 'ghi'])
   })
 })
 
@@ -64,7 +64,7 @@ describe('getAllDescendantIds', () => {
       }
     }
 
-    expect(treeQueries.getAllNodeIdsOrdered(appState.nodes, 'aaa')).toEqual(['aaa', 'bbb', 'ddd', 'eee', 'ccc'])
+    expect(treeQueries.getAllNodeIdsOrdered(appState.nodes, 'aaa')).to.deep.equal(['aaa', 'bbb', 'ddd', 'eee', 'ccc'])
   })
 
   it('should return only the start node id if it is a lowest level descedent', () => {
@@ -78,8 +78,8 @@ describe('getAllDescendantIds', () => {
       }
     }
 
-    expect(treeQueries.getAllNodeIdsOrdered(appState.nodes, 'ccc')).toEqual(['ccc'])
-    expect(treeQueries.getAllNodeIdsOrdered(appState.nodes, 'eee')).toEqual(['eee'])
+    expect(treeQueries.getAllNodeIdsOrdered(appState.nodes, 'ccc')).to.deep.equal(['ccc'])
+    expect(treeQueries.getAllNodeIdsOrdered(appState.nodes, 'eee')).to.deep.equal(['eee'])
   })
 
   it('should return only the start node descendents when the start node is not the root', () => {
@@ -93,7 +93,7 @@ describe('getAllDescendantIds', () => {
       }
     }
 
-    expect(treeQueries.getAllNodeIdsOrdered(appState.nodes, 'bbb')).toEqual(['bbb', 'ddd', 'eee'])
+    expect(treeQueries.getAllNodeIdsOrdered(appState.nodes, 'bbb')).to.deep.equal(['bbb', 'ddd', 'eee'])
   })
 })
 
@@ -110,7 +110,7 @@ describe('getAllUncollapsedDescedantIds', () => {
       }
     }
 
-    expect(treeQueries.getAllUncollapsedDescedantIds('aaa', appState.nodes, 'aaa')).toEqual(['bbb', 'ccc'])
+    expect(treeQueries.getAllUncollapsedDescedantIds('aaa', appState.nodes, 'aaa')).to.deep.equal(['bbb', 'ccc'])
   })
 })
 
@@ -128,7 +128,7 @@ describe('getCurrentlySelectedNodeIds', () => {
 
     const selectedNodeIds = treeQueries.getCurrentlySelectedNodeIds(appState.nodes)
 
-    expect(selectedNodeIds).toEqual(['ddd', 'eee'])
+    expect(selectedNodeIds).to.deep.equal(['ddd', 'eee'])
   })
 })
 
@@ -146,7 +146,7 @@ describe('getCurrentlyFocusedNodeId', () => {
 
     const focusedNodeId = treeQueries.getCurrentlyFocusedNodeId(appState.nodes)
 
-    expect(focusedNodeId).toEqual('ddd')
+    expect(focusedNodeId).to.equal('ddd')
   })
 
   it('should return the current node that has its notes focused', () => {
@@ -162,7 +162,7 @@ describe('getCurrentlyFocusedNodeId', () => {
 
     const focusedNodeId = treeQueries.getCurrentlyFocusedNodeId(appState.nodes)
 
-    expect(focusedNodeId).toEqual('eee')
+    expect(focusedNodeId).to.equal('eee')
   })
 })
 
@@ -199,9 +199,9 @@ describe('getNextNodeThatIsVisible', () => {
     const nodeAbovefff = treeQueries.getNextNodeThatIsVisible('aaa', appState.nodes, 'fff', true)
     const nodeAbovebbb = treeQueries.getNextNodeThatIsVisible('aaa', appState.nodes, 'bbb', true)
 
-    expect(nodeAboveiii.id).toEqual('ggg')
-    expect(nodeAbovefff.id).toEqual('ddd')
-    expect(nodeAbovebbb).toEqual(null)
+    expect(nodeAboveiii.id).to.equal('ggg')
+    expect(nodeAbovefff.id).to.equal('ddd')
+    expect(nodeAbovebbb).to.equal(null)
   })
 
   it('should return the sibling nodeId below, if searching below and it is visible', () => {
@@ -211,11 +211,11 @@ describe('getNextNodeThatIsVisible', () => {
     const nodeBelowddd = treeQueries.getNextNodeThatIsVisible('aaa', appState.nodes, 'ddd', false)
     const nodeBelowggg = treeQueries.getNextNodeThatIsVisible('aaa', appState.nodes, 'ggg', false)
 
-    expect(nodeBelowiii).toEqual(null)
-    expect(nodeBelowbbb.id).toEqual('ccc')
-    expect(nodeBelowccc.id).toEqual('ddd')
-    expect(nodeBelowddd.id).toEqual('fff')
-    expect(nodeBelowddd.id).toEqual('fff')
-    expect(nodeBelowggg.id).toEqual('iii')
+    expect(nodeBelowiii).to.equal(null)
+    expect(nodeBelowbbb.id).to.equal('ccc')
+    expect(nodeBelowccc.id).to.equal('ddd')
+    expect(nodeBelowddd.id).to.equal('fff')
+    expect(nodeBelowddd.id).to.equal('fff')
+    expect(nodeBelowggg.id).to.equal('iii')
   })
 })
