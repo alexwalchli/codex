@@ -1,9 +1,9 @@
 {
   "name": "Codex",
   "version": "0.0.1",
-  "description": "Simple & Smart Note Taking",
+  "description": "Simple & Smart Note taking",
   "scripts": {
-    "start": "node server.js",
+    "start": "standard 'src/**/*.js' 'test/**/*.js' --fix && mocha && node server.js",
     "test": "standard 'src/**/*.js' 'test/**/*.js' --fix && mocha"
   },
   "repository": {
