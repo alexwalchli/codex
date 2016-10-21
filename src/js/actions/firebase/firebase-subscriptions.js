@@ -52,24 +52,24 @@ export function subscribeToNodes () {
         // do an initial load of the user's nodes based on the current user page's descendantIds
         // and then subscribe to changes on each node
     let appState = getState()
-    let initialNodeState = {}
+    let initialTreeState = {}
     let initialNodePromises = []
 
-        // collection of all node Ids for this userPage and user
+    // collection of all node Ids for this userPage and user
     let userPageUserNodesRef = firebaseDb.ref('userPage_users_nodes/' + appState.app.currentUserPageId + '/' + appState.auth.id)
     userPageUserNodesRef.once('value').then(userPageUsersNodesSnapshot => {
       let nodeIds = Object.keys(userPageUsersNodesSnapshot.val())
 
       dispatch(subscribeToUserPageUserNodes(appState.app.currentUserPageId))
 
-            // retrieve all nodes and then subscribe to each
+      // retrieve all nodes and then subscribe to each
       nodeIds.forEach(descendantId => {
         let nodeRef = firebaseDb.ref('nodes/' + descendantId)
         let nodePromise = new Promise((resolve, reject) => {
           nodeRef.once('value').then(snapshot => {
             let node = unwrapNodeSnapshot(snapshot)
 
-            initialNodeState[descendantId] = node
+            initialTreeState[descendantId] = node
             dispatch(subscribeToNode(node.id))
 
             resolve()
@@ -81,7 +81,10 @@ export function subscribeToNodes () {
       Promise.all(initialNodePromises).then(() => {
         dispatch({
           type: INITIAL_NODE_STATE_LOADED,
-          payload: initialNodeState
+          payload: {
+            rootNodeId: appState.userPages[appState.app.currentUserPageId].rootNodeId,
+            initialTreeState
+          }
         })
 
         initialized = true

@@ -128,7 +128,10 @@ function handleAction (newState, action) {
   }
 
   if (action.type === INITIAL_NODE_STATE_LOADED) {
-    return Object.assign({}, action.payload)
+    const rootNode = action.payload.initialTreeState[action.payload.rootNodeId];
+    const newState = Object.assign({}, action.payload.initialTreeState)
+    newState[rootNode.childIds[0]] = node(newState[rootNode.childIds[0]], { type: NODE_FOCUSED, payload: { focusNote: false } })
+    return newState;
   }
 
   if (action.type === NODES_DELETED) {
