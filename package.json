@@ -16,7 +16,11 @@
   },
   "standard": {
     "parser": "babel-eslint",
-    "globals": ["mocha", "sinonChai"]
+    "globals": [
+      "describe",
+      "it",
+      "beforeEach"
+    ]
   },
   "homepage": "http://codex.com",
   "dependencies": {
@@ -63,6 +67,7 @@
     "sinon-chai": "^2.8.0",
     "standard": "^8.4.0",
     "style-loader": "^0.13.1",
+    "wallaby-webpack": "0.0.26",
     "webpack": "^1.13.2",
     "webpack-dev-middleware": "^1.2.0",
     "webpack-dev-server": "^1.15.1",

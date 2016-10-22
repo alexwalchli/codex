@@ -1,15 +1,27 @@
+var wallabyWebpack = require('wallaby-webpack');
+var wallabyPostprocessor = wallabyWebpack({
+    entryPatterns: [
+            'test/common.js'
+    ]
+});
+
 module.exports = (wallaby) => {
   return {
     files: [
-      'src/js/utilities/*.js',
-      'src/js/actions/**/*.js',
-      'src/js/reducers/**/*.js',
-      'src/js/widgets/**/*.js',
-      'src/js/firebase/**/*.js'
+      { pattern: 'node_modules/chai/lib/chai.js', instrument: false },
+      { pattern: 'node_modules/sinon/lib/sinon.js', instrument: false },
+      { pattern: 'node_modules/sinon-chai/lib/sinon-chai.js', instrument: false },
+      { pattern: 'test/common.js', load: false, instrument: false },
+      { pattern: 'src/js/utilities/*.js', load: false  },
+      { pattern: 'src/js/actions/**/*.js', load: false  },
+      { pattern: 'src/js/reducers/**/*.js', load: false  } ,
+      { pattern: 'src/js/widgets/**/*.js', load: false  },
+      { pattern: 'src/js/firebase/**/*.js', load: false  }
     ],
     tests: [
       'test/**/*-spec.js'
     ],
+    testFramework: 'mocha',
     compilers: {
       '**/*.js': wallaby.compilers.babel()
     },
@@ -26,7 +38,6 @@ module.exports = (wallaby) => {
       console.log('Current worker id: ' + wallaby.workerId);
       console.log('Current session id: ' + wallaby.sessionId);
     },
-    testFramework: 'mocha',
     debug: true,
     delays: {
       run: 1000

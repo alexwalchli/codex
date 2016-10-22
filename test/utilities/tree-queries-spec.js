@@ -1,5 +1,4 @@
 import * as treeQueries from '../../src/js/utilities/tree-queries'
-import { describe, it, beforeEach } from 'mocha'
 import { expect } from 'chai'
 
 describe('getPresentNodes', () => {

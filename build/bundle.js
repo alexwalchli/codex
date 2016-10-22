@@ -65,7 +65,7 @@
 /******/ 	}
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "e34388e7c2ecaf052b41"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "00335bacd686cbf207b5"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
 /******/ 	
@@ -7511,7 +7511,7 @@
 	    // do an initial load of the user's nodes based on the current user page's descendantIds
 	    // and then subscribe to changes on each node
 	    var appState = getState();
-	    var initialNodeState = {};
+	    var initialTreeState = {};
 	    var initialNodePromises = [];
 	
 	    // collection of all node Ids for this userPage and user
@@ -7528,7 +7528,7 @@
 	          nodeRef.once('value').then(function (snapshot) {
 	            var node = unwrapNodeSnapshot(snapshot);
 	
-	            initialNodeState[descendantId] = node;
+	            initialTreeState[descendantId] = node;
 	            dispatch(subscribeToNode(node.id));
 	
 	            resolve();
@@ -7540,7 +7540,10 @@
 	      Promise.all(initialNodePromises).then(function () {
 	        dispatch({
 	          type: INITIAL_NODE_STATE_LOADED,
-	          payload: initialNodeState
+	          payload: {
+	            rootNodeId: appState.userPages[appState.app.currentUserPageId].rootNodeId,
+	            initialTreeState: initialTreeState
+	          }
 	        });
 	
 	        initialized = true;
@@ -11471,7 +11474,7 @@
 	exports.i(__webpack_require__(604), "");
 	
 	// module
-	exports.push([module.id, "form label {\n  font-weight: 300;\n  width: 100%;\n}\nform input[type=text] {\n  font-size: 1.2em;\n  border-radius: 4px;\n  border: 1px solid #000;\n  width: 100%;\n}\nform a.btn {\n  background-color: #2185C5;\n  font-size: 1.2em;\n  border-radius: 4px;\n  border: 1px solid #2185C5;\n  color: #fff;\n  margin-right: 10px;\n  padding: 4px;\n  cursor: pointer;\n}\nform a.btn.secondary-btn {\n  background-color: transparent;\n  border: none;\n  color: #2185C5;\n}\nform a.btn.secondary-btn:hover {\n  text-decoration: underline;\n}\n.app-loader {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  margin: auto;\n  width: 220px;\n  height: 400px;\n  font-size: 40px;\n  color: #2185C5;\n  text-align: center;\n}\n.app-loader .spinner-container {\n  float: left;\n  margin-top: 4px;\n}\n.app-loader .spinner-container .spinner {\n  display: inline-block;\n  height: 40px;\n  -webkit-animation: spin 2s linear infinite;\n  -moz-animation: spin 2s linear infinite;\n  animation: spin 2s linear infinite;\n}\n@-moz-keyframes spin {\n  100% {\n    -moz-transform: rotate(360deg);\n  }\n}\n@-webkit-keyframes spin {\n  100% {\n    -webkit-transform: rotate(360deg);\n  }\n}\n@keyframes spin {\n  100% {\n    -webkit-transform: rotate(360deg);\n    transform: rotate(360deg);\n  }\n}\n.side-panel-toggle {\n  position: absolute;\n  padding: 6px 6px 2px 6px;\n  left: 0px;\n  top: 70px;\n  font-size: 1.6em;\n  z-index: 2;\n  cursor: pointer;\n  color: #2185C5;\n  border-right: 1px solid #999999;\n  border-bottom: 1px solid #999999;\n}\n.side-panel-toggle.toggled {\n  background-color: #f2f2f2;\n  left: 200px;\n}\n.pages-side-panel {\n  float: left;\n  height: 100%;\n  width: 200px;\n  background-color: #f2f2f2;\n  border-right: 1px solid #999999;\n  z-index: 1;\n  margin-top: -56px;\n}\n.pages-side-panel .pages .page {\n  width: 100%;\n  min-height: 100px;\n  cursor: pointer;\n  position: relative;\n}\n.pages-side-panel .pages .page:hover {\n  background-color: #f7f7f7;\n}\n.pages-side-panel .pages .page .title {\n  width: 100%;\n  text-align: center;\n  line-height: 100px;\n  font-size: 1.4em;\n  color: #000;\n}\n.pages-side-panel .pages .page input.title {\n  background-color: #ffffff;\n  padding: 0;\n  border: 0;\n  outline: none;\n  font-family: 'Lato', sans-serif;\n}\n.pages-side-panel .pages .page .button {\n  position: absolute;\n  z-index: 1;\n  color: #2185C5;\n  font-size: 1.2em;\n  display: none;\n}\n.pages-side-panel .pages .page:hover .button {\n  position: absolute;\n  z-index: 1;\n  color: #2185C5;\n  font-size: 1.2em;\n  display: block;\n}\n.pages-side-panel .pages .page .button:hover {\n  color: #2185C5;\n}\n.pages-side-panel .pages .page .delete {\n  position: absolute;\n  right: 10px;\n  bottom: 10px;\n}\n.pages-side-panel .pages .page .share {\n  position: absolute;\n  right: 10px;\n  top: 42px;\n}\n.pages-side-panel .pages .page .edit-name {\n  position: absolute;\n  right: 10px;\n  top: 10px;\n}\n.sign-in {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  margin: auto;\n  width: 300px;\n  height: 400px;\n}\n.sign-in-logo {\n  font-family: 'Lora', sans-serif;\n  color: #2185C5;\n  font-size: 40px;\n  text-align: center;\n  margin-bottom: 40px;\n}\n.btn-sign-in {\n  display: block;\n  padding: 6px 12px;\n  margin-bottom: 10px;\n  font-size: 14px;\n  font-weight: normal;\n  line-height: 1.42857143;\n  text-align: center;\n  vertical-align: middle;\n  -ms-touch-action: manipulation;\n  touch-action: manipulation;\n  cursor: pointer;\n  -webkit-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n  background-image: none;\n  border: 1px solid transparent;\n  border-radius: 4px;\n  position: relative;\n  padding-left: 44px;\n  text-align: left;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.btn-sign-in > :first-child {\n  position: absolute;\n  left: 0;\n  top: 0;\n  bottom: 0;\n  width: 32px;\n  line-height: 34px;\n  font-size: 1.6em;\n  text-align: center;\n  border-right: 1px solid rgba(0, 0, 0, 0.2);\n}\n.btn-block {\n  display: block;\n  width: 100%;\n}\n.btn-google {\n  color: #fff;\n  background-color: #dd4b39;\n  border-color: rgba(0, 0, 0, 0.2);\n}\n.btn-github {\n  color: #fff;\n  background-color: #444;\n  border-color: rgba(0, 0, 0, 0.2);\n}\n.btn-twitter {\n  color: #fff;\n  background-color: #55acee;\n  border-color: rgba(0, 0, 0, 0.2);\n}\n.top-bar {\n  margin-bottom: 56px;\n  padding-left: 40px;\n  padding-right: 40px;\n  background-color: transparent;\n  border-bottom: 1px solid #e6e6e6;\n}\n.top-bar .top-bar-left {\n  float: left;\n  width: auto;\n}\n.top-bar .top-bar-right {\n  float: right;\n  width: auto;\n}\n.top-bar .top-bar-right a {\n  cursor: pointer;\n}\n.top-bar .top-bar-right a:hover {\n  text-decoration: underline;\n}\n.top-bar ul {\n  list-style-type: none;\n  padding: 0;\n}\n.top-bar li {\n  position: relative;\n  vertical-align: middle;\n  outline: 0;\n  display: table-cell;\n  font-size: 20px;\n  color: #2185C5;\n}\n.top-bar li a {\n  padding: 1.2em;\n  line-height: 2.6em;\n}\n.top-bar li .logo {\n  font-family: 'Lora', sans-serif;\n  color: #2185C5;\n}\n.top-bar .menu li a,\n.top-bar .menu li i {\n  font-size: 16px;\n}\n.top-bar .menu li a.icon:hover,\n.top-bar .menu li i.icon:hover {\n  text-decoration: none;\n}\n.top-bar li i {\n  font-size: 24px;\n}\n.top-bar li .dropdown {\n  position: absolute;\n  background-color: #f2f2f2;\n  min-width: 300px;\n  right: 0;\n  border-radius: 10px;\n  border: 1px solid #999999;\n  z-index: 1;\n}\n.top-bar li .dropdown .dropdown-content {\n  font-size: 1em;\n  color: #000;\n  padding: 10px;\n}\n.top-bar li .dropdown .dropdown-content label,\n.top-bar li .dropdown .dropdown-content p,\n.top-bar li .dropdown .dropdown-content i,\n.top-bar li .dropdown .dropdown-content input {\n  font-size: 14px;\n}\n.top-bar li .dropdown .dropdown-content .btn {\n  padding: 14px;\n}\n.top-bar li .dropdown .share-form {\n  width: 400px;\n}\n.top-bar .logo {\n  font-size: 30px;\n}\n.top-bar .search {\n  position: relative;\n  margin-right: 20px;\n}\n.top-bar .search .icon {\n  color: #808080;\n}\n.top-bar .search .dripicons-search {\n  position: absolute;\n  right: 8px;\n  top: 8px;\n}\n.top-bar .search .dripicons-tags {\n  position: absolute;\n  transform: scaleX(-1);\n  right: 40px;\n  top: 8px;\n}\n.top-bar .search input {\n  margin-left: 100px;\n  border-radius: 4px;\n  min-width: 400px;\n  border: 1px solid #ccc;\n  font-size: 20px;\n  padding: .2em;\n  color: #2185C5;\n  outline-style: none;\n  background-color: transparent;\n}\n.top-bar .search input:focus {\n  border-color: #2185C5;\n}\n.top-bar span {\n  font-size: 30px;\n}\n#app-context-menu {\n  position: absolute;\n  z-index: 2;\n}\n#tree-container {\n  overflow: hidden;\n}\n/* root node */\n#tree-container > .item {\n  width: 100%;\n  padding-left: 108px;\n}\n/* common node css */\n.item {\n  width: 100%;\n  position: relative;\n  border: 1px solid transparent;\n}\n.item.completed > .depth .content .view-mode-content,\n.item.completed > .depth .content input {\n  color: #cccccc;\n  text-decoration: line-through;\n}\n.item .currentlySelected {\n  border: 1px solid #000;\n}\n.item .currentlySelectedBy {\n  position: absolute;\n  left: 0;\n  top: 0;\n  background-color: #000;\n  color: #fff;\n  font-size: 0.8em;\n}\n.item .currentlySelectedBy > span {\n  padding: 2px 4px 2px 4px;\n}\n.item .notes textarea {\n  color: #808080;\n  background: transparent;\n  resize: none;\n  border: 0 none;\n  width: 100%;\n  outline: none;\n  height: 100%;\n  font-family: 'Lato', sans-serif;\n}\n.item .depth > .menu-btn > i {\n  visibility: hidden;\n}\n.item .depth:hover > .menu-btn > i {\n  visibility: visible;\n}\n.item .children .menu-btn {\n  width: 30px;\n  position: absolute;\n  top: 24px;\n  left: -30px;\n  color: #ccc;\n  font-size: 20px;\n  cursor: pointer;\n}\n.item .children .children .menu-btn {\n  top: 13px;\n  left: -25px;\n  font-size: 16px;\n}\n.item .children .children .children .menu-btn {\n  top: 12px;\n  left: -20px;\n  font-size: 14px;\n}\n.children-outline {\n  background-color: #e6e6e6;\n  position: absolute;\n  width: 1px;\n}\n/* depth 1 nodes */\n.children .item.selected {\n  background-color: #E2E2E8;\n}\n.children .item.hidden {\n  display: none;\n}\n.children .children-outline {\n  top: 68px;\n  bottom: 0px;\n  margin-bottom: -5px;\n  margin-left: 12px;\n}\n.children .item .children {\n  margin-left: 10px;\n  padding-left: 58px;\n}\n.children .item .children:after {\n  visibility: hidden;\n  display: block;\n  font-size: 0;\n  content: \" \";\n  clear: both;\n  height: 0;\n}\n.children .item .bullet-container {\n  position: absolute;\n  height: 60px;\n  width: 22px;\n}\n.children .item.has-children .bullet-container {\n  cursor: pointer;\n}\n.children .item.no-children .bullet-container {\n  cursor: default;\n}\n.children .item.has-children.collapsed > .depth > .bullet-container .outer-circle {\n  background-color: #2185C5 !important;\n}\n.children .item.has-children.collapsed > .depth > .bullet-container .inner-circle {\n  background-color: #fff !important;\n  z-index: 1;\n}\n.children .item.has-children.collapsed > .depth > .bullet-container .number {\n  color: #fff;\n}\n.children .item.has-children > .depth > .bullet-container .outer-circle {\n  display: block;\n}\n.children .item.has-children > .depth > .bullet-container .ordered-bullet .number {\n  top: 13px;\n  font-size: .95em;\n}\n.children .item.no-children .bullet-container .outer-circle {\n  display: none;\n}\n.children .item.no-children .bullet-container .inner-circle {\n  width: 12px;\n  height: 12px;\n}\n.children .item .bullet-container .inner-circle {\n  border-radius: 50%;\n  width: 10px;\n  height: 10px;\n  background-color: #2185C5;\n  position: absolute;\n  top: 29px;\n  left: 7px;\n}\n.children .item .bullet-container .number {\n  color: #2185C5;\n  font-size: 20px;\n  font-weight: bold;\n  top: 5px;\n  left: 5px;\n  position: absolute;\n}\n.children .item .bullet-container .outer-circle {\n  border-radius: 50%;\n  width: 22px;\n  height: 22px;\n  border: 1px solid #2185C5;\n  position: absolute;\n  top: 22px;\n}\n.children .item .content {\n  height: 60px;\n  width: 100%;\n  margin-left: 40px;\n}\n.children .item .notes {\n  margin-left: 40px;\n}\n.children .item .notes textarea {\n  font-size: 1em;\n}\n.children .item .content input,\n.item .content .view-mode-content {\n  line-height: 60px;\n  font-size: 24px;\n  color: #000;\n  font-family: 'Lato', sans-serif;\n  padding: 0;\n  border: none;\n  outline: none;\n}\n/* depth 2 nodes */\n.children .children {\n  margin-left: 10px;\n  padding-left: 58px;\n}\n.children .children .content {\n  height: 36px;\n  margin-left: 34px;\n}\n.children .children .notes {\n  margin-left: 34px;\n}\n.children .children .notes textarea {\n  font-size: .95em;\n}\n.children .children .children-outline {\n  top: 46px;\n  bottom: 0px;\n  margin-bottom: 0px;\n  margin-left: 9px;\n}\n.children .children .content input,\n.children .children .content .view-mode-content {\n  font-size: 20px;\n  line-height: 36px;\n  color: #000;\n}\n.children .children .item .bullet-container {\n  position: absolute;\n  height: 36px;\n  width: 22px;\n}\n.children .children .item.no-children .bullet-container .inner-circle {\n  width: 10px;\n  height: 10px;\n}\n.children .children .item .bullet-container .inner-circle {\n  border-radius: 50%;\n  width: 8px;\n  height: 8px;\n  background-color: #2185C5;\n  position: absolute;\n  top: 17px;\n  left: 6px;\n}\n.children .children .item .bullet-container .outer-circle {\n  border-radius: 50%;\n  width: 18px;\n  height: 18px;\n  border: 1px solid #2185C5;\n  position: absolute;\n  top: 11px;\n}\n/**/\n/* depth 3 nodes and beyond */\n.children .children .children {\n  margin-left: 10px;\n  padding-left: 58px;\n}\n.children .children .children .content {\n  height: 36px;\n  margin-left: 30px;\n}\n.children .children .children .notes {\n  margin-left: 30px;\n}\n.children .children .children .notes textarea {\n  font-size: .85em;\n}\n.children .children .children .children-outline {\n  top: 40px;\n  bottom: 0px;\n  margin-bottom: 0px;\n  margin-left: 7px;\n}\n.children .children .children .content input,\n.children .children .children .content .view-mode-content {\n  font-size: 18px;\n  line-height: 36px;\n  color: #000;\n}\n.children .children .children .item .bullet-container {\n  position: absolute;\n  height: 36px;\n  width: 22px;\n}\n.children .children .item.no-children .bullet-container .inner-circle {\n  width: 8px;\n  height: 8px;\n}\n.children .children .children .item .bullet-container .inner-circle {\n  border-radius: 50%;\n  width: 6px;\n  height: 6px;\n  background-color: #2185C5;\n  position: absolute;\n  top: 16px;\n  left: 5px;\n}\n.children .children .children .item .bullet-container .number {\n  font-size: 18px;\n}\n.children .children .children .item .bullet-container .outer-circle {\n  width: 14px;\n  height: 14px;\n  top: 11px;\n}\n/* Example Styles for React Tags*/\ndiv.ReactTags__tags {\n  position: relative;\n}\n/* Styles for the input */\ndiv.ReactTags__tagInput {\n  width: 200px;\n  border-radius: 2px;\n  display: inline-block;\n}\ndiv.ReactTags__tagInput input,\ndiv.ReactTags__tagInput input:focus {\n  height: 31px;\n  margin: 0;\n  font-size: 12px;\n  width: 100%;\n  border: 1px solid #eee;\n}\n/* Styles for selected tags */\ndiv.ReactTags__selected span.ReactTags__tag {\n  background: #2185C5;\n  color: #fff;\n  font-size: 12px;\n  display: inline-block;\n  padding: 5px;\n  margin: 0 5px;\n  cursor: move;\n  border-radius: 4px;\n}\ndiv.ReactTags__selected a.ReactTags__remove {\n  color: #fff;\n  margin-left: 5px;\n  cursor: pointer;\n  padding: 0;\n  line-height: 10px;\n}\n/* Styles for suggestions */\ndiv.ReactTags__suggestions {\n  position: absolute;\n}\ndiv.ReactTags__suggestions ul {\n  list-style-type: none;\n  box-shadow: 0.05em 0.01em 0.5em rgba(0, 0, 0, 0.2);\n  background: white;\n  width: 200px;\n}\ndiv.ReactTags__suggestions li {\n  border-bottom: 1px solid #ddd;\n  padding: 5px 10px;\n  margin: 0;\n}\ndiv.ReactTags__suggestions li mark {\n  text-decoration: underline;\n  background: none;\n  font-weight: 600;\n}\ndiv.ReactTags__suggestions ul li.active {\n  background: #b7cfe0;\n  cursor: pointer;\n}\n.bullet-menu {\n  position: absolute;\n  top: 50px;\n  left: -30px;\n  background-color: #f2f2f2;\n  width: 200px;\n  z-index: 1;\n  color: #000;\n  border-radius: 6px;\n  border: 1px solid #999999;\n}\n.bullet-menu ul {\n  padding: 0;\n  margin: 0;\n}\n.bullet-menu ul li {\n  list-style: none;\n  padding: 10px;\n  font-size: 14px;\n  cursor: pointer;\n}\n.bullet-menu ul li i {\n  margin-top: 4px;\n}\n.bullet-menu ul li:hover {\n  background-color: #f7f7f7;\n}\nhtml,\nbody {\n  background-color: #fff;\n  font-family: 'Lato', sans-serif;\n  font-size: 14px;\n  padding: 0;\n  margin: 0;\n  height: 100%;\n}\n#root,\n#app,\n#signed-in,\n#tree-container {\n  height: 100%;\n}\n.right {\n  float: right;\n}\n.clearfix:after {\n  visibility: hidden;\n  display: block;\n  font-size: 0;\n  content: \" \";\n  clear: both;\n  height: 0;\n}\n.clearfix:after {\n  visibility: hidden;\n  display: block;\n  font-size: 0;\n  content: \" \";\n  clear: both;\n  height: 0;\n}\n.hidden {\n  display: none;\n}\n", ""]);
+	exports.push([module.id, "form label {\n  font-weight: 300;\n  width: 100%;\n}\nform input[type=text] {\n  font-size: 1.2em;\n  border-radius: 4px;\n  border: 1px solid #000;\n  width: 100%;\n}\nform a.btn {\n  background-color: #2185C5;\n  font-size: 1.2em;\n  border-radius: 4px;\n  border: 1px solid #2185C5;\n  color: #fff;\n  margin-right: 10px;\n  padding: 4px;\n  cursor: pointer;\n}\nform a.btn.secondary-btn {\n  background-color: transparent;\n  border: none;\n  color: #2185C5;\n}\nform a.btn.secondary-btn:hover {\n  text-decoration: underline;\n}\n.app-loader {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  margin: auto;\n  width: 220px;\n  height: 400px;\n  font-size: 40px;\n  color: #2185C5;\n  text-align: center;\n}\n.app-loader .spinner-container {\n  float: left;\n  margin-top: 4px;\n}\n.app-loader .spinner-container .spinner {\n  display: inline-block;\n  height: 40px;\n  -webkit-animation: spin 2s linear infinite;\n  -moz-animation: spin 2s linear infinite;\n  animation: spin 2s linear infinite;\n}\n@-moz-keyframes spin {\n  100% {\n    -moz-transform: rotate(360deg);\n  }\n}\n@-webkit-keyframes spin {\n  100% {\n    -webkit-transform: rotate(360deg);\n  }\n}\n@keyframes spin {\n  100% {\n    -webkit-transform: rotate(360deg);\n    transform: rotate(360deg);\n  }\n}\n.side-panel-toggle {\n  position: absolute;\n  padding: 6px 6px 2px 6px;\n  left: 0px;\n  top: 70px;\n  font-size: 1.6em;\n  z-index: 2;\n  cursor: pointer;\n  color: #2185C5;\n  border-right: 1px solid #999999;\n  border-bottom: 1px solid #999999;\n}\n.side-panel-toggle.toggled {\n  background-color: #f2f2f2;\n  left: 200px;\n}\n.pages-side-panel {\n  float: left;\n  height: 100%;\n  width: 200px;\n  background-color: #f2f2f2;\n  border-right: 1px solid #999999;\n  z-index: 1;\n  margin-top: -56px;\n}\n.pages-side-panel .pages .page {\n  width: 100%;\n  min-height: 100px;\n  cursor: pointer;\n  position: relative;\n}\n.pages-side-panel .pages .page:hover {\n  background-color: #f7f7f7;\n}\n.pages-side-panel .pages .page .title {\n  width: 100%;\n  text-align: center;\n  line-height: 100px;\n  font-size: 1.4em;\n  color: #000;\n}\n.pages-side-panel .pages .page input.title {\n  background-color: #ffffff;\n  padding: 0;\n  border: 0;\n  outline: none;\n  font-family: 'Lato', sans-serif;\n}\n.pages-side-panel .pages .page .button {\n  position: absolute;\n  z-index: 1;\n  color: #2185C5;\n  font-size: 1.2em;\n  display: none;\n}\n.pages-side-panel .pages .page:hover .button {\n  position: absolute;\n  z-index: 1;\n  color: #2185C5;\n  font-size: 1.2em;\n  display: block;\n}\n.pages-side-panel .pages .page .button:hover {\n  color: #2185C5;\n}\n.pages-side-panel .pages .page .delete {\n  position: absolute;\n  right: 10px;\n  bottom: 10px;\n}\n.pages-side-panel .pages .page .share {\n  position: absolute;\n  right: 10px;\n  top: 42px;\n}\n.pages-side-panel .pages .page .edit-name {\n  position: absolute;\n  right: 10px;\n  top: 10px;\n}\n.sign-in {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  margin: auto;\n  width: 300px;\n  height: 400px;\n}\n.sign-in-logo {\n  font-family: 'Lora', sans-serif;\n  color: #2185C5;\n  font-size: 40px;\n  text-align: center;\n  margin-bottom: 40px;\n}\n.btn-sign-in {\n  display: block;\n  padding: 6px 12px;\n  margin-bottom: 10px;\n  font-size: 14px;\n  font-weight: normal;\n  line-height: 1.42857143;\n  text-align: center;\n  vertical-align: middle;\n  -ms-touch-action: manipulation;\n  touch-action: manipulation;\n  cursor: pointer;\n  -webkit-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n  background-image: none;\n  border: 1px solid transparent;\n  border-radius: 4px;\n  position: relative;\n  padding-left: 44px;\n  text-align: left;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.btn-sign-in > :first-child {\n  position: absolute;\n  left: 0;\n  top: 0;\n  bottom: 0;\n  width: 32px;\n  line-height: 34px;\n  font-size: 1.6em;\n  text-align: center;\n  border-right: 1px solid rgba(0, 0, 0, 0.2);\n}\n.btn-block {\n  display: block;\n  width: 100%;\n}\n.btn-google {\n  color: #fff;\n  background-color: #dd4b39;\n  border-color: rgba(0, 0, 0, 0.2);\n}\n.btn-github {\n  color: #fff;\n  background-color: #444;\n  border-color: rgba(0, 0, 0, 0.2);\n}\n.btn-twitter {\n  color: #fff;\n  background-color: #55acee;\n  border-color: rgba(0, 0, 0, 0.2);\n}\n.top-bar {\n  margin-bottom: 56px;\n  padding-left: 40px;\n  padding-right: 40px;\n  background-color: transparent;\n  border-bottom: 1px solid #e6e6e6;\n}\n.top-bar .top-bar-left {\n  float: left;\n  width: auto;\n}\n.top-bar .top-bar-right {\n  float: right;\n  width: auto;\n}\n.top-bar .top-bar-right a {\n  cursor: pointer;\n}\n.top-bar .top-bar-right a:hover {\n  text-decoration: underline;\n}\n.top-bar ul {\n  list-style-type: none;\n  padding: 0;\n}\n.top-bar li {\n  position: relative;\n  vertical-align: middle;\n  outline: 0;\n  display: table-cell;\n  font-size: 20px;\n  color: #2185C5;\n}\n.top-bar li a {\n  padding: 1.2em;\n  line-height: 2.6em;\n}\n.top-bar li .logo {\n  font-family: 'Lora', sans-serif;\n  color: #2185C5;\n}\n.top-bar .menu li a,\n.top-bar .menu li i {\n  font-size: 16px;\n}\n.top-bar .menu li a.icon:hover,\n.top-bar .menu li i.icon:hover {\n  text-decoration: none;\n}\n.top-bar li i {\n  font-size: 24px;\n}\n.top-bar li .dropdown {\n  position: absolute;\n  background-color: #f2f2f2;\n  min-width: 300px;\n  right: 0;\n  border-radius: 10px;\n  border: 1px solid #999999;\n  z-index: 1;\n}\n.top-bar li .dropdown .dropdown-content {\n  font-size: 1em;\n  color: #000;\n  padding: 10px;\n}\n.top-bar li .dropdown .dropdown-content label,\n.top-bar li .dropdown .dropdown-content p,\n.top-bar li .dropdown .dropdown-content i,\n.top-bar li .dropdown .dropdown-content input {\n  font-size: 14px;\n}\n.top-bar li .dropdown .dropdown-content .btn {\n  padding: 14px;\n}\n.top-bar li .dropdown .share-form {\n  width: 400px;\n}\n.top-bar .logo {\n  font-size: 30px;\n}\n.top-bar .search {\n  position: relative;\n  margin-right: 20px;\n}\n.top-bar .search .icon {\n  color: #808080;\n}\n.top-bar .search .dripicons-search {\n  position: absolute;\n  right: 8px;\n  top: 8px;\n}\n.top-bar .search .dripicons-tags {\n  position: absolute;\n  transform: scaleX(-1);\n  right: 40px;\n  top: 8px;\n}\n.top-bar .search input {\n  margin-left: 100px;\n  border-radius: 4px;\n  min-width: 400px;\n  border: 1px solid #ccc;\n  font-size: 20px;\n  padding: .2em;\n  color: #2185C5;\n  outline-style: none;\n  background-color: transparent;\n}\n.top-bar .search input:focus {\n  border-color: #2185C5;\n}\n.top-bar span {\n  font-size: 30px;\n}\n#app-context-menu {\n  position: absolute;\n  z-index: 2;\n}\n/* root node */\n#tree-container > .item {\n  width: 100%;\n  padding-left: 108px;\n}\n/* common node css */\n.item {\n  width: 100%;\n  position: relative;\n  border: 1px solid transparent;\n}\n.item.completed > .depth .content .view-mode-content,\n.item.completed > .depth .content input {\n  color: #cccccc !important;\n  text-decoration: line-through;\n}\n.item .currentlySelected {\n  border: 1px solid #000;\n}\n.item .currentlySelectedBy {\n  position: absolute;\n  left: 0;\n  top: 0;\n  background-color: #000;\n  color: #fff;\n  font-size: 0.8em;\n}\n.item .currentlySelectedBy > span {\n  padding: 2px 4px 2px 4px;\n}\n.item .notes textarea {\n  color: #808080;\n  background: transparent;\n  resize: none;\n  border: 0 none;\n  width: 100%;\n  outline: none;\n  height: 100%;\n  font-family: 'Lato', sans-serif;\n}\n.item .depth > .menu-btn > i {\n  visibility: hidden;\n}\n.item .depth:hover > .menu-btn > i {\n  visibility: visible;\n}\n.item .children .menu-btn {\n  width: 30px;\n  position: absolute;\n  top: 24px;\n  left: -30px;\n  color: #ccc;\n  font-size: 20px;\n  cursor: pointer;\n}\n.item .children .children .menu-btn {\n  top: 13px;\n  left: -25px;\n  font-size: 16px;\n}\n.item .children .children .children .menu-btn {\n  top: 12px;\n  left: -20px;\n  font-size: 14px;\n}\n.children-outline {\n  background-color: #e6e6e6;\n  position: absolute;\n  width: 1px;\n}\n/* depth 1 nodes */\n.children .item.selected {\n  background-color: #E2E2E8;\n}\n.children .item.hidden {\n  display: none;\n}\n.children .children-outline {\n  top: 68px;\n  bottom: 0px;\n  margin-bottom: -5px;\n  margin-left: 12px;\n}\n.children .item .children {\n  margin-left: 10px;\n  padding-left: 58px;\n}\n.children .item .children:after {\n  visibility: hidden;\n  display: block;\n  font-size: 0;\n  content: \" \";\n  clear: both;\n  height: 0;\n}\n.children .item .bullet-container {\n  position: absolute;\n  height: 60px;\n  width: 22px;\n}\n.children .item.has-children .bullet-container {\n  cursor: pointer;\n}\n.children .item.no-children .bullet-container {\n  cursor: default;\n}\n.children .item.has-children.collapsed > .depth > .bullet-container .outer-circle {\n  background-color: #2185C5 !important;\n}\n.children .item.has-children.collapsed > .depth > .bullet-container .inner-circle {\n  background-color: #fff !important;\n  z-index: 1;\n}\n.children .item.has-children.collapsed > .depth > .bullet-container .number {\n  color: #fff;\n}\n.children .item.has-children > .depth > .bullet-container .outer-circle {\n  display: block;\n}\n.children .item.has-children > .depth > .bullet-container .ordered-bullet .number {\n  top: 13px;\n  font-size: .95em;\n}\n.children .item.no-children .bullet-container .outer-circle {\n  display: none;\n}\n.children .item.no-children .bullet-container .inner-circle {\n  width: 12px;\n  height: 12px;\n}\n.children .item .bullet-container .inner-circle {\n  border-radius: 50%;\n  width: 10px;\n  height: 10px;\n  background-color: #2185C5;\n  position: absolute;\n  top: 26px;\n  left: 7px;\n}\n.children .item .bullet-container .number {\n  color: #2185C5;\n  font-size: 20px;\n  font-weight: bold;\n  top: 5px;\n  left: 5px;\n  position: absolute;\n}\n.children .item .bullet-container .outer-circle {\n  border-radius: 50%;\n  width: 22px;\n  height: 22px;\n  border: 1px solid #2185C5;\n  position: absolute;\n  top: 19px;\n}\n.children .item .content {\n  height: 60px;\n  width: 100%;\n  margin-left: 40px;\n}\n.children .item .notes {\n  margin-left: 40px;\n}\n.children .item .notes textarea {\n  font-size: 1em;\n}\n.children .item .content input,\n.item .content .view-mode-content {\n  line-height: 60px;\n  font-size: 24px;\n  color: #000;\n  font-family: 'Lato', sans-serif;\n  padding: 0;\n  border: none;\n  outline: none;\n}\n/* depth 2 nodes */\n.children .children {\n  margin-left: 10px;\n  padding-left: 58px;\n}\n.children .children .content {\n  height: 36px;\n  margin-left: 34px;\n}\n.children .children .notes {\n  margin-left: 34px;\n}\n.children .children .notes textarea {\n  font-size: .95em;\n}\n.children .children .children-outline {\n  top: 46px;\n  bottom: 0px;\n  margin-bottom: 0px;\n  margin-left: 9px;\n}\n.children .children .content input,\n.children .children .content .view-mode-content {\n  font-size: 20px;\n  line-height: 36px;\n  color: #000;\n}\n.children .children .item .bullet-container {\n  position: absolute;\n  height: 36px;\n  width: 22px;\n}\n.children .children .item.no-children .bullet-container .inner-circle {\n  width: 10px;\n  height: 10px;\n}\n.children .children .item .bullet-container .inner-circle {\n  border-radius: 50%;\n  width: 8px;\n  height: 8px;\n  background-color: #2185C5;\n  position: absolute;\n  top: 17px;\n  left: 6px;\n}\n.children .children .item .bullet-container .outer-circle {\n  border-radius: 50%;\n  width: 18px;\n  height: 18px;\n  border: 1px solid #2185C5;\n  position: absolute;\n  top: 11px;\n}\n/**/\n/* depth 3 nodes and beyond */\n.children .children .children {\n  margin-left: 10px;\n  padding-left: 58px;\n}\n.children .children .children .content {\n  height: 36px;\n  margin-left: 30px;\n}\n.children .children .children .notes {\n  margin-left: 30px;\n}\n.children .children .children .notes textarea {\n  font-size: .85em;\n}\n.children .children .children .children-outline {\n  top: 40px;\n  bottom: 0px;\n  margin-bottom: 0px;\n  margin-left: 7px;\n}\n.children .children .children .content input,\n.children .children .children .content .view-mode-content {\n  font-size: 18px;\n  line-height: 36px;\n  color: #000;\n}\n.children .children .children .item .bullet-container {\n  position: absolute;\n  height: 36px;\n  width: 22px;\n}\n.children .children .item.no-children .bullet-container .inner-circle {\n  width: 8px;\n  height: 8px;\n}\n.children .children .children .item .bullet-container .inner-circle {\n  border-radius: 50%;\n  width: 6px;\n  height: 6px;\n  background-color: #2185C5;\n  position: absolute;\n  top: 16px;\n  left: 5px;\n}\n.children .children .children .item .bullet-container .number {\n  font-size: 18px;\n}\n.children .children .children .item .bullet-container .outer-circle {\n  width: 14px;\n  height: 14px;\n  top: 11px;\n}\n/* Example Styles for React Tags*/\ndiv.ReactTags__tags {\n  position: relative;\n}\n/* Styles for the input */\ndiv.ReactTags__tagInput {\n  width: 200px;\n  border-radius: 2px;\n  display: inline-block;\n}\ndiv.ReactTags__tagInput input,\ndiv.ReactTags__tagInput input:focus {\n  height: 31px;\n  margin: 0;\n  font-size: 12px;\n  width: 100%;\n  border: 1px solid #eee;\n}\n/* Styles for selected tags */\ndiv.ReactTags__selected span.ReactTags__tag {\n  background: #2185C5;\n  color: #fff;\n  font-size: 12px;\n  display: inline-block;\n  padding: 5px;\n  margin: 0 5px;\n  cursor: move;\n  border-radius: 4px;\n}\ndiv.ReactTags__selected a.ReactTags__remove {\n  color: #fff;\n  margin-left: 5px;\n  cursor: pointer;\n  padding: 0;\n  line-height: 10px;\n}\n/* Styles for suggestions */\ndiv.ReactTags__suggestions {\n  position: absolute;\n}\ndiv.ReactTags__suggestions ul {\n  list-style-type: none;\n  box-shadow: 0.05em 0.01em 0.5em rgba(0, 0, 0, 0.2);\n  background: white;\n  width: 200px;\n}\ndiv.ReactTags__suggestions li {\n  border-bottom: 1px solid #ddd;\n  padding: 5px 10px;\n  margin: 0;\n}\ndiv.ReactTags__suggestions li mark {\n  text-decoration: underline;\n  background: none;\n  font-weight: 600;\n}\ndiv.ReactTags__suggestions ul li.active {\n  background: #b7cfe0;\n  cursor: pointer;\n}\n.bullet-menu {\n  position: absolute;\n  top: 50px;\n  left: -30px;\n  background-color: #f2f2f2;\n  width: 200px;\n  z-index: 1;\n  color: #000;\n  border-radius: 6px;\n  border: 1px solid #999999;\n}\n.bullet-menu ul {\n  padding: 0;\n  margin: 0;\n}\n.bullet-menu ul li {\n  list-style: none;\n  padding: 10px;\n  font-size: 14px;\n  cursor: pointer;\n}\n.bullet-menu ul li i {\n  margin-top: 4px;\n}\n.bullet-menu ul li:hover {\n  background-color: #f7f7f7;\n}\nhtml,\nbody {\n  background-color: #fff;\n  font-family: 'Lato', sans-serif;\n  font-size: 14px;\n  padding: 0;\n  margin: 0;\n  height: 100%;\n}\n#root,\n#app,\n#signed-in,\n#tree-container {\n  height: 100%;\n}\n.right {\n  float: right;\n}\n.clearfix:after {\n  visibility: hidden;\n  display: block;\n  font-size: 0;\n  content: \" \";\n  clear: both;\n  height: 0;\n}\n.clearfix:after {\n  visibility: hidden;\n  display: block;\n  font-size: 0;\n  content: \" \";\n  clear: both;\n  height: 0;\n}\n.hidden {\n  display: none;\n}\n", ""]);
 	
 	// exports
 
@@ -25965,13 +25968,13 @@
 	  _createClass(AppLoader, [{
 	    key: 'render',
 	    value: function render() {
-	      return React.createElement(
+	      return _react3.default.createElement(
 	        'div',
 	        { className: 'app-loader' },
-	        React.createElement(
+	        _react3.default.createElement(
 	          'div',
 	          { className: 'spinner-container' },
-	          React.createElement('i', { className: 'icon dripicons-loading spinner' })
+	          _react3.default.createElement('i', { className: 'icon dripicons-loading spinner' })
 	        ),
 	        '  Loading...'
 	      );
@@ -26116,28 +26119,28 @@
 	      var toggledCss = pagesSidePanelVisible ? 'toggled' : null;
 	      var pagesSidePanelCss = 'side-panel-toggle ' + toggledCss;
 	
-	      return React.createElement(
+	      return _react3.default.createElement(
 	        'div',
 	        { id: 'app', onClick: function onClick(e) {
 	            return _this2.onClick(e);
 	          } },
-	        showSignIn ? React.createElement(_signIn2.default, null) : null,
-	        showLoading ? React.createElement(_appLoader2.default, null) : null,
-	        appIsInitialized ? React.createElement(
+	        showSignIn ? _react3.default.createElement(_signIn2.default, null) : null,
+	        showLoading ? _react3.default.createElement(_appLoader2.default, null) : null,
+	        appIsInitialized ? _react3.default.createElement(
 	          'div',
 	          { id: 'signed-in' },
-	          React.createElement(
+	          _react3.default.createElement(
 	            'a',
 	            { className: pagesSidePanelCss, onClick: togglePagesSidePanel },
-	            React.createElement('i', { className: 'icon dripicons-menu' })
+	            _react3.default.createElement('i', { className: 'icon dripicons-menu' })
 	          ),
-	          React.createElement(_topBar2.default, null),
-	          React.createElement(_appContextMenu2.default, null),
-	          pagesSidePanelVisible ? React.createElement(_pagesSidePanel2.default, null) : null,
-	          React.createElement(
+	          _react3.default.createElement(_topBar2.default, null),
+	          _react3.default.createElement(_appContextMenu2.default, null),
+	          pagesSidePanelVisible ? _react3.default.createElement(_pagesSidePanel2.default, null) : null,
+	          _react3.default.createElement(
 	            'div',
 	            { id: 'tree-container' },
-	            React.createElement(_node2.default, { id: currentUserPage.rootNodeId })
+	            _react3.default.createElement(_node2.default, { id: currentUserPage.rootNodeId })
 	          )
 	        ) : null
 	      );
@@ -26190,6 +26193,8 @@
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _class, _temp;
 	
 	var _radium = __webpack_require__(89);
 	
@@ -26254,32 +26259,13 @@
 	  return id + '_' + usedKeys[id];
 	};
 	
-	var Highlighter = _wrapComponent('Highlighter')(function (_Component) {
+	var Highlighter = _wrapComponent('Highlighter')((_temp = _class = function (_Component) {
 	  _inherits(Highlighter, _Component);
 	
 	  function Highlighter() {
 	    _classCallCheck(this, Highlighter);
 	
 	    var _this = _possibleConstructorReturn(this, (Highlighter.__proto__ || Object.getPrototypeOf(Highlighter)).apply(this, arguments));
-	
-	    _this.propTypes = {
-	      selection: _react2.PropTypes.shape({
-	        start: _react2.PropTypes.number,
-	        end: _react2.PropTypes.number
-	      }).isRequired,
-	
-	      markup: _react2.PropTypes.string.isRequired,
-	      value: _react2.PropTypes.string.isRequired,
-	
-	      displayTransform: _react2.PropTypes.func.isRequired,
-	      onCaretPositionChange: _react2.PropTypes.func.isRequired,
-	      inputStyle: _react2.PropTypes.object
-	    };
-	
-	    _this.defaultProps = {
-	      value: '',
-	      inputStyle: {}
-	    };
 	
 	    _this.state = { lastPosition: {} };
 	    return _this;
@@ -26460,7 +26446,22 @@
 	  }]);
 	
 	  return Highlighter;
-	}(_react2.Component));
+	}(_react2.Component), _class.propTypes = {
+	  selection: _react2.PropTypes.shape({
+	    start: _react2.PropTypes.number,
+	    end: _react2.PropTypes.number
+	  }).isRequired,
+	
+	  markup: _react2.PropTypes.string.isRequired,
+	  value: _react2.PropTypes.string.isRequired,
+	
+	  displayTransform: _react2.PropTypes.func.isRequired,
+	  onCaretPositionChange: _react2.PropTypes.func.isRequired,
+	  inputStyle: _react2.PropTypes.object
+	}, _class.defaultProps = {
+	  value: '',
+	  inputStyle: {}
+	}, _temp));
 	
 	exports.default = (0, _radium2.default)(Highlighter);
 	
@@ -27350,7 +27351,7 @@
 /* 397 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(module) {"use strict";
+	/* WEBPACK VAR INJECTION */(function(module) {'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -27402,19 +27403,19 @@
 	
 	var _components = {
 	  Suggestion: {
-	    displayName: "Suggestion"
+	    displayName: 'Suggestion'
 	  }
 	};
 	
 	var _UsersAlexwalchliDocumentsCodexCodexNode_modulesReactTransformHmrLibIndexJs2 = (0, _index6.default)({
-	  filename: "/Users/alexwalchli/Documents/Codex/Codex/src/js/components/intellisense/suggestion.js",
+	  filename: '/Users/alexwalchli/Documents/Codex/Codex/src/js/components/intellisense/suggestion.js',
 	  components: _components,
 	  locals: [module],
 	  imports: [_react3.default]
 	});
 	
 	var _UsersAlexwalchliDocumentsCodexCodexNode_modulesReactTransformCatchErrorsLibIndexJs2 = (0, _index4.default)({
-	  filename: "/Users/alexwalchli/Documents/Codex/Codex/src/js/components/intellisense/suggestion.js",
+	  filename: '/Users/alexwalchli/Documents/Codex/Codex/src/js/components/intellisense/suggestion.js',
 	  components: _components,
 	  locals: [],
 	  imports: [_react3.default, _index2.default]
@@ -27426,7 +27427,7 @@
 	  };
 	}
 	
-	var Suggestion = _wrapComponent("Suggestion")((_temp = _class = function (_Component) {
+	var Suggestion = _wrapComponent('Suggestion')((_temp = _class = function (_Component) {
 	  _inherits(Suggestion, _Component);
 	
 	  function Suggestion() {
@@ -27436,21 +27437,20 @@
 	  }
 	
 	  _createClass(Suggestion, [{
-	    key: "render",
+	    key: 'render',
 	    value: function render() {
 	      var rest = (0, _omit2.default)(this.props, (0, _keys2.default)(Suggestion.propTypes));
 	
 	      return _react3.default.createElement(
-	        "li",
-	        _extends({}, rest, substyle(this.props, { "&focused": this.props.focused })),
+	        'li',
+	        _extends({}, rest, substyle(this.props, { '&focused': this.props.focused })),
 	        this.renderContent()
 	      );
 	    }
 	  }, {
-	    key: "renderContent",
+	    key: 'renderContent',
 	    value: function renderContent() {
 	      var _props = this.props;
-	      var id = _props.id;
 	      var query = _props.query;
 	      var descriptor = _props.descriptor;
 	      var suggestion = _props.suggestion;
@@ -27467,7 +27467,7 @@
 	      return highlightedDisplay;
 	    }
 	  }, {
-	    key: "getDisplay",
+	    key: 'getDisplay',
 	    value: function getDisplay() {
 	      var suggestion = this.props.suggestion;
 	
@@ -27487,7 +27487,7 @@
 	      return display;
 	    }
 	  }, {
-	    key: "renderHighlightedDisplay",
+	    key: 'renderHighlightedDisplay',
 	    value: function renderHighlightedDisplay(display) {
 	      var query = this.props.query;
 	
@@ -27496,19 +27496,19 @@
 	
 	      if (i === -1) {
 	        return _react3.default.createElement(
-	          "span",
-	          substyle(this.props, "display"),
+	          'span',
+	          substyle(this.props, 'display'),
 	          display
 	        );
 	      }
 	
 	      return _react3.default.createElement(
-	        "span",
-	        substyle(this.props, "display"),
+	        'span',
+	        substyle(this.props, 'display'),
 	        display.substring(0, i),
 	        _react3.default.createElement(
-	          "b",
-	          substyle(this.props, "highlight"),
+	          'b',
+	          substyle(this.props, 'highlight'),
 	          display.substring(i, i + query.length)
 	        ),
 	        display.substring(i + query.length)
@@ -27534,7 +27534,7 @@
 	
 	
 	var substyle = (0, _substyle.defaultStyle)({
-	  cursor: "pointer"
+	  cursor: 'pointer'
 	});
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(19)(module)))
 
@@ -27681,7 +27681,7 @@
 	        _react3.default.createElement(
 	          'ul',
 	          _extends({ ref: 'suggestions'
-	          }, substyle(this.props, "list")),
+	          }, substyle(this.props, 'list')),
 	          this.renderSuggestions()
 	        ),
 	        this.renderLoadingIndicator()
@@ -27712,10 +27712,10 @@
 	      var query = descriptor.query;
 	
 	
-	      return _react3.default.createElement(_suggestion2.default, _extends({}, substyle(this.props, "item"), {
+	      return _react3.default.createElement(_suggestion2.default, _extends({}, substyle(this.props, 'item'), {
 	        key: id,
 	        id: id,
-	        ref: isFocused ? "focused" : null,
+	        ref: isFocused ? 'focused' : null,
 	        query: query,
 	        index: index,
 	        descriptor: mentionDescriptor,
@@ -27744,7 +27744,7 @@
 	        return;
 	      }
 	
-	      return _react3.default.createElement(_loadingIndicator2.default, substyle(this.props, "loadingIndicator"));
+	      return _react3.default.createElement(_loadingIndicator2.default, substyle(this.props, 'loadingIndicator'));
 	    }
 	  }, {
 	    key: 'handleMouseEnter',
@@ -27780,16 +27780,16 @@
 	
 	
 	var substyle = (0, _substyle.defaultStyle)({
-	  position: "absolute",
+	  position: 'absolute',
 	  zIndex: 1,
-	  backgroundColor: "white",
+	  backgroundColor: 'white',
 	  marginTop: 14,
 	  minWidth: 100,
 	
 	  list: {
 	    margin: 0,
 	    padding: 0,
-	    listStyleType: "none"
+	    listStyleType: 'none'
 	  }
 	});
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(19)(module)))
@@ -28026,71 +28026,71 @@
 	      var toggleShareDropdown = _props.toggleShareDropdown;
 	      var app = _props.app;
 	
-	      return React.createElement(
+	      return _react3.default.createElement(
 	        'nav',
 	        { className: 'top-bar clearfix' },
-	        React.createElement(
+	        _react3.default.createElement(
 	          'div',
 	          { className: 'top-bar-left' },
-	          React.createElement(
+	          _react3.default.createElement(
 	            'ul',
 	            null,
-	            React.createElement(
+	            _react3.default.createElement(
 	              'li',
 	              null,
-	              React.createElement(
+	              _react3.default.createElement(
 	                'span',
 	                { className: 'logo' },
 	                'codex'
 	              )
 	            ),
-	            React.createElement(
+	            _react3.default.createElement(
 	              'li',
 	              null,
-	              React.createElement(_searchInput2.default, null)
+	              _react3.default.createElement(_searchInput2.default, null)
 	            )
 	          )
 	        ),
-	        React.createElement(
+	        _react3.default.createElement(
 	          'div',
 	          { className: 'top-bar-right' },
-	          React.createElement(
+	          _react3.default.createElement(
 	            'ul',
 	            { className: 'menu' },
-	            React.createElement(
+	            _react3.default.createElement(
 	              'li',
 	              null,
-	              React.createElement(
+	              _react3.default.createElement(
 	                'a',
 	                { onClick: toggleShareDropdown },
-	                React.createElement('i', { className: 'icon dripicons-user-group' })
+	                _react3.default.createElement('i', { className: 'icon dripicons-user-group' })
 	              ),
-	              app.shareDropdownVisible ? React.createElement(
+	              app.shareDropdownVisible ? _react3.default.createElement(
 	                'div',
 	                { className: 'dropdown' },
-	                React.createElement(
+	                _react3.default.createElement(
 	                  'div',
 	                  { className: 'dropdown-content' },
-	                  React.createElement(_shareForm2.default, { onShareCancel: toggleShareDropdown, userPageId: currentUserPage.id })
+	                  _react3.default.createElement(_shareForm2.default, { onShareCancel: toggleShareDropdown, userPageId: currentUserPage.id })
 	                )
 	              ) : null
 	            ),
-	            React.createElement(
+	            _react3.default.createElement(
 	              'li',
 	              null,
-	              React.createElement(
+	              _react3.default.createElement(
 	                'a',
 	                null,
-	                React.createElement('i', { className: 'icon dripicons-archive' })
+	                _react3.default.createElement('i', { className: 'icon dripicons-archive' })
 	              )
 	            ),
-	            React.createElement(
+	            _react3.default.createElement(
 	              'li',
 	              null,
-	              React.createElement(
+	              _react3.default.createElement(
 	                'a',
 	                null,
-	                React.createElement('i', { className: 'icon dripicons-user' })
+	                _react3.default.createElement('i', { className: 'icon dripicons-user' })
 	              )
 	            )
 	          )
@@ -28236,10 +28236,10 @@
 	        cssClasses = 'hidden';
 	      }
 	
-	      return React.createElement(
+	      return _react3.default.createElement(
 	        'div',
 	        { id: 'app-context-menu', className: cssClasses },
-	        React.createElement(
+	        _react3.default.createElement(
 	          'button',
 	          { onClick: function onClick(e) {
 	              return _this2.onDeleteClick(e);
@@ -28247,7 +28247,7 @@
 	          'Delete'
 	        ),
 	        ' or ',
-	        React.createElement(
+	        _react3.default.createElement(
 	          'button',
 	          { onClick: function onClick(e) {
 	              return _this2.onCompleteClick(e);
@@ -28393,11 +28393,11 @@
 	
 	var _mentionsinput = __webpack_require__(396);
 	
-	var MentionsInput = _interopRequireWildcard(_mentionsinput);
+	var _mentionsinput2 = _interopRequireDefault(_mentionsinput);
 	
 	var _mention = __webpack_require__(250);
 	
-	var Mention = _interopRequireWildcard(_mention);
+	var _mention2 = _interopRequireDefault(_mention);
 	
 	var _mentionStyle = __webpack_require__(403);
 	
@@ -28459,7 +28459,6 @@
 	    _this.renderChild = _this.renderChild.bind(_this);
 	    _this.handleOnBlur = _this.handleOnBlur.bind(_this);
 	    _this.handleChange = _this.handleChange.bind(_this);
-	    _this.onSelect = _this.onSelect.bind(_this);
 	    _this.onAdd = _this.onAdd.bind(_this);
 	    _this.onRemove = _this.onRemove.bind(_this);
 	
@@ -28635,10 +28634,10 @@
 	    value: function renderChild(childId) {
 	      var id = this.props.id;
 	
-	      return React.createElement(
+	      return _react3.default.createElement(
 	        'div',
 	        { key: childId },
-	        React.createElement(ConnectedNode, { id: childId, parentId: id })
+	        _react3.default.createElement(ConnectedNode, { id: childId, parentId: id })
 	      );
 	    }
 	  }, {
@@ -28674,9 +28673,9 @@
 	          finalContent = finalContent.replace(widgetData.matchingText, _urlWidget2.default.render(widgetData));
 	        });
 	
-	        return React.createElement('div', { className: 'view-mode-content', dangerouslySetInnerHTML: this.getFinalNodeContent(finalContent) });
+	        return _react3.default.createElement('div', { className: 'view-mode-content', dangerouslySetInnerHTML: this.getFinalNodeContent(finalContent) });
 	      } else {
-	        return React.createElement(
+	        return _react3.default.createElement(
 	          'div',
 	          { className: 'view-mode-content' },
 	          content
@@ -28867,95 +28866,95 @@
 	      var currentlySelectedByAnotherUser = currentlySelectedById && currentlySelectedById !== auth.id;
 	      var currentlySelectedCss = currentlySelectedById && currentlySelectedByAnotherUser ? 'currentlySelected' : null;
 	
-	      return React.createElement(
+	      return _react3.default.createElement(
 	        'div',
 	        { className: bulletClasses },
-	        typeof parentId !== 'undefined' ? React.createElement(
+	        typeof parentId !== 'undefined' ? _react3.default.createElement(
 	          'div',
 	          { className: 'depth ' + currentlySelectedCss },
-	          React.createElement(
+	          _react3.default.createElement(
 	            'div',
 	            { className: 'menu-btn', onClick: function onClick(e) {
 	                return _this2.onBulletMenuBtnClicked(e);
 	              } },
-	            React.createElement('i', { className: 'icon dripicons-menu' })
+	            _react3.default.createElement('i', { className: 'icon dripicons-menu' })
 	          ),
-	          menuVisible ? React.createElement(
+	          menuVisible ? _react3.default.createElement(
 	            'div',
 	            { className: 'bullet-menu', onMouseLeave: function onMouseLeave() {
 	                return toggleNodeMenu(id);
 	              } },
-	            React.createElement(
+	            _react3.default.createElement(
 	              'ul',
 	              null,
-	              React.createElement(
+	              _react3.default.createElement(
 	                'li',
 	                { onClick: function onClick(e) {
 	                    return _this2.onAddNoteClicked(e);
 	                  } },
-	                React.createElement('i', { className: 'icon dripicons-document' }),
+	                _react3.default.createElement('i', { className: 'icon dripicons-document' }),
 	                'Add note'
 	              ),
-	              React.createElement(
+	              _react3.default.createElement(
 	                'li',
 	                { onClick: function onClick(e) {
 	                    return _this2.onCompleteBulletClicked(e);
 	                  } },
-	                React.createElement('i', { className: 'icon dripicons-checkmark' }),
+	                _react3.default.createElement('i', { className: 'icon dripicons-checkmark' }),
 	                completed ? 'Re-open' : 'Complete'
 	              ),
-	              childIds.length > 0 ? React.createElement(
+	              childIds.length > 0 ? _react3.default.createElement(
 	                'li',
 	                { onClick: function onClick(e) {
 	                    return _this2.onChangeDisplayModeClicked(e);
 	                  } },
-	                React.createElement('i', { className: 'icon dripicons-list' }),
-	                displayMode === 'unordered' ? React.createElement(
+	                _react3.default.createElement('i', { className: 'icon dripicons-list' }),
+	                displayMode === 'unordered' ? _react3.default.createElement(
 	                  'span',
 	                  null,
 	                  'Numbered List'
-	                ) : React.createElement(
+	                ) : _react3.default.createElement(
 	                  'span',
 	                  null,
 	                  'Unordered List'
 	                )
 	              ) : null,
-	              React.createElement(
+	              _react3.default.createElement(
 	                'li',
 	                { onClick: function onClick(e) {
 	                    return _this2.onDeleteBulletClicked(e);
 	                  } },
-	                React.createElement('i', { className: 'icon dripicons-cross' }),
+	                _react3.default.createElement('i', { className: 'icon dripicons-cross' }),
 	                'Delete'
 	              )
 	            )
 	          ) : null,
-	          React.createElement('div', { className: 'children-outline' }),
-	          React.createElement(
+	          _react3.default.createElement('div', { className: 'children-outline' }),
+	          _react3.default.createElement(
 	            'div',
 	            { className: 'bullet-container', onClick: this.handleBulletClick },
-	            positionInOrderedList ? React.createElement(
+	            positionInOrderedList ? _react3.default.createElement(
 	              'div',
 	              { className: 'ordered-bullet' },
-	              React.createElement('div', { className: 'outer-circle' }),
-	              React.createElement(
+	              _react3.default.createElement('div', { className: 'outer-circle' }),
+	              _react3.default.createElement(
 	                'div',
 	                { className: 'number' },
 	                positionInOrderedList,
 	                '.'
 	              )
-	            ) : React.createElement(
+	            ) : _react3.default.createElement(
 	              'div',
 	              { className: 'unordered-bullet' },
-	              React.createElement('div', { className: 'outer-circle' }),
-	              React.createElement('div', { className: 'inner-circle' })
+	              _react3.default.createElement('div', { className: 'outer-circle' }),
+	              _react3.default.createElement('div', { className: 'inner-circle' })
 	            )
 	          ),
-	          React.createElement(
+	          _react3.default.createElement(
 	            'div',
 	            { className: 'content', onMouseEnter: this.handleOnMouseEnter, onMouseLeave: this.handleOnMouseLeave, onPaste: this.handlePaste },
-	            React.createElement(
-	              MentionsInput,
+	            _react3.default.createElement(
+	              _mentionsinput2.default,
 	              {
 	                singleLine: true,
 	                value: content,
@@ -28969,20 +28968,20 @@
 	                onClick: function onClick(e) {
 	                  return _this2.handleOnClick(e);
 	                } },
-	              React.createElement(Mention, { onAdd: this.onAdd, onRemove: this.onRemove, data: suggestions, style: _defaultMentionStyle2.default })
+	              _react3.default.createElement(_mention2.default, { onAdd: this.onAdd, onRemove: this.onRemove, data: suggestions, style: _defaultMentionStyle2.default })
 	            ),
-	            externalList ? React.createElement(
+	            externalList ? _react3.default.createElement(
 	              'ul',
 	              { className: 'external-data-children' },
 	              externalList.map(function (item) {
-	                return React.createElement(
+	                return _react3.default.createElement(
 	                  'li',
 	                  null,
 	                  ' ',
 	                  item.title,
 	                  ' ',
-	                  React.createElement('br', null),
-	                  React.createElement(
+	                  _react3.default.createElement('br', null),
+	                  _react3.default.createElement(
 	                    'small',
 	                    null,
 	                    item.points,
@@ -28996,10 +28995,10 @@
 	              })
 	            ) : null
 	          ),
-	          React.createElement(
+	          _react3.default.createElement(
 	            'div',
 	            { className: notesCssClasses },
-	            React.createElement('textarea', { ref: 'notesInput',
+	            _react3.default.createElement('textarea', { ref: 'notesInput',
 	              defaultValue: notes,
 	              onBlur: function onBlur() {
 	                return _this2.onNotesInputBlur();
@@ -29011,17 +29010,17 @@
 	                return _this2.onNotesInputClick(e);
 	              } })
 	          ),
-	          currentlySelectedByAnotherUser ? React.createElement(
+	          currentlySelectedByAnotherUser ? _react3.default.createElement(
 	            'div',
 	            { className: 'currentlySelectedBy' },
-	            React.createElement(
+	            _react3.default.createElement(
 	              'span',
 	              null,
 	              currentlySelectedBy
 	            )
 	          ) : null
 	        ) : null,
-	        React.createElement(
+	        _react3.default.createElement(
 	          'div',
 	          { className: 'children' },
 	          childIds.map(this.renderChild)
@@ -29241,66 +29240,66 @@
 	      var currentlySharingPageId = _state2.currentlySharingPageId;
 	
 	
-	      return React.createElement(
+	      return _react3.default.createElement(
 	        'div',
 	        { ref: 'sidePanel', className: 'pages-side-panel' },
-	        React.createElement(
+	        _react3.default.createElement(
 	          'div',
 	          { className: 'pages' },
 	          (0, _treeQueries.dictionaryToArray)(this.props.userPages).map(function (item) {
-	            return React.createElement(
+	            return _react3.default.createElement(
 	              'div',
 	              { onClick: function onClick(e) {
 	                  return _this2.onPageClick(e, item.id);
 	                }, key: item.id, className: 'page' },
-	              item.id === currentlySharingPageId ? React.createElement(_shareForm2.default, { userPageId: item.id, onShareCancel: function onShareCancel(e, id) {
+	              item.id === currentlySharingPageId ? _react3.default.createElement(_shareForm2.default, { userPageId: item.id, onShareCancel: function onShareCancel(e, id) {
 	                  return _this2.onShareCancel(e, id);
 	                }, onShareSubmit: function onShareSubmit(e, id, emails) {
 	                  return _this2.onShareSubmit(e, id, emails);
-	                } }) : React.createElement(
+	                } }) : _react3.default.createElement(
 	                'div',
 	                null,
-	                item.id === currentlyEditingPageNameId ? React.createElement(
+	                item.id === currentlyEditingPageNameId ? _react3.default.createElement(
 	                  'div',
 	                  null,
-	                  React.createElement('input', { onClick: function onClick(e) {
+	                  _react3.default.createElement('input', { onClick: function onClick(e) {
 	                      return _this2.onEditPageNameClicked(e);
 	                    }, onKeyDown: function onKeyDown(e) {
 	                      return _this2.onKeyDownEditPageName(e, item.id);
 	                    }, autoFocus: true, className: 'title', type: 'text', defaultValue: item.title, ref: 'page-name-' + item.id }),
-	                  React.createElement('div', { onClick: function onClick(e) {
+	                  _react3.default.createElement('div', { onClick: function onClick(e) {
 	                      return _this2.onCancelEditPageNameClicked(e, item.id);
 	                    }, className: 'button edit-name icon dripicons-wrong' }),
-	                  React.createElement('div', { onClick: function onClick(e) {
+	                  _react3.default.createElement('div', { onClick: function onClick(e) {
 	                      return _this2.onSavePageNameClicked(e, item.id);
 	                    }, className: 'button delete icon dripicons-return' })
-	                ) : React.createElement(
+	                ) : _react3.default.createElement(
 	                  'div',
 	                  null,
-	                  React.createElement(
+	                  _react3.default.createElement(
 	                    'div',
 	                    { className: 'title' },
 	                    item.title
 	                  ),
-	                  React.createElement('div', { onClick: function onClick(e) {
+	                  _react3.default.createElement('div', { onClick: function onClick(e) {
 	                      return _this2.onEditPageNameClicked(e, item.id);
 	                    }, className: 'button edit-name icon dripicons-pencil' }),
-	                  React.createElement('div', { onClick: function onClick(e) {
+	                  _react3.default.createElement('div', { onClick: function onClick(e) {
 	                      return _this2.onDeleteClicked(e, item.id);
 	                    }, className: 'button delete icon dripicons-cross' })
 	                )
 	              )
 	            );
 	          }),
-	          React.createElement(
+	          _react3.default.createElement(
 	            'div',
 	            { onClick: function onClick() {
 	                return _this2.onClickCreateNewUserPage();
 	              }, className: 'page' },
-	            React.createElement(
+	            _react3.default.createElement(
 	              'div',
 	              { className: 'title' },
-	              React.createElement('i', { className: 'icon dripicons-plus', 'aria-hidden': 'true' }),
+	              _react3.default.createElement('i', { className: 'icon dripicons-plus', 'aria-hidden': 'true' }),
 	              '  Add new Page'
 	            )
 	          )
@@ -29415,12 +29414,12 @@
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      return React.createElement(
+	      return _react3.default.createElement(
 	        'div',
 	        { className: 'search' },
-	        React.createElement('div', { className: 'icon dripicons-search' }),
-	        React.createElement('div', { className: 'icon dripicons-tags' }),
-	        React.createElement('input', { ref: 'searchInput', onChange: this.handleInputChange })
+	        _react3.default.createElement('div', { className: 'icon dripicons-search' }),
+	        _react3.default.createElement('div', { className: 'icon dripicons-tags' }),
+	        _react3.default.createElement('input', { ref: 'searchInput', onChange: this.handleInputChange })
 	      );
 	    }
 	  }]);
@@ -29973,7 +29972,10 @@
 	  }
 	
 	  if (action.type === _firebaseSubscriptions.INITIAL_NODE_STATE_LOADED) {
-	    return Object.assign({}, action.payload);
+	    var rootNode = action.payload.initialTreeState[action.payload.rootNodeId];
+	    var _newState = Object.assign({}, action.payload.initialTreeState);
+	    _newState[rootNode.childIds[0]] = node(_newState[rootNode.childIds[0]], { type: _node.NODE_FOCUSED, payload: { focusNote: false } });
+	    return _newState;
 	  }
 	
 	  if (action.type === _node.NODES_DELETED) {

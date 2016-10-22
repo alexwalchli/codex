@@ -2,7 +2,6 @@ import * as nodeActions from '../../src/js/actions/node/node-actions'
 import { INITIAL_NODE_STATE_LOADED } from '../../src/js/actions/firebase'
 import * as treeReducer from '../../src/js/reducers/tree'
 import nodeFactory from '../../src/js/utilities/node-factory'
-import { describe, it } from 'mocha'
 import { expect } from 'chai'
 
 describe('tree reducer', () => {
@@ -27,15 +26,36 @@ describe('tree reducer', () => {
 
   describe('INITIAL_NODE_STATE_LOADED', () => {
     it('INITIAL_NODE_STATE_LOADED should assign the payload as the state', () => {
-      const initialNodeState = { tree: {} }
+      const initialTreeState = treeState
       const initialNodeStateLoaded = {
         type: INITIAL_NODE_STATE_LOADED,
-        payload: initialNodeState
+        payload: {
+          rootNodeId: '1',
+          initialTreeState
+        }
       }
 
       const newTreeState = treeReducer.tree({}, initialNodeStateLoaded)
 
-      expect(newTreeState).to.deep.equal(initialNodeState)
+      expect(newTreeState).to.deep.equal({
+        '1': { id: '1', childIds: ['123', '321'] },
+        '123': {
+          id: '123',
+          parentId: '1',
+          childIds: [],
+          focused: true,
+          notesFocused: false,
+          collapsed: true,
+          completed: true
+        },
+        '321': {
+          id: '321',
+          parentId: '1',
+          childIds: [],
+          collapsed: false,
+          completed: true
+        }
+      })
     })
   })
 

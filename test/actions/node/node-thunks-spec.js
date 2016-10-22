@@ -2,8 +2,8 @@ import * as firebaseActions from '../../../src/js/actions/firebase/firebase-node
 import * as nodeActions from '../../../src/js/actions/node/node-actions'
 import * as treeQueries from '../../../src/js/utilities/tree-queries'
 import * as nodeThunks from '../../../src/js/actions/node/node-thunks'
-
-import { expect, describe, it, beforeEach, sinon } from '../../common'
+import sinon from 'sinon'
+import { expect } from 'chai'
 
 describe('node-thunks', () => {
   const nodes = {
@@ -63,6 +63,9 @@ describe('node-thunks', () => {
     it('should create the node as a sibling if the currently selected node is not a parent', () => {
 
     })
+    it('should create the node as a sibling if the currently selected node is collapsed', () => {
+
+    })
     it('should focus the new node if the createdFromSiblingOffset is greater than 0', () => {
 
     })
@@ -83,8 +86,8 @@ describe('node-thunks', () => {
 
       nodeThunks.updateContent(nodeId, newContent)(dispatch, getState)
 
-      expect(updateNodeContentSpy.calledWith(nodeId, newContent, userId))
-      expect(contentUpdatedSpy.calledWith(nodeId, newContent))
+      expect(updateNodeContentSpy).to.have.been.calledWith(nodeId, newContent, userId)
+      expect(contentUpdatedSpy).to.have.been.calledWith(nodeId, newContent)
     })
   })
 

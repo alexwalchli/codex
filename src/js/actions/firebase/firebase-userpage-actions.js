@@ -64,7 +64,7 @@ export function shareUserPage (userPage, allDescendantIds, emails, auth) {
           return
         }
 
-    // TODO: ROOTNODEID and CREATEDBYID UNDEFINED
+        // TODO: ROOTNODEID and CREATEDBYID UNDEFINED
 
         let newUserPageId = firebaseDb.ref(`userPages/`).push().key
         let newUserPage = userPageFactory(newUserPageId, userPage.rootNodeId, userPage.createdById, userPage.title, false)
