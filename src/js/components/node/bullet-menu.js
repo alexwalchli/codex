@@ -62,9 +62,7 @@ export class BulletMenu extends Component {
   }
 }
 
-// ///////////////
-// react redux //
-// ///////////////
+// react redux
 
 function mapStateToProps (state, ownProps) {
   return state.tree.present[ownProps.nodeId]

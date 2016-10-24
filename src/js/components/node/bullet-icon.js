@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
+import * as actions from '../../actions/node'
+import { connect } from 'react-redux'
 
-export default class BulletIcon extends Component {
+export class BulletIcon extends Component {
 
   onBulletClick () {
     const { nodeId, toggleNodeExpansion, focusNode } = this.props
@@ -23,3 +25,12 @@ export default class BulletIcon extends Component {
     )
   }
 }
+
+// react redux
+
+const mapStateToProps = (state, ownProps) => {
+  return state.tree.present[ownProps.nodeId]
+}
+
+const ConnectedBulletIcon = connect(mapStateToProps, actions)(BulletIcon)
+export default ConnectedBulletIcon

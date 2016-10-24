@@ -11,11 +11,6 @@ export class BulletNotes extends Component {
     }
   }
 
-
-  // //////////////////
-  // event handling //
-  // //////////////////
-
   onBlur (e) {
     const { nodeId, updateNodeNotes } = this.props
     const notes = this.refs.notesInput.value
@@ -49,10 +44,6 @@ export class BulletNotes extends Component {
     focusNode(nodeId, true)
   }
 
-  // /////////////
-  // rendering //
-  // /////////////
-
   render () {
     const { currentlyEditing, notes } = this.props
 
@@ -73,9 +64,7 @@ export class BulletNotes extends Component {
   }
 }
 
-// ///////////////
-// react redux //
-// ///////////////
+// react redux
 
 function mapStateToProps (state, ownProps) {
   return state.tree.present[ownProps.nodeId]

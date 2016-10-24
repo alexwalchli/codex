@@ -14,9 +14,8 @@ export class BulletEditContentView extends Component {
       content: props.content
     }
   }
-  ////////////////////
-  // event handling //
-  ////////////////////
+  
+  // event handling
 
   onChange (e, value) {
     this.setState({
@@ -87,12 +86,11 @@ export class BulletEditContentView extends Component {
     }
   }
 
-  ///////////////
-  // rendering //
-  ///////////////
+  // rendering
 
   render () {
-    const { content, focused } = this.props
+    const { focused } = this.props
+    const { content } = this.state
     const suggestions = [] // todo
 
     return (
@@ -116,9 +114,7 @@ export class BulletEditContentView extends Component {
   }
 }
 
-// ///////////////
-// react redux //
-// ///////////////
+// react redux
 
 function mapStateToProps (state, ownProps) {
   return state.tree.present[ownProps.nodeId]

@@ -154,7 +154,7 @@ export class Node extends Component {
 
             <div className='children-outline' />
 
-            <BulletIcon positionInOrderedList={positionInOrderedList} />
+            <BulletIcon nodeId={id} positionInOrderedList={positionInOrderedList} />
 
             <div
               className='content'
@@ -195,9 +195,7 @@ export class Node extends Component {
   }
 }
 
-// ///////////////
-// react redux //
-// ///////////////
+// react redux
 
 const mapStateToProps = (state, ownProps) => {
   const nodeFromState = state.tree.present[ownProps.id]
