@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import Node from '../containers/node'
+import Node from '../components/node/node'
 import * as actions from '../actions'
 import PagesSidePanel from '../containers/pages-side-panel'
 import Topbar from './top-bar'
@@ -24,7 +24,6 @@ export class App extends Component {
     let userIsAuthenticated = isAuthenticated(this.props)
     let showSignIn = !userIsAuthenticated && this.props.auth.initialCheck
     let showLoading = userIsAuthenticated && !appIsInitialized
-
     let toggledCss = pagesSidePanelVisible ? `toggled` : null
     let pagesSidePanelCss = `side-panel-toggle ${toggledCss}`
 

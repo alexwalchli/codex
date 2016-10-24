@@ -29,6 +29,7 @@
     "babel-preset-stage-2": "^6.5.0",
     "firebase": "^3.3.0",
     "lodash": "^4.14.1",
+    "markdown-it": "^8.0.1",
     "radium": "^0.18.1",
     "react": "^15.1.0",
     "react-dom": "^15.1.0",

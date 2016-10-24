@@ -10,6 +10,17 @@
     position:relative;
     border:1px solid transparent;
 
+    .view-mode-content {
+        .embeded-code {
+            border-radius:6px;
+            color:@secondary-color;
+            background-color:lighten(@base-color, 50%);
+            font-family: 'Roboto Slab', serif;
+            padding: 0px 6px;
+            font-size:.9em;
+        }
+    }
+
     &.completed {
         > .depth .content .view-mode-content, > .depth .content input{
             color:lighten(@secondary-color, 80%) !important;
@@ -212,7 +223,7 @@
     textarea{ font-size: 1em; }
 }
 
-.children .item .content input, .item .content .view-mode-content{
+.children .item .content input, .children .item .content .view-mode-content{
     line-height: 60px;
     // font-size:28px;
     font-size:24px;
