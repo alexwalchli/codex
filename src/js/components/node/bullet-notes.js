@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import * as actions from '../../actions/node'
 
 export class BulletNotes extends Component {
-  constructor(props){
+  constructor (props) {
     super(props)
 
     this.state = {

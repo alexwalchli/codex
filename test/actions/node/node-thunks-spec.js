@@ -207,3 +207,4 @@ describe('node-thunks', () => {
     })
   })
 })
+

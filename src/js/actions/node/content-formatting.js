@@ -1,6 +1,5 @@
 import * as markdown from 'markdown-it'
 const md = markdown.default()
-            .set()
 
 export const RENDER_MARKDOWN = 'RENDER_MARKDOWN'
 

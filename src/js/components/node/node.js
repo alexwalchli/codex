@@ -86,6 +86,11 @@ export class Node extends Component {
     toggleNodeMenu(id)
   }
 
+  onAddBulletButtonClick (e) {
+    const { id, createNode } = this.props
+    createNode(id, 0, '')
+  }
+
   selectNodeIfHoldingMouseDown (e) {
     const { selectNode, id } = this.props
     if (e.nativeEvent.which === 1 && !this.props.selected && this.props.id !== '0') {
@@ -145,7 +150,8 @@ export class Node extends Component {
       <div className={bulletClasses}>
         { typeof parentId !== 'undefined'
           ? <div className={`depth ${currentlySelectedCss}`}>
-            <div className='menu-btn' onClick={(e) => this.onToggleBulletMenuClick(e)}><i className='icon dripicons-menu' /></div>
+            <div className='add-btn inline-btn' onClick={(e) => this.onAddBulletButtonClick(e)}><i className='icon dripicons-plus' /></div>
+            <div className='menu-btn inline-btn' onClick={(e) => this.onToggleBulletMenuClick(e)}><i className='icon dripicons-menu' /></div>
             { menuVisible
               ? <BulletMenu
                 nodeId={id}

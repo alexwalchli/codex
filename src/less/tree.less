@@ -58,39 +58,52 @@
         }
     }
 
-    .depth > .menu-btn > i {
+    .depth > .inline-btn > i{
         visibility:hidden;
     }
 
-    .depth:hover > .menu-btn > i{
+    .depth:hover > .inline-btn > i{
         visibility:visible;
     }
 
     .children{
-        .menu-btn{
+        .inline-btn{
+            top: 24px;
             width:30px;
             position: absolute;
-            top: 24px;
-            left: -30px;
-            color: #ccc;
+            color:@base-color;
             cursor:pointer;
             font-size:20px;
             cursor:pointer;
         }
-
+        .add-btn{
+            left: -54px;
+        }
+        .menu-btn{
+            left: -30px;
+        }
         .children{
-            .menu-btn{
+            .inline-btn{
                 top:13px;
-                left:-25px;
                 font-size:16px;
             }
-
+            .menu-btn{
+                left:-25px;
+            }
+            .add-btn{
+                left:-45px;
+            }
             .children{
-                .menu-btn{
+                .inline-btn{
                     top:12px;
-                    left:-20px;
                     font-size:14px;
-                }   
+                }
+                .menu-btn{
+                    left:-20px;
+                }
+                .add-btn{
+                    left:-40px;
+                }
             }
         }
     }
@@ -212,6 +225,7 @@
 }
 
 .children .item .content{
+    cursor: text;
     height:60px;
     width:100%;
     margin-left:40px;

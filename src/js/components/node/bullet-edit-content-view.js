@@ -7,14 +7,14 @@ import defaultStyle from '../intellisense/mentionStyle'
 import defaultMentionStyle from '../intellisense/defaultMentionStyle'
 
 export class BulletEditContentView extends Component {
-  constructor(props){
+  constructor (props) {
     super(props)
 
     this.state = {
       content: props.content
     }
   }
-  
+
   // event handling
 
   onChange (e, value) {

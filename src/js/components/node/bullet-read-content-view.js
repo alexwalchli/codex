@@ -10,7 +10,7 @@ export class BulletReadContentView extends Component {
     this.state = {
       renderedContent: ''
     }
-  } 
+  }
 
   componentWillMount () {
     const { content, renderMarkdown } = this.props
@@ -28,14 +28,11 @@ export class BulletReadContentView extends Component {
     }
   }
 
-
   getHtmlContent () {
     return { __html: this.state.renderedContent }
   }
 
   render () {
-    const { content, renderMarkdown } = this.props
-    const { renderedContent } = this.state
     return (
       <div className='view-mode-content' dangerouslySetInnerHTML={this.getHtmlContent()} />
     )
