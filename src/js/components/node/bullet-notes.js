@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actions from '../../actions/node'
+import Textarea from 'react-textarea-autosize';
 
 export class BulletNotes extends Component {
   constructor (props) {
@@ -11,10 +12,36 @@ export class BulletNotes extends Component {
     }
   }
 
+  componentDidUpdate () {
+    const { notesFocused } = this.props
+    if (notesFocused) {
+      this.refs.notesInput.focus()
+    }
+  }
+
+  componentWillMount () {
+    const { notes, renderMarkdown } = this.props
+    this.setState({
+      renderedNotes: renderMarkdown(notes).payload
+    })
+  }
+
+  componentWillReceiveProps (newProps) {
+    const { renderMarkdown } = this.props
+    if (newProps.notes !== this.props.notes) {
+      this.setState({
+        renderedNotes: renderMarkdown(newProps.notes).payload
+      })
+    }
+  }
+
   onBlur (e) {
     const { nodeId, updateNodeNotes } = this.props
     const notes = this.refs.notesInput.value
     updateNodeNotes(nodeId, notes)
+    this.setState({
+      editingNotes: false
+    })
   }
 
   onKeyDown (e) {
@@ -44,21 +71,27 @@ export class BulletNotes extends Component {
     focusNode(nodeId, true)
   }
 
+  getHtmlNotes () {
+    return { __html: this.state.renderedNotes }
+  }
+
   render () {
-    const { currentlyEditing, notes } = this.props
+    const { notes, notesFocused } = this.props
+    const { editingNotes } = this.state
 
     let notesCssClasses = 'notes'
-    if (!notes && !currentlyEditing) {
+    if (!notes && !editingNotes && !notesFocused) {
       notesCssClasses += ' hidden'
     }
 
     return (
-      <div className={notesCssClasses}>
-        <textarea ref='notesInput'
-          defaultValue={notes}
-          onBlur={(e) => this.onBlur(e)}
-          onKeyDown={(e) => this.onKeyDown(e)}
-          onClick={(e) => this.onClick(e)} />
+      <div className={notesCssClasses} onClick={(e) => this.onClick(e)}>
+        { editingNotes || notesFocused
+          ? <Textarea ref='notesInput'
+              defaultValue={notes}
+              onBlur={(e) => this.onBlur(e)}
+              onKeyDown={(e) => this.onKeyDown(e)}  />
+          :  <div dangerouslySetInnerHTML={this.getHtmlNotes()} ></div>}
       </div>
     )
   }

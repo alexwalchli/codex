@@ -31,13 +31,6 @@ export class Node extends Component {
     })
   }
 
-  componentDidUpdate () {
-    const {notesFocused} = this.props
-    if (notesFocused) {
-      this.refs.notesInput.focus()
-    }
-  }
-
   // //////////////////
   // event handling //
   // //////////////////
@@ -115,7 +108,7 @@ export class Node extends Component {
   render () {
     const { parentId, childIds, id, focused, collapsed, visible, selected, completed, notes, positionInOrderedList,
             nodeInitialized, currentlySelectedBy, currentlySelectedById, auth, menuVisible } = this.props
-    const { content, editingNotes } = this.state
+    const { content } = this.state
 
     if (!nodeInitialized) {
       return (false)
@@ -182,7 +175,6 @@ export class Node extends Component {
 
             <BulletNotes
               nodeId={id}
-              currentlyEditing={editingNotes}
               notes={notes} />
 
             { currentlySelectedByAnotherUser

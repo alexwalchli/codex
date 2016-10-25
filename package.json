@@ -36,6 +36,7 @@
     "react-mentions": "^0.5.1",
     "react-redux": "^4.2.1",
     "react-tag-input": "^4.3.3",
+    "react-textarea-autosize": "^4.0.5",
     "redux": "^3.5.2",
     "redux-logger": "^2.6.1",
     "redux-thunk": "^2.1.0",

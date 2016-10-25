@@ -72,7 +72,6 @@ export const nodeTransaction = (events) => {
 // optimistically creates a node in client state then pushes to persistence
 export const createNode = (originNodeId, originOffset, content) =>
   (dispatch, getState) => {
-    console.log(firebaseDb)
     const appState = getState()
     const nodes = getPresentNodes(appState)
     const originNode = nodes[originNodeId]

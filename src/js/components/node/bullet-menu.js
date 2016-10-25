@@ -30,9 +30,6 @@ export class BulletMenu extends Component {
     e.stopPropagation()
     toggleNodeMenu(nodeId)
     focusNode(nodeId, true)
-    this.setState({
-      editingNotes: true
-    })
   }
 
   render () {

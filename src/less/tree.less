@@ -19,6 +19,10 @@
             padding: 0px 6px;
             font-size:.9em;
         }
+
+        a {
+            color:@base-color
+        }
     }
 
     &.completed {
@@ -46,7 +50,9 @@
     }
 
     .notes {
-        textarea {
+        textarea, div {
+            padding:0;
+            margin:0;
             color:lighten(@secondary-color, 50%);
             background: transparent;
             resize: none;
@@ -55,6 +61,13 @@
             outline: none;
             height: 100%;
             font-family: @base-font-face;
+            min-height:34px;
+        }
+        div {
+            margin-bottom:3px;
+        }
+        code, a{
+            color:lighten(@secondary-color, 50%);
         }
     }
 
@@ -68,7 +81,7 @@
 
     .children{
         .inline-btn{
-            top: 24px;
+            top: 21px;
             width:30px;
             position: absolute;
             color:@base-color;
@@ -234,7 +247,7 @@
 .children .item .notes {
     margin-left:40px;
 
-    textarea{ font-size: 1em; }
+    textarea, div { font-size: 1em; }
 }
 
 .children .item .content input, .children .item .content .view-mode-content{
@@ -262,7 +275,7 @@
 .children .children .notes {
     margin-left:34px;
 
-    textarea{ font-size: .95em; }
+    textarea, div { font-size: .95em; }
 }
 
 .children .children .children-outline{
@@ -323,7 +336,7 @@
 
 .children .children .children .notes {
     margin-left:30px;
-    textarea {
+    textarea, div {
         font-size:.85em;
     }
 }
