@@ -1,10 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actions from '../../actions/node'
-import MentionsInput from '../intellisense/mentionsinput'
-import Mention from '../intellisense/mention'
-import defaultStyle from '../intellisense/mentionStyle'
-import defaultMentionStyle from '../intellisense/defaultMentionStyle'
+import IntellisenseInput from '../intellisense/intellisense-input'
 
 export class BulletEditContentView extends Component {
   constructor (props) {
@@ -70,14 +67,6 @@ export class BulletEditContentView extends Component {
     }
   }
 
-  onAddTag (suggestionId, suggestionDisplay) {
-    const { fetchDataIfNeeded, nodeId } = this.props
-  }
-
-  onRemoveTag (suggestionId, suggestionDisplay) {
-
-  }
-
   submitContent () {
     const { id, content, updateContent } = this.props
     if (this.state.content !== content) {
@@ -90,36 +79,60 @@ export class BulletEditContentView extends Component {
   render () {
     const { focused } = this.props
     const { content } = this.state
-    var suggestions = [
-      {
-        id: 'WalterWhite',
-        display: 'Walter White'
-      },
-      {
-        id: 'JessePinkman',
-        display: 'Jesse Pinkman'
-      }
-    ] // todo
+    var intellisenseData = {
+      '/': [
+        {
+          label: 'Complete bullet',
+          trigger: '/',
+          filterText: 'Complete bullet',
+          insertText: null,
+          highlight: false
+        },
+        {
+          label: 'Delete bullet',
+          trigger: '/',
+          filterText: 'Complete bullet',
+          insertText: null,
+          highlight: false
+        }
+      ],
+      '#': [
+        {
+          label: 'inprogress',
+          trigger: '#',
+          filterText: 'inprogress',
+          insertText: null,
+          highlight: false
+        }
+      ]
+    }
 
     return (
-      <MentionsInput
-        markup={'{{{__display__}}}'}
-        singleLine
+      <IntellisenseInput
+        data={intellisenseData}
         value={content}
-        onChange={(e, value) => this.onChange(e, value)}
-        style={defaultStyle({ singleLine: true })}
-        placeholder={''}
         focused={focused}
         onBlur={(e) => this.onBlur(e)}
-        onKeyDown={(e) => this.onKeyDown(e)} >
+        onKeyDown={(e) => this.onKeyDown(e)}
+        onChange={(e, value) => this.onChange(e, value)} />
+      // <MentionsInput
+      //   markup={'{{{__display__}}}'}
+      //   singleLine
+      //   value={content}
+      //   onChange={(e, value) => this.onChange(e, value)}
+      //   style={defaultStyle({ singleLine: true })}
+      //   placeholder={''}
+      //   focused={focused}
+      //   onBlur={(e) => this.onBlur(e)}
+      //   onKeyDown={(e) => this.onKeyDown(e)} >
 
-        <Mention
-          trigger='#'
-          onAdd={(e) => this.onAddTag(e)}
-          onRemove={(e) => this.onRemoveTag(e)}
-          data={suggestions}
-          style={defaultMentionStyle} />
-      </MentionsInput>
+      //   <Mention
+      //     trigger='#'
+      //     onAdd={(e) => this.onAddTag(e)}
+      //     onRemove={(e) => this.onRemoveTag(e)}
+      //     data={suggestions}
+      //     style={defaultMentionStyle} />
+      // </MentionsInput>
     )
   }
 }

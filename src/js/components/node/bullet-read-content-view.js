@@ -47,3 +47,4 @@ const mapStateToProps = (state, ownProps) => {
 
 const ConnectedBulletReadContentView = connect(mapStateToProps, actions)(BulletReadContentView)
 export default ConnectedBulletReadContentView
+

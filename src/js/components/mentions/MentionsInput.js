@@ -366,7 +366,7 @@ const MentionsInput = React.createClass({
         return
       }
       case KEY.SPACE: {
-        return;
+        return
       }
     }
   },
