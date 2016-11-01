@@ -13,17 +13,17 @@ export class BulletReadContentView extends Component {
   }
 
   componentWillMount () {
-    const { content, renderMarkdown } = this.props
+    const { content, renderContent } = this.props
     this.setState({
-      renderedContent: renderMarkdown(content).payload
+      renderedContent: renderContent(content).payload
     })
   }
 
   componentWillReceiveProps (newProps) {
-    const { renderMarkdown } = this.props
+    const { renderedContent } = this.props
     if (newProps.content !== this.props.content) {
       this.setState({
-        renderedContent: renderMarkdown(newProps.content).payload
+        renderedContent: renderedContent(newProps.content).payload
       })
     }
   }

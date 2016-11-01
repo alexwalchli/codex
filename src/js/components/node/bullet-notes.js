@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actions from '../../actions/node'
-import Textarea from 'react-textarea-autosize';
+import Textarea from 'react-textarea-autosize'
 
 export class BulletNotes extends Component {
   constructor (props) {
@@ -20,17 +20,17 @@ export class BulletNotes extends Component {
   }
 
   componentWillMount () {
-    const { notes, renderMarkdown } = this.props
+    const { notes, renderContent } = this.props
     this.setState({
-      renderedNotes: renderMarkdown(notes).payload
+      renderedNotes: renderContent(notes).payload
     })
   }
 
   componentWillReceiveProps (newProps) {
-    const { renderMarkdown } = this.props
+    const { renderContent } = this.props
     if (newProps.notes !== this.props.notes) {
       this.setState({
-        renderedNotes: renderMarkdown(newProps.notes).payload
+        renderedNotes: renderContent(newProps.notes).payload
       })
     }
   }
@@ -88,10 +88,10 @@ export class BulletNotes extends Component {
       <div className={notesCssClasses} onClick={(e) => this.onClick(e)}>
         { editingNotes || notesFocused
           ? <Textarea ref='notesInput'
-              defaultValue={notes}
-              onBlur={(e) => this.onBlur(e)}
-              onKeyDown={(e) => this.onKeyDown(e)}  />
-          :  <div dangerouslySetInnerHTML={this.getHtmlNotes()} ></div>}
+            defaultValue={notes}
+            onBlur={(e) => this.onBlur(e)}
+            onKeyDown={(e) => this.onKeyDown(e)} />
+          : <div dangerouslySetInnerHTML={this.getHtmlNotes()} />}
       </div>
     )
   }

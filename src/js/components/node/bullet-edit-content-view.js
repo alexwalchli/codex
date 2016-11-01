@@ -72,7 +72,6 @@ export class BulletEditContentView extends Component {
 
   onAddTag (suggestionId, suggestionDisplay) {
     const { fetchDataIfNeeded, nodeId } = this.props
-    fetchDataIfNeeded(nodeId, suggestionId, 'all')
   }
 
   onRemoveTag (suggestionId, suggestionDisplay) {
@@ -91,10 +90,20 @@ export class BulletEditContentView extends Component {
   render () {
     const { focused } = this.props
     const { content } = this.state
-    const suggestions = [] // todo
+    var suggestions = [
+      {
+        id: 'WalterWhite',
+        display: 'Walter White'
+      },
+      {
+        id: 'JessePinkman',
+        display: 'Jesse Pinkman'
+      }
+    ] // todo
 
     return (
       <MentionsInput
+        markup={'{{{__display__}}}'}
         singleLine
         value={content}
         onChange={(e, value) => this.onChange(e, value)}
@@ -105,6 +114,7 @@ export class BulletEditContentView extends Component {
         onKeyDown={(e) => this.onKeyDown(e)} >
 
         <Mention
+          trigger='#'
           onAdd={(e) => this.onAddTag(e)}
           onRemove={(e) => this.onRemoveTag(e)}
           data={suggestions}

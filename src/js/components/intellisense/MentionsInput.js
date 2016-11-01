@@ -365,6 +365,9 @@ const MentionsInput = React.createClass({
         this.selectFocused()
         return
       }
+      case KEY.SPACE: {
+        return;
+      }
     }
   },
 

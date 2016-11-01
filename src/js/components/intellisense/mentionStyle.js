@@ -15,7 +15,10 @@ export default (props = {}) => ({
     },
 
     highlighter: {
-      padding: 0,
+      lineHeight: '36px',
+      fontSize: '20px',
+      // backgroundColor:'#d4eaf8',
+      borderRadius: '6px',
       border: 'none'
     },
 
@@ -26,8 +29,8 @@ export default (props = {}) => ({
   },
 
   suggestions: {
-    backgroundColor: '#DF5A49',
-    color: '#FFF',
+    backgroundColor: '#d4eaf8',
+    color: '#000',
     item: {
       padding: '5px 15px',
 
