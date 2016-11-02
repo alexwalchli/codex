@@ -1,7 +1,8 @@
 /* root node */
-#tree-container > .item{
-    width:100%;
-    padding-left:108px;
+#tree-container {
+    padding-right: 60px;
+    padding-left: 60px;
+    padding-top: 60px;
 }
 
 /* common node css */
@@ -23,6 +24,13 @@
         a {
             color:@base-color
         }
+    }
+
+    textarea {
+        width: 100%;
+        resize: none;
+        border: 0 none;
+        outline: none;
     }
 
     &.completed {
@@ -55,10 +63,6 @@
             margin:0;
             color:lighten(@secondary-color, 50%);
             background: transparent;
-            resize: none;
-            border: 0 none;
-            width: 100%;
-            outline: none;
             height: 100%;
             font-family: @base-font-face;
             min-height:34px;
@@ -239,7 +243,7 @@
 
 .children .item .content{
     cursor: text;
-    height:60px;
+    min-height:60px;
     width:100%;
     margin-left:40px;
 }
@@ -268,7 +272,7 @@
 }
 
 .children .children .content {
-    height:36px;
+    min-height:36px;
     margin-left:34px;
 }
 
@@ -330,7 +334,7 @@
 }
 
 .children .children .children .content {
-    height:36px;
+    min-height:36px;
     margin-left:30px;
 }
 

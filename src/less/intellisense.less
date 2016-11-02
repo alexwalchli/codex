@@ -1,0 +1,28 @@
+.intellisense-container {
+
+  .intellisense-suggestion-box {
+    z-index:3;
+    background-color:@base-color;
+    color:@background-color;
+    position: absolute;
+    top:50px; // TODO: set based on cursor position 
+    left:50px; // TODO: set based on cursor position
+    width:200px;
+    
+    ul.suggestions {
+      margin:0;
+      padding:0;
+
+      li.suggestion {
+        font-size:1.2em;
+        list-style: none;
+        padding:6px;
+
+        &.selected {
+          background-color:lighten(@base-color, 10%)
+        }
+      }
+    }
+  }
+
+}

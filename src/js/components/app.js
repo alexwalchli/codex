@@ -39,14 +39,8 @@ export class App extends Component {
 
         { appIsInitialized
           ? <div id='signed-in'>
-            <a className={pagesSidePanelCss} onClick={togglePagesSidePanel} ><i className='icon dripicons-menu' /></a>
-            <Topbar />
-
             <AppContextMenu />
 
-            { pagesSidePanelVisible
-                ? <PagesSidePanel />
-                : null }
             <div id='tree-container'>
               <Node id={currentUserPage.rootNodeId} />
             </div>
@@ -68,3 +62,9 @@ function userPagesList (userPages) {
 
 const ConnectedApp = connect(mapStateToProps, actions)(App)
 export default ConnectedApp
+
+// TODO: Reimplement
+//<a className={pagesSidePanelCss} onClick={togglePagesSidePanel} ><i className='icon dripicons-menu' /></a>
+//  { pagesSidePanelVisible
+                // ? <PagesSidePanel />
+                // : null }

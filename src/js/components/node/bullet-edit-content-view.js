@@ -70,7 +70,19 @@ export class BulletEditContentView extends Component {
   submitContent () {
     const { id, content, updateContent } = this.props
     if (this.state.content !== content) {
-      updateContent(id, this.state.content)
+      updateContent(id, this.state.content.trim())
+    }
+  }
+  
+  onCommandSelected (e, suggestion) {
+    const { nodeId, toggleNodeComplete, deleteNode } = this.props
+    
+    switch (suggestion.action) {
+      case 'COMPLETE_NODE':
+        toggleNodeComplete(nodeId)
+        break;
+      case 'DELETE_NODE':
+        deleteNode(nodeId)
     }
   }
 
@@ -82,22 +94,54 @@ export class BulletEditContentView extends Component {
     var intellisenseData = {
       '/': [
         {
-          label: 'Complete bullet',
+          type: 'COMMAND',
+          action: 'COMPLETE_NODE',
+          label: 'Complete',
           trigger: '/',
-          filterText: 'Complete bullet',
+          filterText: 'Complete',
           insertText: null,
           highlight: false
         },
         {
-          label: 'Delete bullet',
+          type: 'COMMAND',
+          action: 'COMPLETE_ALL_NODES',
+          label: 'Complete all under',
           trigger: '/',
-          filterText: 'Complete bullet',
+          filterText: 'Complete all',
           insertText: null,
           highlight: false
-        }
+        },
+        {
+          type: 'COMMAND',
+          action: 'DELETE_NODE',
+          label: 'Delete',
+          trigger: '/',
+          filterText: 'Delete',
+          insertText: null,
+          highlight: false
+        },
+        {
+          type: 'COMMAND',
+          action: 'COLLAPSE',
+          label: 'Collapse',
+          trigger: '/',
+          filterText: 'Collapse',
+          insertText: null,
+          highlight: false
+        },
+        {
+          type: 'COMMAND',
+          action: 'COLLAPSE_ALL',
+          label: 'Collapse all under',
+          trigger: '/',
+          filterText: 'Collapse all',
+          insertText: null,
+          highlight: false
+        },
       ],
       '#': [
         {
+          type: 'TAG',
           label: 'inprogress',
           trigger: '#',
           filterText: 'inprogress',
@@ -114,7 +158,8 @@ export class BulletEditContentView extends Component {
         focused={focused}
         onBlur={(e) => this.onBlur(e)}
         onKeyDown={(e) => this.onKeyDown(e)}
-        onChange={(e, value) => this.onChange(e, value)} />
+        onChange={(e, value) => this.onChange(e, value)}
+        onCommandSelected={(e, value) => this.onCommandSelected(e, value)} />
       // <MentionsInput
       //   markup={'{{{__display__}}}'}
       //   singleLine

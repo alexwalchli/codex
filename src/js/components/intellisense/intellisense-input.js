@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import SuggestionBox from './suggestion-box'
+import Textarea from 'react-textarea-autosize';
 
 export default class IntellisenseInput extends Component {
 
@@ -7,7 +8,10 @@ export default class IntellisenseInput extends Component {
     super(props)
 
     this.state = {
-      suggestionBoxVisible: false
+      suggestionBoxVisible: false,
+      selectedSuggestionIndex: 0,
+      currentSuggestions: [],
+      currentInputValue: props.value
     }
   }
 
@@ -17,7 +21,11 @@ export default class IntellisenseInput extends Component {
     this.toggleTextInputFocus()
   }
 
-  componentDidUpdate () {
+  componentWillUpdate (nextProps) {
+   
+  }
+
+  componentDidUpdate (nextProps) {
     this.toggleTextInputFocus()
   }
 
@@ -25,6 +33,8 @@ export default class IntellisenseInput extends Component {
 
   onTextInputChange (e) {
     const newValue = this.refs.textInput.value
+    this.setState({ currentInputValue: newValue }) 
+
     if (this.props.onChange) {
       return this.props.onChange(e, newValue)
     }
@@ -32,10 +42,39 @@ export default class IntellisenseInput extends Component {
 
   onTextInputKeyDown (e) {
     if (this.isTriggerCharacter(e.key)) {
-      // render suggestionbox
-      this.setState({ suggestionBoxVisible: true })
-    } else if (this.props.onKeyDown) {
-      return this.props.onKeyDown(e)
+      if (this.state.suggestionBoxVisible) {
+        this.setState({ suggestionBoxVisible: false, currentSuggestions: [] })
+      } else {
+        this.setState({ suggestionBoxVisible: true, currentSuggestions: this.querySuggestions(e.key), currentQuery: e.key })
+      }
+    } else {
+      if (e.key === 'ArrowDown' && this.state.suggestionBoxVisible) {
+        return this.shiftSelectedSuggestion(e, true)
+      } else if (e.key === 'ArrowUp' && this.state.suggestionBoxVisible) {
+        return this.shiftSelectedSuggestion(e, false)
+      } else if ((e.key === 'Enter' || e.key === 'Tab' || e.key === 'Space') && this.state.suggestionBoxVisible) {
+        return this.executeSuggestionSelection(e)
+      } else if (e.key === 'Backspace' && this.state.suggestionBoxVisible) {
+        const newQuery = this.state.currentQuery.slice(0, -1)
+        if (newQuery) {
+          this.setState({ currentSuggestions: this.querySuggestions(newQuery), currentQuery: newQuery })
+          return
+        }
+      } else if (this.state.suggestionBoxVisible) {
+        const newQuery = this.state.currentQuery + e.key
+        this.setState({ currentSuggestions: this.querySuggestions(newQuery), currentQuery: newQuery})
+        return
+      }
+
+      this.setState({ 
+        suggestionBoxVisible: false,
+        currentSuggestions: [], 
+        currentQuery: null
+      })
+
+      if (this.props.onKeyDown) {
+        return this.props.onKeyDown(e)
+      }
     }
   }
 
@@ -45,14 +84,24 @@ export default class IntellisenseInput extends Component {
     }
   }
 
+  onSuggestionSelected (e, suggestion) {
+    if (this.props.onSuggestionSelected) {
+      return this.props.onSuggestionSelected(e, suggestion)
+    }
+  }
+
   // rendering
 
   renderSuggestionBox () {
     const { data } = this.props
+    const { currentSuggestions, selectedSuggestionIndex } = this.state
 
     if (this.state.suggestionBoxVisible) {
       return (
-        <SuggestionBox data={data} />
+        <SuggestionBox 
+          suggestions={currentSuggestions}
+          onSuggestionSelected={(e, suggestion) => this.onSuggestionSelected(e, suggestion)}
+          selectedSuggestionIndex={selectedSuggestionIndex} />
       )
     }
 
@@ -60,13 +109,13 @@ export default class IntellisenseInput extends Component {
   }
 
   render () {
-    const { value } = this.props
+    const { currentInputValue } = this.state
 
     return (
-      <div className='intellisense-input-container'>
-        <textarea
+      <div className='intellisense-container'>
+        <Textarea
           ref='textInput'
-          value={value}
+          value={currentInputValue}
           onChange={(e) => this.onTextInputChange(e)}
           onKeyDown={(e) => this.onTextInputKeyDown(e)}
           onBlur={(e) => this.onTextInputBlur(e)} />
@@ -87,7 +136,50 @@ export default class IntellisenseInput extends Component {
 
   isTriggerCharacter (key) {
     const { data } = this.props
-    return data[key]
+    return !!data[key]
+  }
+
+  shiftSelectedSuggestion (e, down = true) {
+    e.stopPropagation()
+    e.preventDefault()
+    const { selectedSuggestionIndex } = this.state
+    const newSelectedSuggestionIndex = down ? selectedSuggestionIndex + 1 : selectedSuggestionIndex - 1
+    this.setState({ selectedSuggestionIndex: newSelectedSuggestionIndex })
+    if (newSelectedSuggestionIndex === -1) {
+      this.setState({ suggestionBoxVisible: false })
+    }
+  }
+
+  executeSuggestionSelection (e) {
+    e.stopPropagation()
+    e.preventDefault()
+    const { data, onCommandSelected } = this.props
+    const { currentSuggestions, currentQuery, selectedSuggestionIndex, currentInputValue } = this.state
+    const selectedSuggestion = currentSuggestions[selectedSuggestionIndex]
+
+    this.setState({ suggestionBoxVisible: false })
+
+    if (selectedSuggestion.type === 'COMMAND') {
+      onCommandSelected && onCommandSelected(e, selectedSuggestion)
+      this.setState({ 
+        suggestionBoxVisible: false, 
+        currentSuggestions: [], 
+        currentQuery: null, 
+        currentInputValue: currentInputValue.replace(currentQuery, '') 
+      })
+    }
+  }
+
+  querySuggestions (query) {
+    const { data } = this.props
+    const triggerChar = query.substring(0, 1)
+    const queryText = query.substring(1, query.length)
+
+    return data[triggerChar].filter(i => i.label.toLowerCase().startsWith(queryText))
+  }
+
+  plainTextQuery (query) {
+    return query.replace('/', '').replace('#').replace('@')
   }
 
 }
