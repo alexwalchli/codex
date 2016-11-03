@@ -60,21 +60,21 @@ export function getCurrentlyFocusedNodeId (nodes) {
 }
 
 // retrieves the next node above or below that is visible
-export function getNextNodeThatIsVisible (rootNodeId, nodes, currentNodeId, searchAbove = true) {
+export function getNextNodeThatIsVisible (rootNodeId, nodes, visibleNodes, currentNodeId, searchAbove = true) {
   const allNodeIdsOrdered = getAllNodeIdsOrdered(nodes, rootNodeId)
   const currentNodeIndex = allNodeIdsOrdered.indexOf(currentNodeId)
 
   if (searchAbove) {
     for (let j = currentNodeIndex - 1; j > 0; j--) {
       let node = nodes[allNodeIdsOrdered[j]]
-      if (node.visible && !node.deleted) {
+      if (visibleNodes[node.id]) {
         return node
       }
     }
   } else {
     for (let k = currentNodeIndex + 1; k < allNodeIdsOrdered.length; k++) {
       let node = nodes[allNodeIdsOrdered[k]]
-      if (node.visible && !node.deleted) {
+      if (visibleNodes[node.id]) {
         return node
       }
     }

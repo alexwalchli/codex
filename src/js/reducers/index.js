@@ -3,7 +3,7 @@ import { externalDataCache, selectedDataSource } from './external-data-cache'
 import { app } from './app'
 import { search } from './search'
 import { tree } from './tree'
-import { nodeVisibility } from './node-visibility'
+import { visibleNodes } from './node-visibility'
 import { auth } from './auth'
 import { userPages } from './user-page'
 import { queuedRequests } from './firebase-request-queue'
@@ -13,7 +13,7 @@ const undoableActionFilter = action => action.undoable !== false
 const undoableTree = undoable(tree, {
   filter: undoableActionFilter
 })
-const undoableNodeVisibility = undoable(nodeVisibility, {
+const undoableVisibleNodes = undoable(visibleNodes, {
   filter: undoableActionFilter
 })
 
@@ -23,7 +23,7 @@ const rootReducer = combineReducers({
   externalDataCache,
   selectedDataSource,
   tree: undoableTree,
-  nodeVisibility: undoableNodeVisibility,
+  visibleNodes: undoableVisibleNodes,
   search,
   userPages,
   queuedRequests

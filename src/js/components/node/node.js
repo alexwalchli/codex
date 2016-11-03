@@ -207,7 +207,7 @@ const mapStateToProps = (state, ownProps) => {
     positionInOrderedList = parentNode.childIds.indexOf(ownProps.id) + 1
   }
 
-  return Object.assign({ nodeInitialized: !!nodeFromState, auth: state.auth, positionInOrderedList, ...ownProps, visible: state.nodeVisibility.present[ownProps.id] }, nodeFromState)
+  return Object.assign({ nodeInitialized: !!nodeFromState, auth: state.auth, positionInOrderedList, ...ownProps, visible: state.visibleNodes.present[ownProps.id] }, nodeFromState)
 }
 
 const ConnectedNode = connect(mapStateToProps, actions)(Node)

@@ -211,14 +211,25 @@ describe('getNextNodeThatIsVisible', () => {
         ggg: { id: 'ggg', childIds: [], parentId: 'fff', visible: true },
         hhh: { id: 'hhh', childIds: [], parentId: 'aaa', visible: true, deleted: true },
         iii: { id: 'iii', childIds: [], parentId: 'aaa', visible: true }
+      },
+      visibleNodes: {
+        'aaa': true,
+        'bbb': true,
+        'ccc': true,
+        'ddd': true,
+        'eee': false,
+        'fff': true,
+        'ggg': true,
+        'hhh': false,
+        'iii': true
       }
     }
   })
 
   it('should return the sibling nodeId above, if searching above and it is visible', () => {
-    const nodeAboveiii = treeQueries.getNextNodeThatIsVisible('aaa', appState.nodes, 'iii', true)
-    const nodeAbovefff = treeQueries.getNextNodeThatIsVisible('aaa', appState.nodes, 'fff', true)
-    const nodeAbovebbb = treeQueries.getNextNodeThatIsVisible('aaa', appState.nodes, 'bbb', true)
+    const nodeAboveiii = treeQueries.getNextNodeThatIsVisible('aaa', appState.nodes, appState.visibleNodes, 'iii', true)
+    const nodeAbovefff = treeQueries.getNextNodeThatIsVisible('aaa', appState.nodes, appState.visibleNodes, 'fff', true)
+    const nodeAbovebbb = treeQueries.getNextNodeThatIsVisible('aaa', appState.nodes, appState.visibleNodes, 'bbb', true)
 
     expect(nodeAboveiii.id).to.equal('ggg')
     expect(nodeAbovefff.id).to.equal('ddd')
@@ -226,11 +237,11 @@ describe('getNextNodeThatIsVisible', () => {
   })
 
   it('should return the sibling nodeId below, if searching below and it is visible', () => {
-    const nodeBelowiii = treeQueries.getNextNodeThatIsVisible('aaa', appState.nodes, 'iii', false)
-    const nodeBelowbbb = treeQueries.getNextNodeThatIsVisible('aaa', appState.nodes, 'bbb', false)
-    const nodeBelowccc = treeQueries.getNextNodeThatIsVisible('aaa', appState.nodes, 'ccc', false)
-    const nodeBelowddd = treeQueries.getNextNodeThatIsVisible('aaa', appState.nodes, 'ddd', false)
-    const nodeBelowggg = treeQueries.getNextNodeThatIsVisible('aaa', appState.nodes, 'ggg', false)
+    const nodeBelowiii = treeQueries.getNextNodeThatIsVisible('aaa', appState.nodes, appState.visibleNodes, 'iii', false)
+    const nodeBelowbbb = treeQueries.getNextNodeThatIsVisible('aaa', appState.nodes, appState.visibleNodes, 'bbb', false)
+    const nodeBelowccc = treeQueries.getNextNodeThatIsVisible('aaa', appState.nodes, appState.visibleNodes, 'ccc', false)
+    const nodeBelowddd = treeQueries.getNextNodeThatIsVisible('aaa', appState.nodes, appState.visibleNodes, 'ddd', false)
+    const nodeBelowggg = treeQueries.getNextNodeThatIsVisible('aaa', appState.nodes, appState.visibleNodes, 'ggg', false)
 
     expect(nodeBelowiii).to.equal(null)
     expect(nodeBelowbbb.id).to.equal('ccc')

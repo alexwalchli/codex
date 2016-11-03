@@ -1,6 +1,6 @@
 import * as nodeActions from '../../src/js/actions/node/node-actions'
 import { INITIAL_NODE_STATE_LOADED } from '../../src/js/actions/firebase'
-import * as nodeVisibilityReducer from '../../src/js/reducers/node-visibility'
+import * as visibleNodesReducer from '../../src/js/reducers/node-visibility'
 import { expect } from 'chai'
 
 describe('node visibility reducer', () => {
@@ -49,7 +49,7 @@ describe('node visibility reducer', () => {
 
   describe('INITIAL_NODE_STATE_LOADED', () => {
     it('should initialize state and set nodes to hidden that are deleted', () => {
-      const newState = nodeVisibilityReducer.nodeVisibility({}, initialNodeStateLoaded)
+      const newState = visibleNodesReducer.visibleNodes({}, initialNodeStateLoaded)
 
       expect(newState).to.deep.equal({
         '1': true,
@@ -63,8 +63,8 @@ describe('node visibility reducer', () => {
 
   describe('NODE_COLLAPSED', () => {
     it('should set the all descendants to hidden', () => {
-      const initialState = nodeVisibilityReducer.nodeVisibility({}, initialNodeStateLoaded)
-      const newState = nodeVisibilityReducer.nodeVisibility(initialState, nodeActions.nodeCollapsed('123', ['456', '789'], '09876'))
+      const initialState = visibleNodesReducer.visibleNodes({}, initialNodeStateLoaded)
+      const newState = visibleNodesReducer.visibleNodes(initialState, nodeActions.nodeCollapsed('123', ['456', '789'], '09876'))
 
       expect(newState).to.deep.equal({
         '1': true,
@@ -78,8 +78,8 @@ describe('node visibility reducer', () => {
 
   describe('NODE_EXPANDED', () => {
     it('should make all descedants visible', () => {
-      const initialState = nodeVisibilityReducer.nodeVisibility({}, initialNodeStateLoaded)
-      const newState = nodeVisibilityReducer.nodeVisibility(initialState, nodeActions.nodeExpanded('123', ['456', '789'], '09876'))
+      const initialState = visibleNodesReducer.visibleNodes({}, initialNodeStateLoaded)
+      const newState = visibleNodesReducer.visibleNodes(initialState, nodeActions.nodeExpanded('123', ['456', '789'], '09876'))
 
       expect(newState).to.deep.equal({
         '1': true,
@@ -93,8 +93,8 @@ describe('node visibility reducer', () => {
 
   describe('NODES_DELETED', () => {
     it('should all deleted nodes to hidden', () => {
-      const initialState = nodeVisibilityReducer.nodeVisibility({}, initialNodeStateLoaded)
-      const newState = nodeVisibilityReducer.nodeVisibility(initialState, nodeActions.nodesDeleted(['456', '789']))
+      const initialState = visibleNodesReducer.visibleNodes({}, initialNodeStateLoaded)
+      const newState = visibleNodesReducer.visibleNodes(initialState, nodeActions.nodesDeleted(['456', '789']))
 
       expect(newState).to.deep.equal({
         '1': true,
@@ -108,8 +108,8 @@ describe('node visibility reducer', () => {
 
   describe('NODE_CREATED', () => {
     it('should add the node and set to visible', () => {
-      const initialState = nodeVisibilityReducer.nodeVisibility({}, initialNodeStateLoaded)
-      const newState = nodeVisibilityReducer.nodeVisibility(
+      const initialState = visibleNodesReducer.visibleNodes({}, initialNodeStateLoaded)
+      const newState = visibleNodesReducer.visibleNodes(
         initialState,
         nodeActions.nodeCreated({ id: '1011' })
       )

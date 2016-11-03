@@ -3,7 +3,7 @@ import { NODE_CREATED, NODE_EXPANDED, NODE_COLLAPSED, NODES_DELETED, NODE_TRANSA
 import { dictionaryToArray, getAllDescendantIds } from '../utilities/tree-queries'
 import { INITIAL_NODE_STATE_LOADED } from '../actions/firebase/firebase-subscriptions'
 
-export function nodeVisibility (state = {}, action) {
+export function visibleNodes (state = {}, action) {
   let newState = Object.assign({}, state)
 
   if (action.type === NODE_TRANSACTION) {

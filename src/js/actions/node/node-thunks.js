@@ -132,7 +132,7 @@ export const focusNodeAbove = (currentNodeId) =>
   (dispatch, getState) => {
     const state = getState()
     const rootNodeId = getRootNodeId(state)
-    const nodeToFocus = getNextNodeThatIsVisible(rootNodeId, getPresentNodes(state), currentNodeId, true)
+    const nodeToFocus = getNextNodeThatIsVisible(rootNodeId, getPresentNodes(state), state.visibleNodes.present, currentNodeId, true)
 
     if (nodeToFocus) {
       dispatch(nodeActions.nodeFocused(nodeToFocus.id))
@@ -141,9 +141,9 @@ export const focusNodeAbove = (currentNodeId) =>
 
 export const focusNodeBelow = (currentNodeId) =>
   (dispatch, getState) => {
-    const state = getState()
-    const rootNodeId = getRootNodeId(state)
-    const nodeToFocus = getNextNodeThatIsVisible(rootNodeId, getPresentNodes(state), currentNodeId, false)
+    const appState = getState()
+    const rootNodeId = getRootNodeId(appState)
+    const nodeToFocus = getNextNodeThatIsVisible(rootNodeId, getPresentNodes(appState), appState.visibleNodes.present, currentNodeId, false)
 
     if (nodeToFocus) {
       dispatch(nodeActions.nodeFocused(nodeToFocus.id))
@@ -154,7 +154,7 @@ export const demoteNode = (nodeId, parentId) =>
   (dispatch, getState) => {
     const appState = getState()
     const rootNodeId = getRootNodeId(appState)
-    const siblingAbove = getNextNodeThatIsVisible(rootNodeId, getPresentNodes(appState), nodeId, true)
+    const siblingAbove = getNextNodeThatIsVisible(rootNodeId, getPresentNodes(appState), appState.visibleNodes.present, nodeId, true)
     const addAfterLastChildOfSiblingAboveId = siblingAbove.childIds[siblingAbove.childIds.length - 1]
 
     dispatch(nodeTransaction(generateEventsForReassignParentNode(dispatch, nodeId, parentId, siblingAbove.id, addAfterLastChildOfSiblingAboveId, appState)))
