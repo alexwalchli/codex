@@ -73,14 +73,14 @@ export class BulletEditContentView extends Component {
       updateContent(id, this.state.content.trim())
     }
   }
-  
+
   onCommandSelected (e, suggestion) {
     const { nodeId, toggleNodeComplete, deleteNode } = this.props
-    
+
     switch (suggestion.action) {
       case 'COMPLETE_NODE':
         toggleNodeComplete(nodeId)
-        break;
+        break
       case 'DELETE_NODE':
         deleteNode(nodeId)
     }
@@ -137,7 +137,7 @@ export class BulletEditContentView extends Component {
           filterText: 'Collapse all',
           insertText: null,
           highlight: false
-        },
+        }
       ],
       '#': [
         {

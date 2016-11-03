@@ -53,10 +53,11 @@ describe('getAllNodeIdsOrdered', () => {
 
 describe('getAllDescendantIds', () => {
   it('should return a flattened, ordered, list of all children node Ids under the root node', () => {
+    const userId = '123'
     const appState = {
       nodes: {
         aaa: { id: 'aaa', childIds: ['bbb', 'ccc'], parentId: null },
-        bbb: { id: 'bbb', childIds: ['ddd'], collapsed: true, parentId: 'aaa' },
+        bbb: { id: 'bbb', childIds: ['ddd'], collapsedBy: { '123': userId }, parentId: 'aaa' },
         ccc: { id: 'ccc', childIds: [], parentId: 'aaa' },
         ddd: { id: 'ddd', childIds: ['eee'], parentId: 'bbb' },
         eee: { id: 'eee', childIds: [], parentId: 'ddd' }
@@ -67,10 +68,11 @@ describe('getAllDescendantIds', () => {
   })
 
   it('should return only the start node id if it is a lowest level descedent', () => {
+    const userId = '123'
     const appState = {
       nodes: {
         aaa: { id: 'aaa', childIds: ['bbb', 'ccc'], parentId: null },
-        bbb: { id: 'bbb', childIds: ['ddd'], collapsed: true, parentId: 'aaa' },
+        bbb: { id: 'bbb', childIds: ['ddd'], collapsedBy: { '123': userId }, parentId: 'aaa' },
         ccc: { id: 'ccc', childIds: [], parentId: 'aaa' },
         ddd: { id: 'ddd', childIds: ['eee'], parentId: 'bbb' },
         eee: { id: 'eee', childIds: [], parentId: 'ddd' }
@@ -82,10 +84,11 @@ describe('getAllDescendantIds', () => {
   })
 
   it('should return only the start node descendents when the start node is not the root', () => {
+    const userId = '123'
     const appState = {
       nodes: {
         aaa: { id: 'aaa', childIds: ['bbb', 'ccc'], parentId: null },
-        bbb: { id: 'bbb', childIds: ['ddd'], collapsed: true, parentId: 'aaa' },
+        bbb: { id: 'bbb', childIds: ['ddd'], collapsedBy: { '123': userId }, parentId: 'aaa' },
         ccc: { id: 'ccc', childIds: [], parentId: 'aaa' },
         ddd: { id: 'ddd', childIds: ['eee'], parentId: 'bbb' },
         eee: { id: 'eee', childIds: [], parentId: 'ddd' }
@@ -94,31 +97,48 @@ describe('getAllDescendantIds', () => {
 
     expect(treeQueries.getAllNodeIdsOrdered(appState.nodes, 'bbb')).to.deep.equal(['bbb', 'ddd', 'eee'])
   })
+
+  it('should not return deleted nodes or their descendants', () => {
+    const userId = '123'
+    const appState = {
+      nodes: {
+        aaa: { id: 'aaa', childIds: ['bbb', 'ccc'], parentId: null },
+        bbb: { id: 'bbb', childIds: ['ddd'], collapsedBy: { '123': userId }, parentId: 'aaa' },
+        ccc: { id: 'ccc', childIds: [], parentId: 'aaa' },
+        ddd: { id: 'ddd', childIds: ['eee'], parentId: 'bbb', deleted: true },
+        eee: { id: 'eee', childIds: [], parentId: 'ddd' }
+      }
+    }
+
+    expect(treeQueries.getAllNodeIdsOrdered(appState.nodes, 'bbb')).to.deep.equal(['bbb'])
+  })
 })
 
 describe('getAllUncollapsedDescedantIds', () => {
   it('should return a flattened, ordered, list of all children node Ids under a start node ' +
      'that are not collapsed under a parent and does not include the start node Id', () => {
+    const userId = '123'
     const appState = {
       nodes: {
-        aaa: { id: 'aaa', childIds: ['bbb', 'ccc'], parentId: null },
-        bbb: { id: 'bbb', childIds: ['ddd'], collapsed: true, parentId: 'aaa' },
-        ccc: { id: 'ccc', childIds: [], parentId: 'aaa' },
-        ddd: { id: 'ddd', childIds: ['eee'], parentId: 'bbb' },
-        eee: { id: 'eee', childIds: [], parentId: 'ddd' }
+        aaa: { id: 'aaa', childIds: ['bbb', 'ccc'], collapsedBy: {}, parentId: null },
+        bbb: { id: 'bbb', childIds: ['ddd'], collapsedBy: { '123': userId }, parentId: 'aaa' },
+        ccc: { id: 'ccc', childIds: [], collapsedBy: {}, parentId: 'aaa' },
+        ddd: { id: 'ddd', childIds: ['eee'], collapsedBy: {}, parentId: 'bbb' },
+        eee: { id: 'eee', childIds: [], collapsedBy: {}, parentId: 'ddd' }
       }
     }
 
-    expect(treeQueries.getAllUncollapsedDescedantIds('aaa', appState.nodes, 'aaa')).to.deep.equal(['bbb', 'ccc'])
+    expect(treeQueries.getAllUncollapsedDescedantIds('aaa', appState.nodes, 'aaa', userId)).to.deep.equal(['bbb', 'ccc'])
   })
 })
 
 describe('getCurrentlySelectedNodeIds', () => {
   it('should return node Ids that are selected', () => {
+    const userId = '123'
     const appState = {
       nodes: {
         aaa: { id: 'aaa', childIds: ['bbb', 'ccc'], parentId: null },
-        bbb: { id: 'bbb', childIds: ['ddd'], collapsed: true, parentId: 'aaa' },
+        bbb: { id: 'bbb', childIds: ['ddd'], collapsedBy: { '123': userId }, parentId: 'aaa' },
         ccc: { id: 'ccc', childIds: [], parentId: 'aaa', selected: false },
         ddd: { id: 'ddd', childIds: ['eee'], parentId: 'bbb', selected: true },
         eee: { id: 'eee', childIds: [], parentId: 'ddd', selected: true }
@@ -133,10 +153,11 @@ describe('getCurrentlySelectedNodeIds', () => {
 
 describe('getCurrentlyFocusedNodeId', () => {
   it('should return the current node that is focused', () => {
+    const userId = '123'
     const appState = {
       nodes: {
         aaa: { id: 'aaa', childIds: ['bbb', 'ccc'], parentId: null },
-        bbb: { id: 'bbb', childIds: ['ddd'], collapsed: true, parentId: 'aaa' },
+        bbb: { id: 'bbb', childIds: ['ddd'], collapsedBy: { '123': userId }, parentId: 'aaa' },
         ccc: { id: 'ccc', childIds: [], parentId: 'aaa', selected: true },
         ddd: { id: 'ddd', childIds: ['eee'], parentId: 'bbb', focused: true },
         eee: { id: 'eee', childIds: [], parentId: 'ddd', focused: false }
@@ -149,10 +170,11 @@ describe('getCurrentlyFocusedNodeId', () => {
   })
 
   it('should return the current node that has its notes focused', () => {
+    const userId = '123'
     const appState = {
       nodes: {
         aaa: { id: 'aaa', childIds: ['bbb', 'ccc'], parentId: null },
-        bbb: { id: 'bbb', childIds: ['ddd'], collapsed: true, parentId: 'aaa' },
+        bbb: { id: 'bbb', childIds: ['ddd'], collapsedBy: { '123': userId }, parentId: 'aaa' },
         ccc: { id: 'ccc', childIds: [], parentId: 'aaa', selected: true, notesFocused: false },
         ddd: { id: 'ddd', childIds: ['eee'], parentId: 'bbb', focused: false },
         eee: { id: 'eee', childIds: [], parentId: 'ddd', notesFocused: true }
@@ -167,7 +189,7 @@ describe('getCurrentlyFocusedNodeId', () => {
 
 describe('getNextNodeThatIsVisible', () => {
   let appState
-
+  const userId = '123'
   beforeEach(() => {
     // aaa
     // --bbb
@@ -183,7 +205,7 @@ describe('getNextNodeThatIsVisible', () => {
         aaa: { id: 'aaa', childIds: ['bbb', 'hhh', 'iii'], parentId: null },
         bbb: { id: 'bbb', childIds: ['ccc', 'ddd', 'fff'], parentId: 'aaa', visible: true },
         ccc: { id: 'ccc', childIds: [], parentId: 'bbb', visible: true },
-        ddd: { id: 'ddd', childIds: ['eee'], parentId: 'bbb', collapsed: true, visible: true },
+        ddd: { id: 'ddd', childIds: ['eee'], parentId: 'bbb', collapsedBy: { '123': userId }, visible: true },
         eee: { id: 'eee', childIds: [], parentId: 'ddd', visible: false },
         fff: { id: 'fff', childIds: ['ggg'], parentId: 'bbb', visible: true },
         ggg: { id: 'ggg', childIds: [], parentId: 'fff', visible: true },

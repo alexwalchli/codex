@@ -193,3 +193,23 @@ export function reassignParentNode (nodeId, oldParentId, newParentId, updatedChi
     }))
   }
 }
+
+export function collapseNode (nodeId, userId) {
+  return dispatch => {
+    dispatch(firebaseRequestQueueActions.enqueueRequest(this, () => {
+      return firebaseDb.ref().update({
+        [`nodes/${nodeId}/collapsedBy/${userId}/`]: true
+      })
+    }))
+  }
+}
+
+export function expandNode (nodeId, userId) {
+  return dispatch => {
+    dispatch(firebaseRequestQueueActions.enqueueRequest(this, () => {
+      return firebaseDb.ref().update({
+        [`nodes/${nodeId}/collapsedBy/${userId}/`]: false
+      })
+    }))
+  }
+}

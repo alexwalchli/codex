@@ -1,6 +1,6 @@
-import { NODE_CREATED, NODE_FOCUSED, NODE_SHOWN, NODE_HIDDEN, NODE_EXPANDED, NODE_COLLAPSED, NODE_NOTES_UPDATED, NODE_DISPLAY_MODE_UPDATED,
+import { NODE_CREATED, NODE_FOCUSED, NODE_EXPANDED, NODE_COLLAPSED, NODE_NOTES_UPDATED, NODE_DISPLAY_MODE_UPDATED,
          CONTENT_UPDATED, CHILD_IDS_UPDATED, NODE_UNFOCUSED, NODES_DELETED, NODE_SELECTED, NODE_DESELECTED, NODE_COMPLETE_TOGGLED, NODES_COMPLETED, REMOVE_CHILD_NODE,
-         NODE_TRANSACTION, NODE_PARENT_UPDATED, NODE_UPDATED, NODES_SEARCHED, NODE_MENU_TOGGLED, CLOSE_ALL_NODE_MENUS_AND_DESELECT_ALL_NODES }
+         NODE_TRANSACTION, NODE_PARENT_UPDATED, NODE_UPDATED, NODE_MENU_TOGGLED, CLOSE_ALL_NODE_MENUS_AND_DESELECT_ALL_NODES }
     from '../actions/node'
 import { INITIAL_NODE_STATE_LOADED } from '../actions/firebase/firebase-subscriptions'
 import { dictionaryToArray } from '../utilities/tree-queries'
@@ -58,21 +58,17 @@ function node (state, action) {
         parentId: action.payload.newParentId,
         lastUpdatedById: action.payload.updatedById
       })
-    case NODE_SHOWN:
-      return Object.assign({}, state, {
-        visible: true
-      })
-    case NODE_HIDDEN:
-      return Object.assign({}, state, {
-        visible: false
-      })
     case NODE_COLLAPSED:
       return Object.assign({}, state, {
-        collapsed: true
+        collapsedBy: Object.assign({}, state.collapsedBy, {
+          [action.payload.userId]: true
+        })
       })
     case NODE_EXPANDED:
       return Object.assign({}, state, {
-        collapsed: false
+        collapsedBy: Object.assign({}, state.collapsedBy, {
+          [action.payload.userId]: false
+        })
       })
     case NODE_MENU_TOGGLED:
       return Object.assign({}, state, {
@@ -105,18 +101,6 @@ export function tree (state = {}, action) {
     return newState
   }
 
-  if (action.type === NODES_SEARCHED) {
-    dictionaryToArray(newState).forEach((n) => {
-      if (action.payload.resultingNodeIds.indexOf(n.id) === -1) {
-        newState[n.id] = node(n, { type: NODE_HIDDEN })
-      } else {
-        newState[n.id] = node(n, { type: NODE_SHOWN })
-      }
-    })
-
-    return newState
-  }
-
   return handleAction(newState, action)
 }
 
@@ -145,13 +129,6 @@ function handleAction (newState, action) {
   if (action.type === NODES_COMPLETED) {
     action.payload.nodeIds.forEach(nodeId => {
       newState[nodeId].completed = true
-    })
-  }
-
-  if (action.type === NODE_COLLAPSED || action.type === NODE_EXPANDED) {
-    let nodeAction = action.type === NODE_COLLAPSED ? NODE_HIDDEN : NODE_SHOWN
-    action.payload.forEach(descendentId => {
-      newState[descendentId] = node(newState[descendentId], { type: nodeAction, descendentId })
     })
   }
 

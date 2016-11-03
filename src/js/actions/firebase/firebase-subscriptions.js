@@ -83,7 +83,8 @@ export function subscribeToNodes () {
           type: INITIAL_NODE_STATE_LOADED,
           payload: {
             rootNodeId: appState.userPages[appState.app.currentUserPageId].rootNodeId,
-            initialTreeState
+            initialTreeState,
+            userId: appState.auth.id
           }
         })
 
@@ -154,6 +155,7 @@ export function subscribeToNode (nodeId) {
 function unwrapNodeSnapshot (nodeSnapshot) {
   let node = nodeSnapshot.val()
   node.childIds = node.childIds || []
+  node.collapsedBy = node.collapsedBy || {}
   return node
 }
 

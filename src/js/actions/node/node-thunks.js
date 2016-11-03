@@ -225,14 +225,17 @@ export const deleteNodes = (nodeIds) => (dispatch, getState) => {
 
 export const toggleNodeExpansion = (nodeId, forceToggleChildrenExpansion) =>
   (dispatch, getState) => {
-    const nodes = getPresentNodes(getState())
+    const appState = getState()
+    const nodes = getPresentNodes(appState)
     const allDescendentIds = forceToggleChildrenExpansion
                               ? getAllDescendantIds(nodes, nodeId)
                               : getAllUncollapsedDescedantIds(nodeId, nodes, nodeId)
-    if (nodes[nodeId].collapsed) {
-      dispatch(nodeActions.nodeExpanded(nodeId, allDescendentIds))
+    if (nodes[nodeId].collapsedBy[appState.auth.id]) {
+      dispatch(firebaseActions.expandNode(nodeId, appState.auth.id))
+      dispatch(nodeActions.nodeExpanded(nodeId, allDescendentIds, appState.auth.id))
     } else {
-      dispatch(nodeActions.nodeCollapsed(nodeId, allDescendentIds))
+      dispatch(firebaseActions.collapseNode(nodeId, appState.auth.id))
+      dispatch(nodeActions.nodeCollapsed(nodeId, allDescendentIds, appState.auth.id))
     }
   }
 

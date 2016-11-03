@@ -32,15 +32,18 @@ export function getAllNodeIdsOrdered (nodes, startNodeId) {
 
 // recursively retrieves, and flattens, all node IDs under the startNodeId
 export function getAllDescendantIds (nodes, startNodeId) {
-  return nodes[startNodeId].childIds.reduce((acc, childId) => (
-    [ ...acc, childId, ...getAllDescendantIds(nodes, childId) ]
-  ), [])
+  return nodes[startNodeId].childIds.reduce((acc, childId) => {
+    if (!nodes[childId].deleted) {
+      return [ ...acc, childId, ...getAllDescendantIds(nodes, childId) ]
+    }
+    return acc
+  }, [])
 }
 
 // recursively retrieves, and flattens, all node Ids excluding children of collapsed nodes, except children of the start node
-export function getAllUncollapsedDescedantIds (rootNodeId, nodes, startNodeId) {
+export function getAllUncollapsedDescedantIds (rootNodeId, nodes, startNodeId, userId) {
   return nodes[startNodeId].childIds.reduce((acc, childId) => {
-    if (rootNodeId !== startNodeId && nodes[nodes[childId].parentId].collapsed) {
+    if (rootNodeId !== startNodeId && !nodes[nodes[childId].parentId].collapsedBy[userId]) {
       return acc
     }
     return [ ...acc, childId, ...getAllUncollapsedDescedantIds(rootNodeId, nodes, childId) ]

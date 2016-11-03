@@ -5,6 +5,7 @@ export default function createNode (id, parentId, childIds, content, createdById
     childIds: childIds || [],
     content: content || '',
     createdById,
-    visible: true
+    visible: true,
+    collapsedBy: {}
   }
 }

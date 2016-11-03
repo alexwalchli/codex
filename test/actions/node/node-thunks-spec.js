@@ -6,26 +6,26 @@ import sinon from 'sinon'
 import { expect } from 'chai'
 
 describe('node-thunks', () => {
+  let getState
+  let dispatch
+  let userId = 111
   const nodes = {
     '1': { id: '1', childIds: ['123', '321'] },
     '123': {
       id: '123',
       parentId: '1',
       childIds: [],
-      collapsed: true,
+      collapsedBy: { '111': true },
       completed: true
     },
     '321': {
       id: '321',
       parentId: '1',
       childIds: [],
-      collapsed: false,
+      collapsedBy: {},
       completed: true
     }
   }
-  let getState
-  let dispatch
-  let userId = 111
 
   beforeEach(() => {
     getState = () => {
@@ -97,6 +97,8 @@ describe('node-thunks', () => {
     const getAllUncollapsedDescedantIdsSpy = sinon.spy(treeQueries, 'getAllUncollapsedDescedantIds')
     const nodeExpandedSpy = sinon.spy(nodeActions, 'nodeExpanded')
     const nodeCollapsedSpy = sinon.spy(nodeActions, 'nodeCollapsed')
+    const collapseNodeSpy = sinon.spy(firebaseActions, 'collapseNode')
+    const expandNodeSpy = sinon.spy(firebaseActions, 'expandNode')
 
     beforeEach(function () {
       getAllDescendantIdsSpy.reset()
@@ -111,22 +113,27 @@ describe('node-thunks', () => {
       expect(getAllDescendantIdsSpy).to.have.been.calledWith(nodes, nodeId)
       expect(getAllDescendantIdsSpy.callCount).to.equal(1)
     })
+
     it('should dispatch get all uncollapsed descendents if forceToggleChildrenExpansion = false', () => {
       nodeThunks.toggleNodeExpansion(nodeId, false)(dispatch, getState)
 
       expect(getAllUncollapsedDescedantIdsSpy).to.have.been.calledWith(nodeId, nodes, nodeId)
       expect(getAllDescendantIdsSpy.callCount).to.equal(0)
     })
-    it('should dispatch nodeExpanded if node is collapsed', () => {
+
+    it('should dispatch nodeExpanded any sync to firebase if node is collapsed', () => {
       nodeThunks.toggleNodeExpansion(nodeId, false)(dispatch, getState)
 
-      expect(nodeExpandedSpy).to.have.been.calledWith(nodeId, [])
+      expect(expandNodeSpy).to.have.been.calledWith(nodeId, userId)
+      expect(nodeExpandedSpy).to.have.been.calledWith(nodeId, [], userId)
       expect(nodeCollapsedSpy.callCount).to.equal(0)
     })
-    it('should dispatch nodeCollapsed if node is expanded', () => {
+
+    it('should dispatch nodeCollapsed and sync to firebase if node is expanded', () => {
       nodeThunks.toggleNodeExpansion('321', true)(dispatch, getState)
 
-      expect(nodeCollapsedSpy).to.have.been.calledWith('321', [])
+      expect(collapseNodeSpy).to.have.been.calledWith('321', userId)
+      expect(nodeCollapsedSpy).to.have.been.calledWith('321', [], userId)
       expect(nodeExpandedSpy.callCount).equal(0)
     })
   })

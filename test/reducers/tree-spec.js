@@ -5,24 +5,24 @@ import nodeFactory from '../../src/js/utilities/node-factory'
 import { expect } from 'chai'
 
 describe('tree reducer', () => {
+  const userId = '09876'
   const treeState = {
     '1': { id: '1', childIds: ['123', '321'] },
     '123': {
       id: '123',
       parentId: '1',
       childIds: [],
-      collapsed: true,
+      collapsedBy: { '09876': true },
       completed: true
     },
     '321': {
       id: '321',
       parentId: '1',
       childIds: [],
-      collapsed: false,
+      collapsedBy: {},
       completed: true
     }
   }
-  const userId = '09876'
 
   describe('INITIAL_NODE_STATE_LOADED', () => {
     it('INITIAL_NODE_STATE_LOADED should assign the payload as the state', () => {
@@ -45,14 +45,14 @@ describe('tree reducer', () => {
           childIds: [],
           focused: true,
           notesFocused: false,
-          collapsed: true,
+          collapsedBy: { '09876': true },
           completed: true
         },
         '321': {
           id: '321',
           parentId: '1',
           childIds: [],
-          collapsed: false,
+          collapsedBy: {},
           completed: true
         }
       })

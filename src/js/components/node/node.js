@@ -106,7 +106,7 @@ export class Node extends Component {
   }
 
   render () {
-    const { parentId, childIds, id, focused, collapsed, visible, selected, completed, notes, positionInOrderedList,
+    const { parentId, childIds, id, focused, collapsedBy, visible, selected, completed, notes, positionInOrderedList,
             nodeInitialized, currentlySelectedBy, currentlySelectedById, auth, menuVisible } = this.props
     const { content } = this.state
 
@@ -129,7 +129,7 @@ export class Node extends Component {
     } else {
       bulletClasses += ' no-children'
     }
-    if (collapsed) {
+    if (collapsedBy[auth.id]) {
       bulletClasses += ' collapsed'
     }
     if (completed) {
@@ -185,9 +185,12 @@ export class Node extends Component {
 
           </div>
         : null }
-        <div className='children'>
-          { childIds.map(this.renderChild.bind(this)) }
-        </div>
+
+        { !collapsedBy[auth.id]
+          ? <div className='children'>
+            { childIds.map(this.renderChild.bind(this)) }
+          </div>
+          : null }
       </div>
     )
   }
@@ -204,7 +207,7 @@ const mapStateToProps = (state, ownProps) => {
     positionInOrderedList = parentNode.childIds.indexOf(ownProps.id) + 1
   }
 
-  return Object.assign({ nodeInitialized: !!nodeFromState, auth: state.auth, positionInOrderedList, ...ownProps }, nodeFromState)
+  return Object.assign({ nodeInitialized: !!nodeFromState, auth: state.auth, positionInOrderedList, ...ownProps, visible: state.nodeVisibility.present[ownProps.id] }, nodeFromState)
 }
 
 const ConnectedNode = connect(mapStateToProps, actions)(Node)

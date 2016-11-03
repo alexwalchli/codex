@@ -5,8 +5,6 @@ export const CHILD_IDS_UPDATED = 'CHILD_IDS_UPDATED' // fired when a node's chil
 export const NODE_PARENT_UPDATED = 'NODE_PARENT_UPDATED' // a node's parent ID is updated
 export const NODES_DELETED = 'NODES_DELETED'
 export const NODE_EXPANSION_TOGGLED = 'NODE_EXPANSION_TOGGLED'
-export const NODE_SHOWN = 'NODE_SHOWN'
-export const NODE_HIDDEN = 'NODE_HIDDEN'
 export const NODE_COLLAPSED = 'NODE_COLLAPSED'
 export const NODE_EXPANDED = 'NODE_EXPANDED'
 export const NODE_FOCUSED = 'NODE_FOCUSED'
@@ -72,19 +70,25 @@ export const nodesDeleted = (nodeIds) => {
   }
 }
 
-export const nodeExpanded = (nodeId, allDescendentIds) => {
+export const nodeExpanded = (nodeId, allDescendentIds, userId) => {
   return {
     type: NODE_EXPANDED,
     nodeId,
-    payload: allDescendentIds
+    payload: {
+      allDescendentIds,
+      userId
+    }
   }
 }
 
-export const nodeCollapsed = (nodeId, allDescendentIds) => {
+export const nodeCollapsed = (nodeId, allDescendentIds, userId) => {
   return {
     type: NODE_COLLAPSED,
     nodeId,
-    payload: allDescendentIds
+    payload: {
+      allDescendentIds,
+      userId
+    }
   }
 }
 

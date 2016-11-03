@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import SuggestionBox from './suggestion-box'
-import Textarea from 'react-textarea-autosize';
+import Textarea from 'react-textarea-autosize'
 
 export default class IntellisenseInput extends Component {
 
@@ -22,7 +22,7 @@ export default class IntellisenseInput extends Component {
   }
 
   componentWillUpdate (nextProps) {
-   
+
   }
 
   componentDidUpdate (nextProps) {
@@ -33,7 +33,7 @@ export default class IntellisenseInput extends Component {
 
   onTextInputChange (e) {
     const newValue = this.refs.textInput.value
-    this.setState({ currentInputValue: newValue }) 
+    this.setState({ currentInputValue: newValue })
 
     if (this.props.onChange) {
       return this.props.onChange(e, newValue)
@@ -62,13 +62,13 @@ export default class IntellisenseInput extends Component {
         }
       } else if (this.state.suggestionBoxVisible) {
         const newQuery = this.state.currentQuery + e.key
-        this.setState({ currentSuggestions: this.querySuggestions(newQuery), currentQuery: newQuery})
+        this.setState({ currentSuggestions: this.querySuggestions(newQuery), currentQuery: newQuery })
         return
       }
 
-      this.setState({ 
+      this.setState({
         suggestionBoxVisible: false,
-        currentSuggestions: [], 
+        currentSuggestions: [],
         currentQuery: null
       })
 
@@ -93,12 +93,11 @@ export default class IntellisenseInput extends Component {
   // rendering
 
   renderSuggestionBox () {
-    const { data } = this.props
     const { currentSuggestions, selectedSuggestionIndex } = this.state
 
     if (this.state.suggestionBoxVisible) {
       return (
-        <SuggestionBox 
+        <SuggestionBox
           suggestions={currentSuggestions}
           onSuggestionSelected={(e, suggestion) => this.onSuggestionSelected(e, suggestion)}
           selectedSuggestionIndex={selectedSuggestionIndex} />
@@ -153,7 +152,7 @@ export default class IntellisenseInput extends Component {
   executeSuggestionSelection (e) {
     e.stopPropagation()
     e.preventDefault()
-    const { data, onCommandSelected } = this.props
+    const { onCommandSelected } = this.props
     const { currentSuggestions, currentQuery, selectedSuggestionIndex, currentInputValue } = this.state
     const selectedSuggestion = currentSuggestions[selectedSuggestionIndex]
 
@@ -161,11 +160,11 @@ export default class IntellisenseInput extends Component {
 
     if (selectedSuggestion.type === 'COMMAND') {
       onCommandSelected && onCommandSelected(e, selectedSuggestion)
-      this.setState({ 
-        suggestionBoxVisible: false, 
-        currentSuggestions: [], 
-        currentQuery: null, 
-        currentInputValue: currentInputValue.replace(currentQuery, '') 
+      this.setState({
+        suggestionBoxVisible: false,
+        currentSuggestions: [],
+        currentQuery: null,
+        currentInputValue: currentInputValue.replace(currentQuery, '')
       })
     }
   }

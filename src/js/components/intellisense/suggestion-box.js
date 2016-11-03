@@ -10,7 +10,7 @@ export default class SuggestionBox extends Component {
       <Suggestion
         id={suggestion.id}
         label={suggestion.label}
-        selected={idx === selectedSuggestionIndex} />        
+        selected={idx === selectedSuggestionIndex} />
     )
   }
 
