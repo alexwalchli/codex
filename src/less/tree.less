@@ -167,6 +167,43 @@
     position: absolute;
     height:60px;
     width:22px;
+
+    .pulse {
+        animation: pulse 3s ease-out;
+        animation-iteration-count: infinite;
+        width: 40px;
+        height: 40px;
+        border: 5px solid @base-color;
+        border-radius: 30px;
+        background-color: transparent;
+        z-index: 10;
+        position: absolute;
+        top: 6px;
+        left: -13px;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(0);
+            opacity: 0.0;
+        }
+        25% {
+            transform: scale(0);
+            opacity: 0.1;
+        }
+        50% {
+            transform: scale(0.1);
+            opacity: 0.3;
+        }
+        75% {
+            transform: scale(0.5);
+            opacity: 0.5;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 0.0;
+        }
+    }
 }
 
 .children .item.has-children .bullet-container {
