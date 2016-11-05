@@ -1,5 +1,30 @@
 .intellisense-container {
 
+  .highlighter {
+    line-height:inherit;
+    font-size:inherit;
+    display:block;
+    background-color: transparent;
+    font-family: inherit;
+    span:not(.caret) {
+      visibility: hidden;
+    }
+
+  }
+
+  textarea {
+    width: 100%;
+    resize: none;
+    border: 0 none;
+    padding:0;
+    outline: none;
+    font-size:inherit;
+    line-height:inherit;
+    background: transparent;
+    position: absolute;
+    font-family: inherit;
+  }
+
   .intellisense-suggestion-box {
     z-index:3;
     background-color:@base-color;

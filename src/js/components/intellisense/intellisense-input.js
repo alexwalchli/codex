@@ -1,8 +1,11 @@
 import React, { Component } from 'react'
 import SuggestionBox from './suggestion-box'
 import Textarea from 'react-textarea-autosize'
+import * as actions from '../../actions'
+import { connect } from 'react-redux'
+import Highlighter from './Highlighter'
 
-export default class IntellisenseInput extends Component {
+export class IntellisenseInput extends Component {
 
   constructor (props) {
     super(props)
@@ -45,14 +48,20 @@ export default class IntellisenseInput extends Component {
       if (this.state.suggestionBoxVisible) {
         this.setState({ suggestionBoxVisible: false, currentSuggestions: [] })
       } else {
-        this.setState({ suggestionBoxVisible: true, currentSuggestions: this.querySuggestions(e.key), currentQuery: e.key })
+        this.setState({
+          suggestionBoxVisible: true,
+          currentSuggestions: this.querySuggestions(e.key),
+          currentQuery: e.key,
+          selectedSuggestionIndex: 0 })
       }
     } else {
       if (e.key === 'ArrowDown' && this.state.suggestionBoxVisible) {
         return this.shiftSelectedSuggestion(e, true)
       } else if (e.key === 'ArrowUp' && this.state.suggestionBoxVisible) {
         return this.shiftSelectedSuggestion(e, false)
-      } else if ((e.key === 'Enter' || e.key === 'Tab' || e.key === 'Space') && this.state.suggestionBoxVisible) {
+      } else if ((e.key === 'Enter' || e.key === 'Tab' || e.key === ' ') && (this.state.suggestionBoxVisible)) {
+        return this.executeSuggestionSelection(e)
+      } else if (e.key === ' ' && this.state.currentQuery && this.state.currentQuery.startsWith('#')) {
         return this.executeSuggestionSelection(e)
       } else if (e.key === 'Backspace' && this.state.suggestionBoxVisible) {
         const newQuery = this.state.currentQuery.slice(0, -1)
@@ -84,6 +93,13 @@ export default class IntellisenseInput extends Component {
     }
   }
 
+  onTextInputSelect (e) {
+    this.setState({
+      selectionStart: e.target.selectionStart,
+      selectionEnd: e.target.selectionEnd
+    })
+  }
+
   onSuggestionSelected (e, suggestion) {
     if (this.props.onSuggestionSelected) {
       return this.props.onSuggestionSelected(e, suggestion)
@@ -98,6 +114,7 @@ export default class IntellisenseInput extends Component {
     if (this.state.suggestionBoxVisible) {
       return (
         <SuggestionBox
+          ref='suggestionBox'
           suggestions={currentSuggestions}
           onSuggestionSelected={(e, suggestion) => this.onSuggestionSelected(e, suggestion)}
           selectedSuggestionIndex={selectedSuggestionIndex} />
@@ -117,8 +134,10 @@ export default class IntellisenseInput extends Component {
           value={currentInputValue}
           onChange={(e) => this.onTextInputChange(e)}
           onKeyDown={(e) => this.onTextInputKeyDown(e)}
-          onBlur={(e) => this.onTextInputBlur(e)} />
+          onBlur={(e) => this.onTextInputBlur(e)}
+          onSelect={(e) => this.onTextInputSelect(e)} />
         {this.renderSuggestionBox()}
+        <Highlighter value={currentInputValue} />
       </div>
     )
   }
@@ -150,22 +169,50 @@ export default class IntellisenseInput extends Component {
   }
 
   executeSuggestionSelection (e) {
-    e.stopPropagation()
-    e.preventDefault()
-    const { onCommandSelected } = this.props
+    const { onCommandSelected, createTag } = this.props
     const { currentSuggestions, currentQuery, selectedSuggestionIndex, currentInputValue } = this.state
     const selectedSuggestion = currentSuggestions[selectedSuggestionIndex]
 
     this.setState({ suggestionBoxVisible: false })
 
+    if (currentQuery.startsWith('#') && !selectedSuggestion) {
+      const tagLabel = currentQuery.substring(1, currentQuery.length)
+      createTag(tagLabel.toLowerCase(), tagLabel)
+      return
+    }
+
+    e.stopPropagation()
+    e.preventDefault()
+
     if (selectedSuggestion.type === 'COMMAND') {
-      onCommandSelected && onCommandSelected(e, selectedSuggestion)
       this.setState({
-        suggestionBoxVisible: false,
-        currentSuggestions: [],
-        currentQuery: null,
         currentInputValue: currentInputValue.replace(currentQuery, '')
       })
+      onCommandSelected && onCommandSelected(e, selectedSuggestion)
+    } else if (selectedSuggestion.type === 'TAG') {
+      const caretPosition = this.getCurrentCaretPosition()
+      const newInputValue = currentInputValue.substr(0, caretPosition.selectionStart - currentQuery.length) +
+        '#' + selectedSuggestion.label +
+        currentInputValue.substr(caretPosition.selectionStart + ('#' + selectedSuggestion.label).length)
+
+      this.setState({
+        currentInputValue: newInputValue
+      })
+    }
+
+    this.setState({
+      suggestionBoxVisible: false,
+      currentSuggestions: [],
+      currentQuery: null
+    })
+  }
+
+  getCurrentCaretPosition () {
+    const { selectionStart, selectionEnd } = this.refs.textInput
+
+    return {
+      selectionStart,
+      selectionEnd
     }
   }
 
@@ -182,3 +229,74 @@ export default class IntellisenseInput extends Component {
   }
 
 }
+
+// react redux
+
+function mapStateToProps (state, ownProps) {
+  let tags = state.tags.map(t => ({
+    type: 'TAG',
+    label: t.label,
+    trigger: '#',
+    filterText: t.id,
+    insertText: null,
+    highlight: false
+  }))
+
+  let intellisenseData = {
+    '#': tags,
+    '/': [
+      {
+        type: 'COMMAND',
+        action: 'COMPLETE_NODE',
+        label: 'Complete',
+        trigger: '/',
+        filterText: 'Complete',
+        insertText: null,
+        highlight: false
+      },
+      {
+        type: 'COMMAND',
+        action: 'COMPLETE_ALL_NODES',
+        label: 'Complete all under',
+        trigger: '/',
+        filterText: 'Complete all',
+        insertText: null,
+        highlight: false
+      },
+      {
+        type: 'COMMAND',
+        action: 'DELETE_NODE',
+        label: 'Delete',
+        trigger: '/',
+        filterText: 'Delete',
+        insertText: null,
+        highlight: false
+      },
+      {
+        type: 'COMMAND',
+        action: 'COLLAPSE',
+        label: 'Collapse',
+        trigger: '/',
+        filterText: 'Collapse',
+        insertText: null,
+        highlight: false
+      },
+      {
+        type: 'COMMAND',
+        action: 'COLLAPSE_ALL',
+        label: 'Collapse all under',
+        trigger: '/',
+        filterText: 'Collapse all',
+        insertText: null,
+        highlight: false
+      }
+    ]
+  }
+  return {
+    data: intellisenseData,
+    ...ownProps
+  }
+}
+
+const ConnectedIntellisenseInput = connect(mapStateToProps, actions)(IntellisenseInput)
+export default ConnectedIntellisenseInput

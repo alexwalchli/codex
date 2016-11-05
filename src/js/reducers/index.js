@@ -7,6 +7,7 @@ import { visibleNodes } from './node-visibility'
 import { auth } from './auth'
 import { userPages } from './user-page'
 import { queuedRequests } from './firebase-request-queue'
+import { tags } from './tags'
 import undoable from 'redux-undo'
 
 const undoableActionFilter = action => action.undoable !== false
@@ -26,7 +27,8 @@ const rootReducer = combineReducers({
   visibleNodes: undoableVisibleNodes,
   search,
   userPages,
-  queuedRequests
+  queuedRequests,
+  tags
 })
 
 export default rootReducer

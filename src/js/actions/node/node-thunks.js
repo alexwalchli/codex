@@ -370,3 +370,16 @@ export const updateNodeDisplayMode = (nodeId, mode) =>
     dispatch(nodeActions.nodeDisplayModeUpdated(nodeId, mode))
     dispatch(firebaseActions.updateNodeDisplayMode(nodeId, mode, appState.auth.id))
   }
+
+export const addTagToNode = (nodeId, tagId) =>
+  (dispatch, getState) => {
+    const appState = getState()
+    const node = getPresentNodes(appState)[nodeId]
+
+    if (node.tags.indexOf(tagId) === -1) {
+      const updatedTags = Object.assign([], node.tags)
+      updatedTags.push(tagId)
+      dispatch(nodeActions.nodeTagsUpdated(nodeId, updatedTags))
+      // TODO: dispatch(firebaseActions.updateNodeTags(nodeId, tags)
+    }
+  }

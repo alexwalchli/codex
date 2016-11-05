@@ -89,95 +89,18 @@ export class BulletEditContentView extends Component {
   // rendering
 
   render () {
-    const { focused } = this.props
+    const { focused, nodeId } = this.props
     const { content } = this.state
-    var intellisenseData = {
-      '/': [
-        {
-          type: 'COMMAND',
-          action: 'COMPLETE_NODE',
-          label: 'Complete',
-          trigger: '/',
-          filterText: 'Complete',
-          insertText: null,
-          highlight: false
-        },
-        {
-          type: 'COMMAND',
-          action: 'COMPLETE_ALL_NODES',
-          label: 'Complete all under',
-          trigger: '/',
-          filterText: 'Complete all',
-          insertText: null,
-          highlight: false
-        },
-        {
-          type: 'COMMAND',
-          action: 'DELETE_NODE',
-          label: 'Delete',
-          trigger: '/',
-          filterText: 'Delete',
-          insertText: null,
-          highlight: false
-        },
-        {
-          type: 'COMMAND',
-          action: 'COLLAPSE',
-          label: 'Collapse',
-          trigger: '/',
-          filterText: 'Collapse',
-          insertText: null,
-          highlight: false
-        },
-        {
-          type: 'COMMAND',
-          action: 'COLLAPSE_ALL',
-          label: 'Collapse all under',
-          trigger: '/',
-          filterText: 'Collapse all',
-          insertText: null,
-          highlight: false
-        }
-      ],
-      '#': [
-        {
-          type: 'TAG',
-          label: 'inprogress',
-          trigger: '#',
-          filterText: 'inprogress',
-          insertText: null,
-          highlight: false
-        }
-      ]
-    }
 
     return (
       <IntellisenseInput
-        data={intellisenseData}
+        nodeId={nodeId}
         value={content}
         focused={focused}
         onBlur={(e) => this.onBlur(e)}
         onKeyDown={(e) => this.onKeyDown(e)}
         onChange={(e, value) => this.onChange(e, value)}
         onCommandSelected={(e, value) => this.onCommandSelected(e, value)} />
-      // <MentionsInput
-      //   markup={'{{{__display__}}}'}
-      //   singleLine
-      //   value={content}
-      //   onChange={(e, value) => this.onChange(e, value)}
-      //   style={defaultStyle({ singleLine: true })}
-      //   placeholder={''}
-      //   focused={focused}
-      //   onBlur={(e) => this.onBlur(e)}
-      //   onKeyDown={(e) => this.onKeyDown(e)} >
-
-      //   <Mention
-      //     trigger='#'
-      //     onAdd={(e) => this.onAddTag(e)}
-      //     onRemove={(e) => this.onRemoveTag(e)}
-      //     data={suggestions}
-      //     style={defaultMentionStyle} />
-      // </MentionsInput>
     )
   }
 }

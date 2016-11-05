@@ -20,9 +20,9 @@ export class BulletIcon extends Component {
           : null }
         { positionInOrderedList
           ? <div className='ordered-bullet'>
-              <div className='outer-circle' />
-              <div className='number'>{positionInOrderedList}.</div>
-            </div>
+            <div className='outer-circle' />
+            <div className='number'>{positionInOrderedList}.</div>
+          </div>
           : <div className='unordered-bullet'><div className='outer-circle' /><div className='inner-circle' /></div> }
       </div>
     )
