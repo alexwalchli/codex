@@ -22,6 +22,7 @@ export const NODE_NOTES_UPDATED = `NODE_NOTES_UPDATED`
 export const NODE_DISPLAY_MODE_UPDATED = `NODE_DISPLAY_MODE_UPDATED`
 export const NODE_MENU_TOGGLED = `TOGGLE_NODE_MENU`
 export const REMOVE_CHILD_NODE = `REMOVE_CHILD_NODE`
+export const NODE_TAGS_UPDATED = `NODE_TAGS_UPDATED`
 
 export const nodeCreated = (newNode) => {
   return {
@@ -223,6 +224,16 @@ export const removeChildNode = (nodeId, childId) => {
     nodeId,
     payload: {
       childId
+    }
+  }
+}
+
+export const nodeTagsUpdated = (nodeId, updatedTagIds) => {
+  return {
+    type: NODE_TAGS_UPDATED,
+    nodeId,
+    payload: {
+      updatedTagIds
     }
   }
 }

@@ -8,9 +8,8 @@ describe('tags action', () => {
   let getState
   let dispatch
   let userId = 111
-  sinon.stub(nodeActions, 'addTagToNode', () => ({
-    addTagToNode: true
-  }))
+  const addTagToNodeActionCreatorStub = {}
+  sinon.stub(nodeActions, 'addTagToNode', () => (addTagToNodeActionCreatorStub))
 
   beforeEach(() => {
     getState = () => {
@@ -33,28 +32,27 @@ describe('tags action', () => {
 
   describe('createTag', () => {
     it('should not create a duplicate tag', () => {
-      tagActions.createTag('todo', 'ToDo', '123')(dispatch, getState)
+      tagActions.createTag('#', 'todo', 'ToDo', '123')(dispatch, getState)
       expect(dispatch).to.not.have.been.called
     })
 
     it('should dispatch a tagCreated and a addTagToNode', () => {
-      tagActions.createTag('newtag', 'New Tag', '123')(dispatch, getState)
+      tagActions.createTag('#', 'newtag', 'New Tag', '123')(dispatch, getState)
 
-      expect(dispatch).to.have.been.calledWith(tagActions.tagCreated('newtag', 'New Tag'))
-      expect(dispatch).to.have.been.calledWith({
-        addTagToNode: true
-      })
+      expect(dispatch).to.have.been.calledWith(tagActions.tagCreated('#', 'newtag', 'New Tag'))
+      expect(dispatch).to.have.been.calledWith(addTagToNodeActionCreatorStub)
     })
   })
 
   describe('tagCreated', () => {
     it('should create a proper tag created action', () => {
-      const tagCreatedAction = tagActions.tagCreated('newtag', 'New Tag')
+      const tagCreatedAction = tagActions.tagCreated('#', 'newtag', 'New Tag')
 
       expect(tagCreatedAction).to.deep.equal({
         type: tagActions.TAG_CREATED,
         payload: {
           tag: {
+            type: '#',
             id: 'newtag',
             label: 'New Tag'
           }

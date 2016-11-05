@@ -1,6 +1,6 @@
 import { NODE_CREATED, NODE_FOCUSED, NODE_EXPANDED, NODE_COLLAPSED, NODE_NOTES_UPDATED, NODE_DISPLAY_MODE_UPDATED,
          CONTENT_UPDATED, CHILD_IDS_UPDATED, NODE_UNFOCUSED, NODES_DELETED, NODE_SELECTED, NODE_DESELECTED, NODE_COMPLETE_TOGGLED, NODES_COMPLETED, REMOVE_CHILD_NODE,
-         NODE_TRANSACTION, NODE_PARENT_UPDATED, NODE_UPDATED, NODE_MENU_TOGGLED, CLOSE_ALL_NODE_MENUS_AND_DESELECT_ALL_NODES }
+         NODE_TRANSACTION, NODE_PARENT_UPDATED, NODE_UPDATED, NODE_MENU_TOGGLED, CLOSE_ALL_NODE_MENUS_AND_DESELECT_ALL_NODES, NODE_TAGS_UPDATED }
     from '../actions/node'
 import { INITIAL_NODE_STATE_LOADED } from '../actions/firebase/firebase-subscriptions'
 import { dictionaryToArray } from '../utilities/tree-queries'
@@ -85,6 +85,10 @@ function node (state, action) {
     case NODE_DISPLAY_MODE_UPDATED:
       return Object.assign({}, state, {
         displayMode: action.payload.mode
+      })
+    case NODE_TAGS_UPDATED:
+      return Object.assign({}, state, {
+        taggedByIds: action.payload.updatedTagIds
       })
     default:
       return state

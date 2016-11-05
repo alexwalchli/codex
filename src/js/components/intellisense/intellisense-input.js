@@ -177,7 +177,7 @@ export class IntellisenseInput extends Component {
 
     if (currentQuery.startsWith('#') && !selectedSuggestion) {
       const tagLabel = currentQuery.substring(1, currentQuery.length)
-      createTag(tagLabel.toLowerCase(), tagLabel)
+      createTag('#', tagLabel.toLowerCase(), tagLabel)
       return
     }
 

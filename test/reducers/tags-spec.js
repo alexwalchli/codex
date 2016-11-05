@@ -6,14 +6,17 @@ import { expect } from 'chai'
 describe('tags reducer', () => {
   const initialTagsState = [
     {
+      type: '#',
       id: 'inprogress',
       label: 'InProgress'
     },
     {
+      type: '#',
       id: 'todo',
       label: 'ToDo'
     },
     {
+      type: '#',
       id: 'learning',
       label: 'Learning'
     }
@@ -38,22 +41,26 @@ describe('tags reducer', () => {
   describe('TAG_CREATED', () => {
     it('should add the tag to state', () => {
       const initialState = tagsReducer.tags({}, initialNodeStateLoaded)
-      const newState = tagsReducer.tags(initialState, tagActions.tagCreated('reading', 'reading'))
+      const newState = tagsReducer.tags(initialState, tagActions.tagCreated('#', 'reading', 'reading'))
 
       expect(newState).to.deep.equal([
         {
+          type: '#',
           id: 'inprogress',
           label: 'InProgress'
         },
         {
+          type: '#',
           id: 'todo',
           label: 'ToDo'
         },
         {
+          type: '#',
           id: 'learning',
           label: 'Learning'
         },
         {
+          type: '#',
           id: 'reading',
           label: 'reading'
         }

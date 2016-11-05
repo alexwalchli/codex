@@ -91,4 +91,16 @@ describe('tree reducer', () => {
       expect(newTreeState['321'].selected).to.equal(false)
     })
   })
+
+  describe('NODE_TAGS_UPDATED', () => {
+    it('NODE_TAGS_UPDATED should set the nodes tags', () => {
+      const nodeId = '123'
+      const tagIds = [ 'inprogress', 'learning' ]
+      const action = nodeActions.nodeTagsUpdated(nodeId, tagIds)
+
+      const newTreeState = treeReducer.tree(treeState, action)
+
+      expect(newTreeState['123'].taggedByIds).to.deep.equal(tagIds)
+    })
+  })
 })
