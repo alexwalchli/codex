@@ -23,6 +23,7 @@ describe('node action creators', () => {
       parentId: '1',
       childIds: [],
       collapsedBy: { '111': true },
+      focused: true,
       completed: true
     },
     '321': {
@@ -63,11 +64,16 @@ describe('node action creators', () => {
     dispatch = sinon.spy()
     firebaseCreateNodeStub = sinon.stub(nodeFirebaseActions, 'createNode', () => (firebaseCreateNodeResultStub))
     nodeFirebaseActionsGetNewNodeIdStub = sinon.stub(nodeFirebaseActions, 'getNewNodeId', () => (nodeFirebaseActionsGetNewNodeIdStubResult))
+
+    sinon.spy(nodeActions, 'nodeFocused')
+    sinon.spy(nodeActions, 'nodeUnfocused')
   })
 
   afterEach(() => {
     firebaseCreateNodeStub.restore()
     nodeFirebaseActionsGetNewNodeIdStub.restore()
+    nodeActions.nodeFocused.restore()
+    nodeActions.nodeUnfocused.restore()
   })
 
   describe('createNode', () => {
@@ -75,32 +81,70 @@ describe('node action creators', () => {
       const originNodeId = '123'
       const originOffset = 1
       const newNodeContent = 'some content'
+      // const expectedUpdatedParentChildIds = ['123', nodeFirebaseActionsGetNewNodeIdStubResult, '321']
+      // const expectedNewNode = nodeFactory(nodeFirebaseActionsGetNewNodeIdStubResult, '1', [], newNodeContent, userId)
+
+      nodeActionCreators.createNode(originNodeId, originOffset, newNodeContent)(dispatch, getState)
+
+      // TODO: assert optimistic actions
+
+      expect(dispatch.callCount).to.equal(2)
+    })
+    it('should create the node as a child if the origin node is has children', () => {
+      const originNodeId = '456'
+      const originOffset = 1
+      const newNodeContent = 'some content'
+      const expectedUpdatedParentChildIds = [nodeFirebaseActionsGetNewNodeIdStubResult, '789']
+      const expectedNewNode = nodeFactory(nodeFirebaseActionsGetNewNodeIdStubResult, originNodeId, [], newNodeContent, userId)
+
+      nodeActionCreators.createNode(originNodeId, originOffset, newNodeContent)(dispatch, getState)
+
+      expect(firebaseCreateNodeStub).to.have.been.calledWith(expectedNewNode, currentUserPageId, expectedUpdatedParentChildIds)
+    })
+    it('should create the node as a sibling if the currently selected node is not a parent', () => {
+      const originNodeId = '123'
+      const originOffset = 1
+      const newNodeContent = 'some content'
       const expectedUpdatedParentChildIds = ['123', nodeFirebaseActionsGetNewNodeIdStubResult, '321']
       const expectedNewNode = nodeFactory(nodeFirebaseActionsGetNewNodeIdStubResult, '1', [], newNodeContent, userId)
 
       nodeActionCreators.createNode(originNodeId, originOffset, newNodeContent)(dispatch, getState)
+
       expect(firebaseCreateNodeStub).to.have.been.calledWith(expectedNewNode, currentUserPageId, expectedUpdatedParentChildIds)
       expect(dispatch).to.have.been.calledWith(firebaseCreateNodeResultStub)
-      expect(dispatch.callCount).to.equal(2)
     })
-    // it('should create the node as a child if the currently selected node is a parent', () => {
+    it('should create the node as a sibling if the currently selected node is collapsed', () => {
+      const originNodeId = '123'
+      const originOffset = 1
+      const newNodeContent = 'some content'
+      const expectedUpdatedParentChildIds = ['123', nodeFirebaseActionsGetNewNodeIdStubResult, '321']
+      const expectedNewNode = nodeFactory(nodeFirebaseActionsGetNewNodeIdStubResult, '1', [], newNodeContent, userId)
 
-    // })
-    // it('should create the node as a sibling if the currently selected node is not a parent', () => {
+      nodeActionCreators.createNode(originNodeId, originOffset, newNodeContent)(dispatch, getState)
 
-    // })
-    // it('should create the node as a sibling if the currently selected node is collapsed', () => {
+      expect(firebaseCreateNodeStub).to.have.been.calledWith(expectedNewNode, currentUserPageId, expectedUpdatedParentChildIds)
+      expect(dispatch).to.have.been.calledWith(firebaseCreateNodeResultStub)
+    })
+    it('should focus the new node if the originOffset is greater than 0', () => {
+      const originNodeId = '123'
+      const originOffset = 1
+      const newNodeContent = 'some content'
 
-    // })
-    // it('should focus the new node if the createdFromSiblingOffset is greater than 0', () => {
+      nodeActionCreators.createNode(originNodeId, originOffset, newNodeContent)(dispatch, getState)
 
-    // })
-    // it('should not focus the new node if the createdFromSiblingOffset is equal to or less than 0', () => {
+      expect(nodeActions.nodeUnfocused).to.have.been.calledWith(originNodeId)
+      expect(nodeActions.nodeFocused).to.have.been.calledWith(nodeFirebaseActionsGetNewNodeIdStubResult)
+    })
+    it('should not focus the new node if the originOffset is equal to or less than 0', () => {
+      const originNodeId = '123'
+      const originOffset = 1
+      const newNodeContent = 'some content'
 
-    // })
-    // it('should not focus the new node if the createdFromSiblingOffset is equal to or less than 0', () => {
+      nodeActionCreators.createNode(originNodeId, originOffset, newNodeContent)(dispatch, getState)
 
-    // })
+      expect(nodeActions.nodeUnfocused).to.not.have.been.called
+      expect(nodeActions.nodeFocused).to.not.have.been.called
+    })
   })
 
   describe('updateContent', () => {
