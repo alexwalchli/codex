@@ -19,7 +19,8 @@
     "globals": [
       "describe",
       "it",
-      "beforeEach"
+      "beforeEach",
+      "afterEach"
     ]
   },
   "homepage": "http://codex.com",

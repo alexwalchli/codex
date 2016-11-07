@@ -7,6 +7,10 @@ function unwrapNodeSnapshot (nodeSnapshot) {
   return node
 }
 
+export function getNewNodeId () {
+  return firebaseDb.ref('nodes').push().key
+}
+
 export function getNodeSnapshot (nodeId) {
   return firebaseDb.ref(`nodes/${nodeId}`).once('value').then(snapshot => {
     return unwrapNodeSnapshot(snapshot)

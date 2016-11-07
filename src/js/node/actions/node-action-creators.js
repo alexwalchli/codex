@@ -1,5 +1,4 @@
 import { ActionCreators } from 'redux-undo'
-import { firebaseDb } from '../../firebase/'
 import nodeFactory from '../helpers/node-factory'
 import * as nodeActions from './node-actions'
 import * as nodeSelectors from '../selectors/node-selectors'
@@ -48,14 +47,14 @@ export const generateEventsForReassignParentNode = (dispatch, nodeId, oldParentI
   return optimisticEvents
 }
 
-// optimistically creates a node in client state then pushes to persistence
+// optimistically creates a node in client state and pushes to persistence
 export const createNode = (originNodeId, originOffset, content) =>
   (dispatch, getState) => {
     const appState = getState()
     const nodes = nodeSelectors.getPresentNodes(appState)
     const originNode = nodes[originNodeId]
     const parentOfNewNode = nodes[originNode.childIds.length === 0 || originNode.collapsed ? originNode.parentId : originNodeId]
-    const newNodeId = firebaseDb.ref('nodes').push().key
+    const newNodeId = nodeFirebaseActions.getNewNodeId()
     let optimisticEvents = []
     // if the node was created from a node with children AND it is not collapsed, add the node to it, else add the node to created from node's parent
     let newNode = nodeFactory(newNodeId, parentOfNewNode.id, [], content, getState().auth.id)
@@ -73,8 +72,8 @@ export const createNode = (originNodeId, originOffset, content) =>
       optimisticEvents.push(nodeActions.nodeFocused(newNodeId))
     }
 
-    dispatch(nodeActions.nodeTransaction(optimisticEvents))
     dispatch(nodeFirebaseActions.createNode(newNode, appState.app.currentUserPageId, updatedParentChildIds))
+    dispatch(nodeActions.nodeTransaction(optimisticEvents))
   }
 
 export const updateContent = (nodeId, newContent) =>

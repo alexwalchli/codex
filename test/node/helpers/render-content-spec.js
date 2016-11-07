@@ -1,4 +1,4 @@
-import * as renderContent from '../../../src/js/node/helpers/render-content'
+import renderContent from '../../../src/js/node/helpers/render-content'
 import { expect } from 'chai'
 
 describe('content-rendering', () => {

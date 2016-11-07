@@ -2,7 +2,7 @@ import * as markdown from 'markdown-it'
 const md = markdown.default()
             .set({ linkify: true })
 
-export const renderContent = (content) => {
+const renderContent = (content) => {
   let renderedContent
   if (!content || !content.trim()) {
     renderedContent = ''

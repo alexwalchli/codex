@@ -3,13 +3,19 @@ import * as nodeActions from '../../../src/js/node/actions/node-actions'
 import * as nodeActionCreators from '../../../src/js/node/actions/node-action-creators'
 import * as nodeActionTypes from '../../../src/js/node/actions/node-action-types'
 import * as nodeSelectors from '../../../src/js/node/selectors/node-selectors'
+import nodeFactory from '../../../src/js/node/helpers/node-factory'
 import sinon from 'sinon'
 import { expect } from 'chai'
 
 describe('node action creators', () => {
   let getState
   let dispatch
-  let userId = 111
+  let firebaseCreateNodeResultStub = { firebaseCreateNode: true }
+  let firebaseCreateNodeStub
+  let nodeFirebaseActionsGetNewNodeIdStub
+  let nodeFirebaseActionsGetNewNodeIdStubResult = '1111111'
+  const userId = 111
+  const currentUserPageId = 54321
   const nodes = {
     '1': { id: '1', childIds: ['123', '321'] },
     '123': {
@@ -46,7 +52,7 @@ describe('node action creators', () => {
     getState = () => {
       return {
         app: {
-          currentUserPageId: 54321
+          currentUserPageId: currentUserPageId
         },
         tree: {
           present: nodes
@@ -55,23 +61,28 @@ describe('node action creators', () => {
       }
     }
     dispatch = sinon.spy()
+    firebaseCreateNodeStub = sinon.stub(nodeFirebaseActions, 'createNode', () => (firebaseCreateNodeResultStub))
+    nodeFirebaseActionsGetNewNodeIdStub = sinon.stub(nodeFirebaseActions, 'getNewNodeId', () => (nodeFirebaseActionsGetNewNodeIdStubResult))
+  })
+
+  afterEach(() => {
+    firebaseCreateNodeStub.restore()
+    nodeFirebaseActionsGetNewNodeIdStub.restore()
   })
 
   describe('createNode', () => {
-    // it('should create and dispatch optimistic actions', () => {
-    //   // console.log(firebaseDb);
-    //   // sinon.spy(firebaseDb, 'ref').and.callFake(() => {
-    //   //   return {
-    //   //     push: () => { return '123456'; } // new node ID
-    //   //   };
-    //   // });
-    //   // // const nodeRef = firebase.database().ref().child('nodes');
-    //   // // sinon.spy(nodeRef, 'ref');
+    it('should create and dispatch optimistic actions', () => {
+      const originNodeId = '123'
+      const originOffset = 1
+      const newNodeContent = 'some content'
+      const expectedUpdatedParentChildIds = ['123', nodeFirebaseActionsGetNewNodeIdStubResult, '321']
+      const expectedNewNode = nodeFactory(nodeFirebaseActionsGetNewNodeIdStubResult, '1', [], newNodeContent, userId)
 
-    //   // nodeActions.createNode('123', 1, 'some content')(dispatch, getState);
-
-    //   // expect(firebaseDb.ref).toHaveBeenCalledWith('nodes');
-    // })
+      nodeActionCreators.createNode(originNodeId, originOffset, newNodeContent)(dispatch, getState)
+      expect(firebaseCreateNodeStub).to.have.been.calledWith(expectedNewNode, currentUserPageId, expectedUpdatedParentChildIds)
+      expect(dispatch).to.have.been.calledWith(firebaseCreateNodeResultStub)
+      expect(dispatch.callCount).to.equal(2)
+    })
     // it('should create the node as a child if the currently selected node is a parent', () => {
 
     // })
