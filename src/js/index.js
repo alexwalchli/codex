@@ -2,9 +2,9 @@ import 'babel-polyfill'
 import React from 'react'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
-import configureStore from './store/configure-store'
-import App from './components/app'
-import { subscribeToAuthStateChanged } from './actions/firebase/firebase-subscriptions'
+import configureStore from './redux/configure-store'
+import App from './app/components/app'
+import { subscribeToAuthStateChanged } from './auth/actions/auth-firebase-subscriptions'
 
 require('../less/app.less')
 

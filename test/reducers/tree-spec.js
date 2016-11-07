@@ -1,7 +1,7 @@
-import * as nodeActions from '../../src/js/actions/node/node-actions'
-import { INITIAL_NODE_STATE_LOADED } from '../../src/js/actions/firebase'
-import * as treeReducer from '../../src/js/reducers/tree'
-import nodeFactory from '../../src/js/utilities/node-factory'
+import * as nodeActions from '../../src/js/node/actions/node-actions'
+import { INITIAL_NODE_STATE_LOADED } from '../../src/js/node/actions/node-action-types'
+import * as treeReducer from '../../src/js/node/reducers/tree-reducer'
+import nodeFactory from '../../src/js/node/helpers/node-factory'
 import { expect } from 'chai'
 
 describe('tree reducer', () => {

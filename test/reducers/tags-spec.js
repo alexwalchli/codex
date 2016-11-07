@@ -1,6 +1,6 @@
-import * as tagActions from '../../src/js/actions/tags'
-import { INITIAL_NODE_STATE_LOADED } from '../../src/js/actions/firebase'
-import * as tagsReducer from '../../src/js/reducers/tags'
+import * as tagActions from '../../src/js/tag/actions/tag-actions'
+import { INITIAL_NODE_STATE_LOADED } from '../../src/js/node/actions/node-action-types'
+import * as tagsReducer from '../../src/js/tag/reducers/tag-reducer'
 import { expect } from 'chai'
 
 describe('tags reducer', () => {

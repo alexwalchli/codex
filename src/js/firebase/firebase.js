@@ -1,5 +1,5 @@
 import firebase from 'firebase'
-import firebaseConfig from './config'
+import firebaseConfig from './firebase-config'
 
 let firebaseApp,
   firebaseAuth,
