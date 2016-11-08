@@ -55,25 +55,25 @@ export const createNode = (originNodeId, originOffset, content) =>
     const originNode = nodes[originNodeId]
     const parentOfNewNode = nodes[originNode.childIds.length === 0 || originNode.collapsed ? originNode.parentId : originNodeId]
     const newNodeId = nodeFirebaseActions.getNewNodeId()
-    let optimisticEvents = []
+    let nodeTransaction = []
     // if the node was created from a node with children AND it is not collapsed, add the node to it, else add the node to created from node's parent
     let newNode = nodeFactory(newNodeId, parentOfNewNode.id, [], content, getState().auth.id)
     let updatedParentChildIds = getUpdatedChildIdsForAddition(parentOfNewNode, newNodeId, originNodeId, originOffset)
 
-    optimisticEvents.push(nodeActions.nodeCreated(newNode))
-    optimisticEvents.push(nodeActions.childIdsUpdated(parentOfNewNode.id, updatedParentChildIds, appState.auth.id))
+    nodeTransaction.push(nodeActions.nodeCreated(newNode))
+    nodeTransaction.push(nodeActions.childIdsUpdated(parentOfNewNode.id, updatedParentChildIds, appState.auth.id))
     if (originOffset > 0) {
       // if we're adding the new node below the current then focus on the new node, else stay focused on the current node
       let nodeIdsToDeselect = nodeSelectors.getCurrentlySelectedNodeIds(nodes)
       let nodeIdToUnfocus = nodeSelectors.getCurrentlyFocusedNodeId(nodes)
 
-      nodeIdsToDeselect.forEach(id => optimisticEvents.push(nodeActions.nodeDeselected(id)))
-      optimisticEvents.push(nodeActions.nodeUnfocused(nodeIdToUnfocus))
-      optimisticEvents.push(nodeActions.nodeFocused(newNodeId))
+      nodeIdsToDeselect.forEach(id => nodeTransaction.push(nodeActions.nodeDeselected(id)))
+      nodeTransaction.push(nodeActions.nodeUnfocused(nodeIdToUnfocus))
+      nodeTransaction.push(nodeActions.nodeFocused(newNodeId))
     }
 
     dispatch(nodeFirebaseActions.createNode(newNode, appState.app.currentUserPageId, updatedParentChildIds))
-    dispatch(nodeActions.nodeTransaction(optimisticEvents))
+    dispatch(nodeActions.nodeTransaction(nodeTransaction))
   }
 
 export const updateContent = (nodeId, newContent) =>
