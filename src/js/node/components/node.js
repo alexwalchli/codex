@@ -7,6 +7,7 @@ import BulletReadContentView from './bullet-read-content-view'
 import BulletNotes from './bullet-notes'
 import BulletMenu from './bullet-menu'
 import BulletIcon from './bullet-icon'
+import * as nodeSelectors from '../selectors/node-selectors'
 
 export class Node extends Component {
   constructor (props) {
@@ -199,15 +200,7 @@ export class Node extends Component {
 // react redux
 
 const mapStateToProps = (state, ownProps) => {
-  const nodeFromState = state.tree.present[ownProps.id]
-  const parentNode = state.tree.present[ownProps.parentId]
-
-  let positionInOrderedList
-  if (parentNode && parentNode.displayMode === 'ordered') {
-    positionInOrderedList = parentNode.childIds.indexOf(ownProps.id) + 1
-  }
-
-  return Object.assign({ nodeInitialized: !!nodeFromState, auth: state.auth, positionInOrderedList, ...ownProps, visible: state.visibleNodes.present[ownProps.id] }, nodeFromState)
+  return { ...ownProps, ...nodeSelectors.getNodeDataForComponent(state, ownProps.id, ownProps.parentId) }
 }
 
 const ConnectedNode = connect(mapStateToProps, actionCreators)(Node)

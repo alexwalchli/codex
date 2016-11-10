@@ -252,4 +252,10 @@ describe('nodeSelectors', () => {
       expect(nodeBelowggg.id).to.equal('iii')
     })
   })
+
+  describe('getNodeDataForComponent', () => {
+    it('should do something...', () => {
+      
+    })
+  })
 })

@@ -82,3 +82,15 @@ export function getNextNodeThatIsVisible (rootNodeId, nodes, visibleNodes, curre
 
   return null
 }
+
+export const getNodeDataForComponent = (state, id, parentId) => {
+  const nodeFromState = state.tree.present[id]
+  const parentNode = state.tree.present[parentId]
+
+  let positionInOrderedList
+  if (parentNode && parentNode.displayMode === 'ordered') {
+    positionInOrderedList = parentNode.childIds.indexOf(id) + 1
+  }
+
+  return { nodeInitialized: !!nodeFromState, auth: state.auth, positionInOrderedList, visible: state.visibleNodes.present[id], ...nodeFromState }
+}
