@@ -1,5 +1,5 @@
 import { firebaseDb } from '../../firebase'
-import * as firebaseRequestQueueActions from '../../requestqueue/actions/firebase-request-queue-actions'
+import * as firebaseRequestQueueActionCreators from '../../requestqueue/actions/firebase-request-queue-action-creators'
 
 function unwrapNodeSnapshot (nodeSnapshot) {
   let node = nodeSnapshot.val()
@@ -19,7 +19,7 @@ export function getNodeSnapshot (nodeId) {
 
 export function createNode (node, userPageId, updatedParentChildIds) {
   return dispatch => {
-    dispatch(firebaseRequestQueueActions.enqueueRequest(this, () => {
+    dispatch(firebaseRequestQueueActionCreators.enqueueRequest(this, () => {
       return firebaseDb.ref('node_userPages_users/' + node.parentId).once('value').then(parentNodeUserPagesUsersSnapshot => {
         const parentNodeUserPagesUsers = parentNodeUserPagesUsersSnapshot.val()
         const nodeUpdates = {
@@ -44,7 +44,7 @@ export function createNode (node, userPageId, updatedParentChildIds) {
 
 export function updateNodeComplete (nodeId, complete, userId) {
   return dispatch => {
-    dispatch(firebaseRequestQueueActions.enqueueRequest(this, () => {
+    dispatch(firebaseRequestQueueActionCreators.enqueueRequest(this, () => {
       return firebaseDb.ref().update({
         [`nodes/${nodeId}/completed`]: complete,
         [`nodes/${nodeId}/lastUpdatedById`]: userId
@@ -55,7 +55,7 @@ export function updateNodeComplete (nodeId, complete, userId) {
 
 export function updateNodeNotes (nodeId, notes, userId) {
   return dispatch => {
-    dispatch(firebaseRequestQueueActions.enqueueRequest(this, () => {
+    dispatch(firebaseRequestQueueActionCreators.enqueueRequest(this, () => {
       return firebaseDb.ref().update({
         [`nodes/${nodeId}/notes`]: notes,
         [`nodes/${nodeId}/lastUpdatedById`]: userId
@@ -66,7 +66,7 @@ export function updateNodeNotes (nodeId, notes, userId) {
 
 export function updateNodeDisplayMode (nodeId, mode, userId) {
   return dispatch => {
-    dispatch(firebaseRequestQueueActions.enqueueRequest(this, () => {
+    dispatch(firebaseRequestQueueActionCreators.enqueueRequest(this, () => {
       return firebaseDb.ref().update({
         [`nodes/${nodeId}/displayMode`]: mode,
         [`nodes/${nodeId}/lastUpdatedById`]: userId
@@ -82,7 +82,7 @@ export function updateNodeSelectedByUser (nodeId, userId, userDisplayName) {
       [`nodes/${nodeId}/currentlySelectedBy`]: userDisplayName
     }
 
-    dispatch(firebaseRequestQueueActions.enqueueRequest(this, () => {
+    dispatch(firebaseRequestQueueActionCreators.enqueueRequest(this, () => {
       return firebaseDb.ref(`nodes/${nodeId}`).once('value').then(snapshot => {
         if (snapshot.val()) {
           return firebaseDb.ref().update(dbUpdates)
@@ -101,7 +101,7 @@ export function updateNodeContent (nodeId, newContent, userId) {
       [`nodes/${nodeId}/lastUpdatedById`]: userId
     }
 
-    dispatch(firebaseRequestQueueActions.enqueueRequest(this, () => {
+    dispatch(firebaseRequestQueueActionCreators.enqueueRequest(this, () => {
       return firebaseDb.ref(`nodes/${nodeId}`).once('value').then(snapshot => {
         if (snapshot.val()) {
           return firebaseDb.ref().update(dbUpdates)
@@ -126,7 +126,7 @@ export function deleteNode (node, updatedParentChildIds, allDescendantIdsOfNode,
       dbUpdates[`nodes/${descedantId}/lastUpdatedById/`] = userId
     })
 
-    return dispatch(firebaseRequestQueueActions.enqueueRequest(this, () => {
+    return dispatch(firebaseRequestQueueActionCreators.enqueueRequest(this, () => {
       return firebaseDb.ref(`nodes/${node.id}`).once('value').then(snapshot => {
         if (snapshot.val()) {
           return firebaseDb.ref().update(dbUpdates)
@@ -153,7 +153,7 @@ export function deleteNodes (nodesToDelete = [], userId) {
       })
     })
 
-    return dispatch(firebaseRequestQueueActions.enqueueRequest(this, () => {
+    return dispatch(firebaseRequestQueueActionCreators.enqueueRequest(this, () => {
       return firebaseDb.ref().update(dbUpdates)
     }))
   }
@@ -166,7 +166,7 @@ export function completeNodes (nodeIds, userId) {
       dbUpdates[`nodes/${nodeId}/completed`] = true
     })
 
-    return dispatch(firebaseRequestQueueActions.enqueueRequest(this, () => {
+    return dispatch(firebaseRequestQueueActionCreators.enqueueRequest(this, () => {
       return firebaseDb.ref().update(dbUpdates)
     }))
   }
@@ -186,7 +186,7 @@ export function reassignParentNode (nodeId, oldParentId, newParentId, updatedChi
     dbUpdates[`nodes/${newParentId}/childIds`] = updatedChildIdsForNewParent
     dbUpdates[`nodes/${newParentId}/lastUpdatedById`] = userId
 
-    return dispatch(firebaseRequestQueueActions.enqueueRequest(this, () => {
+    return dispatch(firebaseRequestQueueActionCreators.enqueueRequest(this, () => {
       return firebaseDb.ref(`nodes/${nodeId}`).once(`value`).then(snapshot => {
         if (snapshot.val()) {
           return firebaseDb.ref().update(dbUpdates)
@@ -200,7 +200,7 @@ export function reassignParentNode (nodeId, oldParentId, newParentId, updatedChi
 
 export function collapseNode (nodeId, userId) {
   return dispatch => {
-    dispatch(firebaseRequestQueueActions.enqueueRequest(this, () => {
+    dispatch(firebaseRequestQueueActionCreators.enqueueRequest(this, () => {
       return firebaseDb.ref().update({
         [`nodes/${nodeId}/collapsedBy/${userId}/`]: true
       })
@@ -210,7 +210,7 @@ export function collapseNode (nodeId, userId) {
 
 export function expandNode (nodeId, userId) {
   return dispatch => {
-    dispatch(firebaseRequestQueueActions.enqueueRequest(this, () => {
+    dispatch(firebaseRequestQueueActionCreators.enqueueRequest(this, () => {
       return firebaseDb.ref().update({
         [`nodes/${nodeId}/collapsedBy/${userId}/`]: false
       })

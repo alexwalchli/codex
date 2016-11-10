@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import * as actionCreators from '../../actions/node-action-creators'
+import * as actionCreators from '../../node/actions/node-action-creators'
 
 export class Highlighter extends Component {
 
@@ -18,17 +18,23 @@ export class Highlighter extends Component {
 
   render () {
     const { value, tags } = this.props
-    let valueWithHighlights = value
     let components = []
-    const words = valueWithHighlights.split(' ')
-    words.forEach((w, idx) => {
-      const tag = tags.find(t => (t.type + t.label) === w)
-      if (tag) {
-        components.push(this.renderTag(tag.label))
+    const words = value.split(/(\s+)/);
+    let plainTextWordTrail = ''
+    for (let i = 0; i < words.length; i++) {
+      let matchingTag = tags.find(t => (t.type + t.label) === words[i])
+      if (matchingTag) {
+        components.push(this.renderText(plainTextWordTrail))
+        components.push(this.renderTag(matchingTag.type + matchingTag.label))
+        plainTextWordTrail = ''
       } else {
-        components.push(this.renderText(w))
+        plainTextWordTrail += words[i]
+        if(i === words.length - 1){
+          // we're at the end, wrap it up
+          components.push(this.renderText(plainTextWordTrail))
+        }
       }
-    })
+    }
 
     return (
       <div className='highlighter'>

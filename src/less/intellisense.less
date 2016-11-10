@@ -6,11 +6,16 @@
     display:block;
     background-color: transparent;
     font-family: inherit;
+    color:transparent;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+
     span:not(.caret) {
       visibility: hidden;
     }
     strong.tag {
-      background-color:@base-color;
+      font-weight:inherit;
+      background-color:lighten(@base-color, 35%);
     }
 
   }
@@ -26,6 +31,8 @@
     background: transparent;
     position: absolute;
     font-family: inherit;
+    white-space: pre-wrap;
+    word-wrap: break-word;
   }
 
   .intellisense-suggestion-box {

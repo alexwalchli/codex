@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import SuggestionBox from './suggestion-box'
 import Textarea from 'react-textarea-autosize'
-import * as actionCreators from '../../actions/node-action-creators'
+import * as nodeActionCreators from '../../node/actions/node-action-creators'
+import * as tagActionCreators from '../../tag/actions/tag-action-creators'
 import { connect } from 'react-redux'
 import Highlighter from './Highlighter'
 
@@ -170,7 +171,7 @@ export class IntellisenseInput extends Component {
   }
 
   executeSuggestionSelection (e) {
-    const { nodeId, onCommandSelected, createTag } = this.props
+    const { nodeId, onCommandSelected, createTag, addTagToNode } = this.props
     const { currentSuggestions, currentQuery, selectedSuggestionIndex, currentInputValue } = this.state
     const selectedSuggestion = currentSuggestions[selectedSuggestionIndex]
 
@@ -195,6 +196,8 @@ export class IntellisenseInput extends Component {
       const newInputValue = currentInputValue.substr(0, caretPosition.selectionStart - currentQuery.length) +
         '#' + selectedSuggestion.label +
         currentInputValue.substr(caretPosition.selectionStart + ('#' + selectedSuggestion.label).length)
+      
+      addTagToNode(nodeId, selectedSuggestion.id)
 
       this.setState({
         currentInputValue: newInputValue
@@ -235,6 +238,7 @@ export class IntellisenseInput extends Component {
 
 function mapStateToProps (state, ownProps) {
   let tags = state.tags.map(t => ({
+    id: t.id,
     type: 'TAG',
     label: t.label,
     trigger: '#',
@@ -299,5 +303,5 @@ function mapStateToProps (state, ownProps) {
   }
 }
 
-const ConnectedIntellisenseInput = connect(mapStateToProps, actionCreators)(IntellisenseInput)
+const ConnectedIntellisenseInput = connect(mapStateToProps, { ...nodeActionCreators, ...tagActionCreators })(IntellisenseInput)
 export default ConnectedIntellisenseInput

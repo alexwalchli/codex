@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actionCreators from '../actions/node-action-creators'
-import IntellisenseInput from './intellisense/intellisense-input'
+import IntellisenseInput from '../../intellisense/components/intellisense-input'
 
 export class BulletEditContentView extends Component {
   constructor (props) {

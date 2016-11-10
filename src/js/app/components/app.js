@@ -5,6 +5,7 @@ import AppContextMenu from './app-context-menu'
 import SignIn from '../../auth/components/sign-in'
 import AppLoader from './app-loader'
 import { isAuthenticated } from '../../auth/helpers/index'
+import * as actionCreators from '../actions/app-action-creators'
 
 export class App extends Component {
 
@@ -46,14 +47,14 @@ export class App extends Component {
 }
 
 function mapStateToProps (state, ownProps) {
-  return Object.assign({}, state)
+  return Object.assign({}, { ...state, ...ownProps })
 }
 
 function userPagesList (userPages) {
   return Object.keys(userPages).map(userPageId => userPages[userPageId])
 }
 
-const ConnectedApp = connect(mapStateToProps)(App)
+const ConnectedApp = connect(mapStateToProps, actionCreators)(App)
 export default ConnectedApp
 
 // TODO: Reimplement

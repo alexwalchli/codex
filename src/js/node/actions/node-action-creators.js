@@ -330,7 +330,7 @@ export const addTagToNode = (nodeId, tagId) =>
     const node = nodeSelectors.getPresentNodes(appState)[nodeId]
 
     if (node.taggedByIds.indexOf(tagId) === -1) {
-      const updatedTags = Object.assign([], node.tags)
+      const updatedTags = Object.assign([], node.taggedByIds)
       updatedTags.push(tagId)
       dispatch(nodeActions.nodeTagsUpdated(nodeId, updatedTags))
       // TODO: dispatch(nodeFirebaseActions.updateNodeTags(nodeId, tags)
