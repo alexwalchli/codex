@@ -112,15 +112,16 @@ export class IntellisenseInput extends Component {
   // rendering
 
   renderSuggestionBox () {
-    const { currentSuggestions, selectedSuggestionIndex } = this.state
-
     if (this.state.suggestionBoxVisible) {
+      const { currentSuggestions, selectedSuggestionIndex, caretPosition } = this.state
+
       return (
         <SuggestionBox
           ref='suggestionBox'
           suggestions={currentSuggestions}
           onSuggestionSelected={(e, suggestion) => this.onSuggestionSelected(e, suggestion)}
-          selectedSuggestionIndex={selectedSuggestionIndex} />
+          selectedSuggestionIndex={selectedSuggestionIndex}
+          caretPosition={caretPosition} />
       )
     }
 
@@ -129,7 +130,7 @@ export class IntellisenseInput extends Component {
 
   render () {
     const { nodeId } = this.props
-    const { currentInputValue } = this.state
+    const { currentInputValue, selectionStart, selectionEnd } = this.state
 
     return (
       <div className='intellisense-container'>
@@ -139,14 +140,29 @@ export class IntellisenseInput extends Component {
           onChange={(e) => this.onTextInputChange(e)}
           onKeyDown={(e) => this.onTextInputKeyDown(e)}
           onBlur={(e) => this.onTextInputBlur(e)}
-          onSelect={(e) => this.onTextInputSelect(e)} />
+          onSelect={(e) => this.onTextInputSelect(e)}
+        />
         {this.renderSuggestionBox()}
-        <Highlighter nodeId={nodeId} value={currentInputValue} />
+        <Highlighter 
+          nodeId={nodeId}
+          value={currentInputValue}
+          onCaretPositionChange={(e, position) => this.onCaretPositionChange(e, position)}
+          selection={{
+            start: selectionStart,
+            end: selectionEnd
+          }}
+        />
       </div>
     )
   }
 
   // util
+
+  onCaretPositionChange (e, position) {
+    this.setState({
+      caretPosition: position
+    })
+  }
 
   toggleTextInputFocus () {
     if (this.props.focused) {

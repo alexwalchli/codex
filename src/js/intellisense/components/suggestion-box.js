@@ -15,10 +15,18 @@ export default class SuggestionBox extends Component {
   }
 
   render () {
-    const { suggestions } = this.props
+    const { suggestions, caretPosition } = this.props
+    let style = {
+      position: 'absolute',
+      left: caretPosition.left,
+      top: caretPosition.top + caretPosition.height
+    }
 
     return (
-      <div className='intellisense-suggestion-box'>
+      <div className='intellisense-suggestion-box' style={style}>
+        <div className='instruction'>
+          Continue typing to filter
+        </div>
         <ul className='suggestions'>
           {suggestions.map((suggestion, idx) => { return this.renderSuggestion(suggestion, idx) })}
         </ul>

@@ -1,4 +1,5 @@
 .intellisense-container {
+  position:relative;
 
   .highlighter {
     line-height:inherit;
@@ -15,7 +16,7 @@
     }
     strong.tag {
       font-weight:inherit;
-      background-color:lighten(@base-color, 35%);
+      background-color:lighten(@base-color, 45%);
     }
 
   }
@@ -44,14 +45,21 @@
     left:50px; // TODO: set based on cursor position
     width:200px;
     
+    .instruction {
+      font-size:.4em;
+      text-align:center;
+      line-height:30px;
+    }
+
     ul.suggestions {
       margin:0;
       padding:0;
 
       li.suggestion {
-        font-size:1.2em;
+        font-size:.6em;
         list-style: none;
-        padding:6px;
+        padding:6px 6px 6px 24px;
+        line-height: 30px;
 
         &.selected {
           background-color:lighten(@base-color, 10%)
