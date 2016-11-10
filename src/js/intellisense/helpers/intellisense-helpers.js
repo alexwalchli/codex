@@ -8,7 +8,3 @@ export const autoCompleteQueryWithSelectedSuggestion = (caretPosition, inputValu
 export const renderHighlights = (value) => {
 
 }
-
-export const parseQuery = (query) => {
-
-}

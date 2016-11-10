@@ -6,6 +6,7 @@ import * as tagActionCreators from '../../tag/actions/tag-action-creators'
 import { connect } from 'react-redux'
 import Highlighter from './Highlighter'
 import { autoCompleteQueryWithSelectedSuggestion } from '../helpers/intellisense-helpers'
+import * as intellisenseSelectors from '../selectors/intellisense-selectors'
 
 export class IntellisenseInput extends Component {
 
@@ -156,8 +157,8 @@ export class IntellisenseInput extends Component {
   }
 
   isTriggerCharacter (key) {
-    const { data } = this.props
-    return !!data[key]
+    const { suggestions } = this.props
+    return !!suggestions[key]
   }
 
   shiftSelectedSuggestion (e, down = true) {
@@ -220,15 +221,11 @@ export class IntellisenseInput extends Component {
   }
 
   querySuggestions (query) {
-    const { data } = this.props
+    const { suggestions } = this.props
     const triggerChar = query.substring(0, 1)
     const queryText = query.substring(1, query.length)
 
-    return data[triggerChar].filter(i => i.label.toLowerCase().startsWith(queryText))
-  }
-
-  plainTextQuery (query) {
-    return query.replace('/', '').replace('#').replace('@')
+    return suggestions[triggerChar].filter(i => i.label.toLowerCase().startsWith(queryText))
   }
 
 }
@@ -236,68 +233,8 @@ export class IntellisenseInput extends Component {
 // react redux
 
 function mapStateToProps (state, ownProps) {
-  let tags = state.tags.map(t => ({
-    id: t.id,
-    type: 'TAG',
-    label: t.label,
-    trigger: '#',
-    filterText: t.id,
-    insertText: null,
-    highlight: false
-  }))
-
-  let intellisenseData = {
-    '#': tags,
-    '/': [
-      {
-        type: 'COMMAND',
-        action: 'COMPLETE_NODE',
-        label: 'Complete',
-        trigger: '/',
-        filterText: 'Complete',
-        insertText: null,
-        highlight: false
-      },
-      {
-        type: 'COMMAND',
-        action: 'COMPLETE_ALL_NODES',
-        label: 'Complete all under',
-        trigger: '/',
-        filterText: 'Complete all',
-        insertText: null,
-        highlight: false
-      },
-      {
-        type: 'COMMAND',
-        action: 'DELETE_NODE',
-        label: 'Delete',
-        trigger: '/',
-        filterText: 'Delete',
-        insertText: null,
-        highlight: false
-      },
-      {
-        type: 'COMMAND',
-        action: 'COLLAPSE',
-        label: 'Collapse',
-        trigger: '/',
-        filterText: 'Collapse',
-        insertText: null,
-        highlight: false
-      },
-      {
-        type: 'COMMAND',
-        action: 'COLLAPSE_ALL',
-        label: 'Collapse all under',
-        trigger: '/',
-        filterText: 'Collapse all',
-        insertText: null,
-        highlight: false
-      }
-    ]
-  }
   return {
-    data: intellisenseData,
+    suggestions: intellisenseSelectors.allSuggestions(state),
     ...ownProps
   }
 }
