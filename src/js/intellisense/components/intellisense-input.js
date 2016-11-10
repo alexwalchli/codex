@@ -5,6 +5,7 @@ import * as nodeActionCreators from '../../node/actions/node-action-creators'
 import * as tagActionCreators from '../../tag/actions/tag-action-creators'
 import { connect } from 'react-redux'
 import Highlighter from './Highlighter'
+import { autoCompleteQueryWithSelectedSuggestion } from '../helpers/intellisense-helpers'
 
 export class IntellisenseInput extends Component {
 
@@ -193,10 +194,8 @@ export class IntellisenseInput extends Component {
       onCommandSelected && onCommandSelected(e, selectedSuggestion)
     } else if (selectedSuggestion.type === 'TAG') {
       const caretPosition = this.getCurrentCaretPosition()
-      const newInputValue = currentInputValue.substr(0, caretPosition.selectionStart - currentQuery.length) +
-        '#' + selectedSuggestion.label +
-        currentInputValue.substr(caretPosition.selectionStart + ('#' + selectedSuggestion.label).length)
-      
+      const newInputValue = autoCompleteQueryWithSelectedSuggestion(caretPosition, currentInputValue, currentQuery, selectedSuggestion)
+
       addTagToNode(nodeId, selectedSuggestion.id)
 
       this.setState({

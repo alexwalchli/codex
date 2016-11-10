@@ -19,7 +19,7 @@ export class Highlighter extends Component {
   render () {
     const { value, tags } = this.props
     let components = []
-    const words = value.split(/(\s+)/);
+    const words = value.split(/(\s+)/)
     let plainTextWordTrail = ''
     for (let i = 0; i < words.length; i++) {
       let matchingTag = tags.find(t => (t.type + t.label) === words[i])
@@ -29,7 +29,7 @@ export class Highlighter extends Component {
         plainTextWordTrail = ''
       } else {
         plainTextWordTrail += words[i]
-        if(i === words.length - 1){
+        if (i === words.length - 1) {
           // we're at the end, wrap it up
           components.push(this.renderText(plainTextWordTrail))
         }
