@@ -19,8 +19,8 @@ export default class SuggestionBox extends Component {
     const { suggestions, caretPosition } = this.props
     let style = {
       position: 'absolute',
-      left: caretPosition.left,
-      top: caretPosition.top + caretPosition.height
+      left: caretPosition ? caretPosition.left : 0,
+      top: caretPosition ? caretPosition.top + caretPosition.height : 0
     }
 
     return (

@@ -39,7 +39,9 @@ export class IntellisenseInput extends Component {
 
   onTextInputChange (e) {
     const newValue = this.refs.textInput.value
-    this.setState({ currentInputValue: newValue })
+    this.setState({ 
+      currentInputValue: newValue
+    })
 
     if (this.props.onChange) {
       return this.props.onChange(e, newValue)

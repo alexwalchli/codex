@@ -75,7 +75,6 @@ export class Highlighter extends Component {
     let componentKey = 0;
 
     // TODO: If cursor is in middle of a tag, it should still remain highlighted
-    // TODO: Fix a bug if the cursor is right at the end of a tag, it won't highlight
 
     for (let i = 0; i < words.length; i++) {
       let matchingTag = tags.find(t => (t.type + t.label) === words[i])
