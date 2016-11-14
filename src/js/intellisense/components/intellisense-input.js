@@ -143,7 +143,7 @@ export class IntellisenseInput extends Component {
           onSelect={(e) => this.onTextInputSelect(e)}
         />
         {this.renderSuggestionBox()}
-        <Highlighter 
+        <Highlighter
           nodeId={nodeId}
           value={currentInputValue}
           onCaretPositionChange={(e, position) => this.onCaretPositionChange(e, position)}

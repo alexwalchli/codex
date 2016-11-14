@@ -255,7 +255,7 @@ describe('nodeSelectors', () => {
 
   describe('getNodeDataForComponent', () => {
     it('should do something...', () => {
-      
+
     })
   })
 })
