@@ -162,16 +162,11 @@ export class Node extends Component {
               onMouseLeave={(e) => this.onContentMouseLeave(e)}
               onPaste={(e) => this.onContentPaste(e)}
               onClick={(e) => this.onContentClick(e)}>
-              { focused
-                ? <BulletEditContentView
-                  nodeId={id}
-                  content={content}
-                  focused={focused}
-                  />
-                : <BulletReadContentView
-                  nodeId={id}
-                  content={content}
-                  /> }
+              <BulletEditContentView
+                nodeId={id}
+                content={content}
+                focused={focused}
+                />
             </div>
 
             <BulletNotes

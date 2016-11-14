@@ -189,7 +189,7 @@ export class IntellisenseInput extends Component {
   }
 
   executeSuggestionSelection (e) {
-    const { nodeId, onCommandSelected, createTag, addTagToNode } = this.props
+    const { nodeId, onCommandSelected, createTag, addTagToNode, updateContent } = this.props
     const { currentSuggestions, currentQuery, selectedSuggestionIndex, currentInputValue } = this.state
     const selectedSuggestion = currentSuggestions[selectedSuggestionIndex]
 
@@ -198,6 +198,7 @@ export class IntellisenseInput extends Component {
     if (currentQuery.startsWith('#') && !selectedSuggestion) {
       const tagLabel = currentQuery.substring(1, currentQuery.length)
       createTag('#', tagLabel.toLowerCase(), tagLabel, nodeId)
+      updateContent(nodeId, currentInputValue)
       return
     }
 
@@ -219,6 +220,8 @@ export class IntellisenseInput extends Component {
         currentInputValue: newInputValue
       })
     }
+
+    updateContent(nodeId, currentInputValue)
 
     this.setState({
       suggestionBoxVisible: false,
