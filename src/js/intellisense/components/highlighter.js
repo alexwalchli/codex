@@ -73,9 +73,13 @@ export class Highlighter extends Component {
     var positionInText = 0
     let caretRendered = false
     let componentKey = 0;
+
+    // TODO: If cursor is in middle of a tag, it should still remain highlighted
+    // TODO: Fix a bug if the cursor is right at the end of a tag, it won't highlight
+
     for (let i = 0; i < words.length; i++) {
       let matchingTag = tags.find(t => (t.type + t.label) === words[i])
-      if (!caretRendered && positionInText + words[i].length >= selection.end) {
+      if (!caretRendered && positionInText + words[i].length > selection.end) {
         // this word contains the cursor position. Split it and place the caret in between.
         var plainTextWordTrailPlusCurrentWord = plainTextWordTrail + words[i]
         wrappedTextAndTagComponents.push(this.renderText(plainTextWordTrailPlusCurrentWord.substring(0, selection.end), componentKey++))
