@@ -12,21 +12,21 @@ export class Highlighter extends Component {
     }
   }
 
-  renderTag (label, idx) {
+  renderTag (label, key) {
     return (
-      <strong className='tag'>{label}</strong>
+      <strong key={key} className='tag'>{label}</strong>
     )
   }
 
-  renderText (text, idx) {
+  renderText (text, key) {
     return (
-      <span>{text}</span>
+      <span key={key}>{text}</span>
     )
   }
 
-  renderCaret () {
+  renderCaret (key) {
     return (
-      <span className='caret' ref='caret'>&nbsp;</span>
+      <span key={key} className='caret' ref='caret'>&nbsp;</span>
     )
   }
 
@@ -72,26 +72,27 @@ export class Highlighter extends Component {
     let plainTextWordTrail = ''
     var positionInText = 0
     let caretRendered = false
+    let componentKey = 0;
     for (let i = 0; i < words.length; i++) {
       let matchingTag = tags.find(t => (t.type + t.label) === words[i])
       if (!caretRendered && positionInText + words[i].length >= selection.end) {
         // this word contains the cursor position. Split it and place the caret in between.
         var plainTextWordTrailPlusCurrentWord = plainTextWordTrail + words[i]
-        wrappedTextAndTagComponents.push(this.renderText(plainTextWordTrailPlusCurrentWord.substring(0, selection.end)))
-        wrappedTextAndTagComponents.push(this.renderCaret())
-        wrappedTextAndTagComponents.push(this.renderText(plainTextWordTrailPlusCurrentWord.substring(selection.end, plainTextWordTrailPlusCurrentWord.length)))
+        wrappedTextAndTagComponents.push(this.renderText(plainTextWordTrailPlusCurrentWord.substring(0, selection.end), componentKey++))
+        wrappedTextAndTagComponents.push(this.renderCaret(componentKey++))
+        wrappedTextAndTagComponents.push(this.renderText(plainTextWordTrailPlusCurrentWord.substring(selection.end, plainTextWordTrailPlusCurrentWord.length), componentKey++))
         caretRendered = true
         plainTextWordTrail = ''
       } else if (matchingTag) {
-        wrappedTextAndTagComponents.push(this.renderText(plainTextWordTrail))
-        wrappedTextAndTagComponents.push(this.renderTag(matchingTag.type + matchingTag.label))
+        wrappedTextAndTagComponents.push(this.renderText(plainTextWordTrail, componentKey++))
+        wrappedTextAndTagComponents.push(this.renderTag(matchingTag.type + matchingTag.label, componentKey++))
         plainTextWordTrail = ''
       } else {
         plainTextWordTrail += words[i]
 
         if (i === words.length - 1) {
           // we're at the end, wrap it up
-          wrappedTextAndTagComponents.push(this.renderText(plainTextWordTrail))
+          wrappedTextAndTagComponents.push(this.renderText(plainTextWordTrail, componentKey++))
         }
       }
 
