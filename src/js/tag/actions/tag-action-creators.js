@@ -1,5 +1,6 @@
 import * as nodeActionCreators from '../../node/actions/node-action-creators'
 import * as tagActions from '../../tag/actions/tag-actions'
+import * as tagFirebaseActions from './tag-firebase-actions'
 
 export const createTag = (type, label, nodeId) =>
   (dispatch, getState) => {
@@ -8,6 +9,6 @@ export const createTag = (type, label, nodeId) =>
     if (!appState.tags.find(t => t.id === tagId)) {
       dispatch(tagActions.tagCreated(type, tagId, label))
       dispatch(nodeActionCreators.addTagToNode(nodeId, tagId))
-      // TODO: dispatch(firebaseTagActions.createTag(id, label))
+      dispatch(tagFirebaseActions.createTag(tagId, appState.app.currentUserPageId))
     }
   }

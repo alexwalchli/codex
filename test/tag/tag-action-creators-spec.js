@@ -1,4 +1,5 @@
 import * as tagActionCreators from '../../src/js/tag/actions/tag-action-creators'
+import * as tagFirebaseActions from '../../src/js/tag/actions/tag-firebase-actions'
 import * as tagActions from '../../src/js/tag/actions/tag-actions'
 import * as nodeActionCreators from '../../src/js/node/actions/node-action-creators'
 import sinon from 'sinon'
@@ -9,11 +10,16 @@ describe('tag action creators', () => {
   let dispatch
   let userId = 111
   const addTagToNodeActionCreatorStub = {}
-  sinon.stub(nodeActionCreators, 'addTagToNode', () => (addTagToNodeActionCreatorStub))
+  const tagFirebaseCreateTagActionStub = {}
 
   beforeEach(() => {
+    sinon.stub(nodeActionCreators, 'addTagToNode', () => (addTagToNodeActionCreatorStub))
+    sinon.stub(tagFirebaseActions, 'createTag', () => (tagFirebaseCreateTagActionStub))
     getState = () => {
       return {
+        app: {
+          currentUserPageId: '12345'
+        },
         tags: [
           {
             type: '#',
@@ -32,6 +38,11 @@ describe('tag action creators', () => {
     dispatch = sinon.spy()
   })
 
+  afterEach(() => {
+    nodeActionCreators.addTagToNode.restore()
+    tagFirebaseActions.createTag.restore()
+  })
+
   describe('createTag', () => {
     it('should not create a duplicate tag', () => {
       tagActionCreators.createTag('#', 'ToDo', '123')(dispatch, getState)
@@ -43,6 +54,7 @@ describe('tag action creators', () => {
 
       expect(dispatch).to.have.been.calledWith(tagActions.tagCreated('#', '#new tag', 'New Tag'))
       expect(dispatch).to.have.been.calledWith(addTagToNodeActionCreatorStub)
+      expect(dispatch).to.have.been.calledWith(tagFirebaseCreateTagActionStub)
     })
   })
 })
