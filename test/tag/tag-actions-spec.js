@@ -19,6 +19,7 @@ describe('tags action', () => {
       })
     })
   })
+
   describe('tagRemoved', () => {
     it('should fire a TAG_REMOVED and update the node in persistance', () => {
       const tagCreatedAction = tagActions.tagCreated('#', 'newtag', 'New Tag')
