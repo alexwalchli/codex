@@ -16,11 +16,13 @@ describe('tag action creators', () => {
       return {
         tags: [
           {
-            id: 'inprogress',
+            type: '#',
+            id: '#inprogress',
             label: 'InProgress'
           },
           {
-            id: 'todo',
+            type: '#',
+            id: '#todo',
             label: 'ToDo'
           }
         ],
@@ -32,14 +34,14 @@ describe('tag action creators', () => {
 
   describe('createTag', () => {
     it('should not create a duplicate tag', () => {
-      tagActionCreators.createTag('#', 'todo', 'ToDo', '123')(dispatch, getState)
+      tagActionCreators.createTag('#', 'ToDo', '123')(dispatch, getState)
       expect(dispatch).to.not.have.been.called
     })
 
     it('should dispatch a tagCreated and a addTagToNode', () => {
-      tagActionCreators.createTag('#', 'newtag', 'New Tag', '123')(dispatch, getState)
+      tagActionCreators.createTag('#', 'New Tag', '123')(dispatch, getState)
 
-      expect(dispatch).to.have.been.calledWith(tagActions.tagCreated('#', 'newtag', 'New Tag'))
+      expect(dispatch).to.have.been.calledWith(tagActions.tagCreated('#', '#new tag', 'New Tag'))
       expect(dispatch).to.have.been.calledWith(addTagToNodeActionCreatorStub)
     })
   })

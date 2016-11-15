@@ -174,3 +174,19 @@ export const nodeTagsUpdated = (nodeId, updatedTagIds) => ({
     updatedTagIds
   }
 })
+
+export const tagAdded = (nodeId, tagId) => ({
+  type: nodeActionTypes.TAG_ADDED,
+  nodeId,
+  payload: {
+    tagId
+  }
+})
+
+export const tagRemoved = (nodeId, tagId) => ({
+  type: nodeActionTypes.TAG_REMOVED,
+  nodeId,
+  payload: {
+    tagId
+  }
+})

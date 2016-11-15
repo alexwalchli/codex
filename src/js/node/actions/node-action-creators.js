@@ -79,6 +79,14 @@ export const createNode = (originNodeId, originOffset, content) =>
 export const updateContent = (nodeId, newContent) =>
   (dispatch, getState) => {
     const appState = getState()
+    const node = nodeSelectors.getPresentNodes(appState)[nodeId]
+
+    node.taggedByIds.forEach(tagId => {
+      if (!newContent.toLowerCase().includes(tagId)) {
+        dispatch(removeTagFromNode(nodeId, tagId))
+      }
+    })
+
     dispatch(nodeFirebaseActions.updateNodeContent(nodeId, newContent, appState.auth.id))
     dispatch(nodeActions.contentUpdated(nodeId, newContent, appState.auth.id))
   }
@@ -326,13 +334,12 @@ export const updateNodeDisplayMode = (nodeId, mode) =>
 
 export const addTagToNode = (nodeId, tagId) =>
   (dispatch, getState) => {
-    const appState = getState()
-    const node = nodeSelectors.getPresentNodes(appState)[nodeId]
-
-    if (node.taggedByIds.indexOf(tagId) === -1) {
-      const updatedTags = Object.assign([], node.taggedByIds)
-      updatedTags.push(tagId)
-      dispatch(nodeActions.nodeTagsUpdated(nodeId, updatedTags))
-      // TODO: dispatch(nodeFirebaseActions.updateNodeTags(nodeId, tags)
-    }
+    dispatch(nodeActions.tagAdded(nodeId, tagId))
+    // TODO: dispatch(nodeFirebaseActions.updateNodeTags(nodeId, tags)
   }
+
+export const removeTagFromNode = (nodeId, tagId) =>
+    (dispatch, getState) => {
+      dispatch(nodeActions.tagRemoved(nodeId, tagId))
+      // TODO: dispatch(nodeFirebaseActions.updateNodeTags(nodeId, tags))
+    }

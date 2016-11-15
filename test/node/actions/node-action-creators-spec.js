@@ -24,28 +24,32 @@ describe('node action creators', () => {
       childIds: [],
       collapsedBy: { '111': true },
       focused: true,
-      completed: true
+      completed: true,
+      taggedByIds: []
     },
     '321': {
       id: '321',
       parentId: '1',
       childIds: [],
       collapsedBy: {},
-      completed: true
+      completed: true,
+      taggedByIds: []
     },
     '456': {
       id: '456',
       parentId: '1',
       childIds: ['789'],
       collapsedBy: {},
-      completed: true
+      completed: true,
+      taggedByIds: []
     },
     '789': {
       id: '789',
       parentId: '456',
       childIds: [],
       collapsedBy: {},
-      completed: true
+      completed: true,
+      taggedByIds: []
     }
   }
 

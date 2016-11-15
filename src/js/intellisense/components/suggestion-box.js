@@ -4,7 +4,7 @@ import Suggestion from './suggestion'
 export default class SuggestionBox extends Component {
 
   renderSuggestion (suggestion, idx) {
-    const { selectedSuggestionIndex, key } = this.props
+    const { selectedSuggestionIndex } = this.props
     const suggestionKey = 'suggestion-' + idx
     return (
       <Suggestion

@@ -7,6 +7,7 @@ import { connect } from 'react-redux'
 import Highlighter from './Highlighter'
 import { autoCompleteQueryWithSelectedSuggestion } from '../helpers/intellisense-helpers'
 import * as intellisenseSelectors from '../selectors/intellisense-selectors'
+import * as nodeSelectors from '../../node/selectors/node-selectors'
 
 export class IntellisenseInput extends Component {
 
@@ -39,7 +40,7 @@ export class IntellisenseInput extends Component {
 
   onTextInputChange (e) {
     const newValue = this.refs.textInput.value
-    this.setState({ 
+    this.setState({
       currentInputValue: newValue
     })
 
@@ -49,6 +50,8 @@ export class IntellisenseInput extends Component {
   }
 
   onTextInputKeyDown (e) {
+    // TODO: Clean this up
+
     if (this.isTriggerCharacter(e.key)) {
       if (this.state.suggestionBoxVisible) {
         this.setState({ suggestionBoxVisible: false, currentSuggestions: [] })
@@ -199,7 +202,7 @@ export class IntellisenseInput extends Component {
 
     if (currentQuery.startsWith('#') && !selectedSuggestion) {
       const tagLabel = currentQuery.substring(1, currentQuery.length)
-      createTag('#', tagLabel.toLowerCase(), tagLabel, nodeId)
+      createTag('#', tagLabel, nodeId)
       updateContent(nodeId, currentInputValue)
       return
     }
@@ -256,6 +259,7 @@ export class IntellisenseInput extends Component {
 function mapStateToProps (state, ownProps) {
   return {
     suggestions: intellisenseSelectors.allSuggestions(state),
+    node: nodeSelectors.getNodeDataForComponent(state),
     ...ownProps
   }
 }

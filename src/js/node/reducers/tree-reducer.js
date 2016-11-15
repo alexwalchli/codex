@@ -10,6 +10,15 @@ function childIds (state, action) {
   }
 }
 
+function taggedByIds (state, action) {
+  switch (action.type) {
+    case nodeActionTypes.TAG_ADDED:
+      return [...state, action.payload.tagId]
+    case nodeActionTypes.TAG_REMOVED:
+      return Object.assign([], state.filter(tagId => tagId !== action.payload.tagId))
+  }
+}
+
 function node (state, action) {
   switch (action.type) {
     case nodeActionTypes.NODE_CREATED:
@@ -85,6 +94,14 @@ function node (state, action) {
     case nodeActionTypes.NODE_TAGS_UPDATED:
       return Object.assign({}, state, {
         taggedByIds: action.payload.updatedTagIds
+      })
+    case nodeActionTypes.TAG_ADDED:
+      return Object.assign({}, state, {
+        taggedByIds: taggedByIds(state.taggedByIds, action)
+      })
+    case nodeActionTypes.TAG_REMOVED:
+      return Object.assign({}, state, {
+        taggedByIds: taggedByIds(state.taggedByIds, action)
       })
     default:
       return state

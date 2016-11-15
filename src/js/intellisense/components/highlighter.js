@@ -72,7 +72,7 @@ export class Highlighter extends Component {
     let plainTextWordTrail = ''
     var positionInText = 0
     let caretRendered = false
-    let componentKey = 0;
+    let componentKey = 0
 
     // TODO: If cursor is in middle of a tag, it should still remain highlighted
 

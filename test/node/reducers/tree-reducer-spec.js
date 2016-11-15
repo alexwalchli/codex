@@ -13,14 +13,16 @@ describe('tree reducer', () => {
       parentId: '1',
       childIds: [],
       collapsedBy: { '09876': true },
-      completed: true
+      completed: true,
+      taggedByIds: []
     },
     '321': {
       id: '321',
       parentId: '1',
       childIds: [],
       collapsedBy: {},
-      completed: true
+      completed: true,
+      taggedByIds: []
     }
   }
 
@@ -46,14 +48,16 @@ describe('tree reducer', () => {
           focused: true,
           notesFocused: false,
           collapsedBy: { '09876': true },
-          completed: true
+          completed: true,
+          taggedByIds: []
         },
         '321': {
           id: '321',
           parentId: '1',
           childIds: [],
           collapsedBy: {},
-          completed: true
+          completed: true,
+          taggedByIds: []
         }
       })
     })
@@ -101,6 +105,34 @@ describe('tree reducer', () => {
       const newTreeState = treeReducer.tree(treeState, action)
 
       expect(newTreeState['123'].taggedByIds).to.deep.equal(tagIds)
+    })
+  })
+
+  describe('TAG_ADDED', () => {
+    it('should add the tag to the node state', () => {
+      const nodeId = '123'
+      const action = nodeActions.tagAdded(nodeId, 'inprogress')
+
+      const newTreeState = treeReducer.tree(treeState, action)
+
+      expect(newTreeState['123'].taggedByIds).to.deep.equal(['inprogress'])
+    })
+  })
+
+  describe('TAG_REMOVED', () => {
+    it('should remove the tag from node state', () => {
+      const nodeId = '123'
+      let newTreeState = treeState
+      const addInProgressTagAction = nodeActions.tagAdded(nodeId, 'inprogress')
+      newTreeState = treeReducer.tree(newTreeState, addInProgressTagAction)
+      const addLearningTagAction = nodeActions.tagAdded(nodeId, 'learning')
+      newTreeState = treeReducer.tree(newTreeState, addLearningTagAction)
+
+      const action = nodeActions.tagRemoved(nodeId, 'learning')
+
+      newTreeState = treeReducer.tree(newTreeState, action)
+
+      expect(newTreeState[nodeId].taggedByIds).to.deep.equal(['inprogress'])
     })
   })
 })
