@@ -35,7 +35,7 @@ export class BulletReadContentView extends Component {
 
   render () {
     return (
-      <div className='view-mode-content' dangerouslySetInnerHTML={this.getHtmlContent()} />
+      <div className='rendered-content' dangerouslySetInnerHTML={this.getHtmlContent()} />
     )
   }
 }

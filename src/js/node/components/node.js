@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import _ from 'lodash'
 import * as actionCreators from '../actions/node-action-creators'
 import BulletEditContentView from './bullet-edit-content-view'
+import BulletReadContentView from './bullet-read-content-view'
 import BulletNotes from './bullet-notes'
 import BulletMenu from './bullet-menu'
 import BulletIcon from './bullet-icon'
@@ -107,16 +108,19 @@ export class Node extends Component {
 
   render () {
     const { parentId, childIds, id, focused, collapsedBy, visible, selected, completed, notes, positionInOrderedList,
-            nodeInitialized, currentlySelectedBy, currentlySelectedById, auth, menuVisible } = this.props
+            nodeInitialized, currentlySelectedBy, currentlySelectedById, auth, menuVisible, rootNodeId, lastChild } = this.props
     const { content } = this.state
 
     if (!nodeInitialized) {
       return (false)
     }
 
-    var bulletClasses = 'item'
+    var bulletClasses = 'node'
     if (focused) {
       bulletClasses += ' focused'
+    }
+    if (lastChild) {
+      bulletClasses += ' last-child'
     }
     if (visible === false) {
       bulletClasses += ' hidden'
@@ -141,6 +145,13 @@ export class Node extends Component {
 
     return (
       <div className={bulletClasses}>
+        { parentId !== rootNodeId
+            ? <div className='vertex-horizontal' />
+            : null }
+        { parentId !== rootNodeId
+            ? <div className='vertex-vertical' />
+            : null }
+
         { typeof parentId !== 'undefined'
           ? <div className={`depth ${currentlySelectedCss}`}>
             <div className='add-btn inline-btn' onClick={(e) => this.onAddBulletButtonClick(e)}><i className='icon dripicons-plus' /></div>
@@ -151,21 +162,23 @@ export class Node extends Component {
                 />
               : null }
 
-            <div className='children-outline' />
-
             <BulletIcon nodeId={id} positionInOrderedList={positionInOrderedList} />
-
             <div
               className='content'
               onMouseEnter={(e) => this.onContentMouseEnter(e)}
               onMouseLeave={(e) => this.onContentMouseLeave(e)}
               onPaste={(e) => this.onContentPaste(e)}
               onClick={(e) => this.onContentClick(e)}>
-              <BulletEditContentView
-                nodeId={id}
-                content={content}
-                focused={focused}
-                />
+              { focused
+                ? <BulletEditContentView
+                  nodeId={id}
+                  content={content}
+                  focused={focused}
+                  />
+                : <BulletReadContentView
+                  nodeId={id}
+                  content={content}
+                  /> }
             </div>
 
             <BulletNotes
