@@ -1,20 +1,20 @@
-@sizing-factor: .75;
+@type-scale: 1.250;
 
 ////////////////////
 // depth 1 sizing //
 ////////////////////
 
-@node-depth-1-indendation: 64px;
-@node-depth-1-left-content-pad: @node-depth-1-indendation * .5;
+@node-depth-1-indendation: 60px;
+@node-depth-1-left-content-pad: @node-depth-1-indendation / @type-scale;
 @node-depth-1-line-height: @node-depth-1-indendation;
-@node-depth-1-font-size: 24px;
+@node-depth-1-font-size: 1.8em;
 
 // bullet icon inner circle
-@node-depth-1-bullet-icon-inner-circle-diameter: 12px;
+@node-depth-1-bullet-icon-inner-circle-diameter: 10px;
 @node-depth-1-bullet-icon-inner-circle-diameter-no-children: @node-depth-1-bullet-icon-inner-circle-diameter * 1.2;
 
 // bullet icon outer circle
-@node-depth-1-bullet-icon-outer-circle-diameter: 24px;
+@node-depth-1-bullet-icon-outer-circle-diameter: 20px;
 @node-depth-1-bullet-icon-outer-circle-top: (@node-depth-1-line-height / 2) - (@node-depth-1-bullet-icon-outer-circle-diameter / 2);
 @node-depth-1-bullet-icon-outer-circle-left: 0;
 @node-depth-1-bullet-icon-inner-circle-top: 1 + (@node-depth-1-line-height / 2) - (@node-depth-1-bullet-icon-inner-circle-diameter / 2);
@@ -24,39 +24,39 @@
 // depth 2 sizing //
 ////////////////////
 
-@node-depth-2-indendation: @node-depth-1-indendation * @sizing-factor;
-@node-depth-2-left-content-pad: @node-depth-1-indendation * .8;
-@node-depth-2-line-height: @node-depth-1-line-height * @sizing-factor;
-@node-depth-2-font-size: @node-depth-1-font-size * @sizing-factor;
+@node-depth-2-indendation: @node-depth-1-indendation / @type-scale;
+@node-depth-2-left-content-pad: @node-depth-1-indendation / @type-scale;
+@node-depth-2-line-height: @node-depth-1-line-height / @type-scale;
+@node-depth-2-font-size: @node-depth-1-font-size / @type-scale;
 
 // bullet icon inner circle
-@node-depth-2-bullet-icon-inner-circle-diameter: @node-depth-1-bullet-icon-inner-circle-diameter * @sizing-factor;
+@node-depth-2-bullet-icon-inner-circle-diameter: @node-depth-1-bullet-icon-inner-circle-diameter / @type-scale;
 @node-depth-2-bullet-icon-inner-circle-diameter-no-children: @node-depth-2-bullet-icon-inner-circle-diameter * 1.2;
-@node-depth-2-bullet-icon-inner-circle-top: @node-depth-1-bullet-icon-inner-circle-top * @sizing-factor;
-@node-depth-2-bullet-icon-inner-circle-left: @node-depth-1-bullet-icon-inner-circle-left * @sizing-factor;
+@node-depth-2-bullet-icon-inner-circle-top: @node-depth-1-bullet-icon-inner-circle-top / @type-scale;
+@node-depth-2-bullet-icon-inner-circle-left: @node-depth-1-bullet-icon-inner-circle-left / @type-scale;
 
 // bullet icon outer circle
-@node-depth-2-bullet-icon-outer-circle-diameter: @node-depth-1-bullet-icon-outer-circle-diameter * @sizing-factor;
-@node-depth-2-bullet-icon-outer-circle-top: @node-depth-1-bullet-icon-outer-circle-top * @sizing-factor;
+@node-depth-2-bullet-icon-outer-circle-diameter: @node-depth-1-bullet-icon-outer-circle-diameter / @type-scale;
+@node-depth-2-bullet-icon-outer-circle-top: @node-depth-1-bullet-icon-outer-circle-top / @type-scale;
 @node-depth-2-bullet-icon-outer-circle-left: 0;
 
 ////////////////////
 // depth 3 sizing //
 ////////////////////
 
-@node-depth-3-indendation: @node-depth-2-indendation * @sizing-factor;
-@node-depth-3-left-content-pad: @node-depth-2-indendation * .8;
-@node-depth-3-line-height: @node-depth-2-line-height * @sizing-factor;
-@node-depth-3-font-size: @node-depth-2-font-size * @sizing-factor;
+@node-depth-3-indendation: @node-depth-2-indendation / @type-scale;
+@node-depth-3-left-content-pad: @node-depth-2-indendation / @type-scale;
+@node-depth-3-line-height: @node-depth-2-line-height / @type-scale;
+@node-depth-3-font-size: @node-depth-2-font-size / @type-scale;
 
-@node-depth-3-bullet-icon-inner-circle-diameter: @node-depth-2-bullet-icon-inner-circle-diameter * @sizing-factor;
+@node-depth-3-bullet-icon-inner-circle-diameter: @node-depth-2-bullet-icon-inner-circle-diameter / @type-scale;
 @node-depth-3-bullet-icon-inner-circle-diameter-no-children: @node-depth-3-bullet-icon-inner-circle-diameter * 1.2;
 
-@node-depth-3-bullet-icon-outer-circle-diameter: @node-depth-2-bullet-icon-outer-circle-diameter * @sizing-factor;
-@node-depth-3-bullet-icon-outer-circle-top: @node-depth-2-bullet-icon-outer-circle-top * @sizing-factor;
+@node-depth-3-bullet-icon-outer-circle-diameter: @node-depth-2-bullet-icon-outer-circle-diameter / @type-scale;
+@node-depth-3-bullet-icon-outer-circle-top: @node-depth-2-bullet-icon-outer-circle-top / @type-scale;
 @node-depth-3-bullet-icon-outer-circle-left: 0;
-@node-depth-3-bullet-icon-inner-circle-top: @node-depth-2-bullet-icon-inner-circle-top * @sizing-factor;
-@node-depth-3-bullet-icon-inner-circle-left: @node-depth-2-bullet-icon-inner-circle-left * @sizing-factor;
+@node-depth-3-bullet-icon-inner-circle-top: @node-depth-2-bullet-icon-inner-circle-top / @type-scale;
+@node-depth-3-bullet-icon-inner-circle-left: @node-depth-2-bullet-icon-inner-circle-left / @type-scale;
 
 
 .node {
@@ -149,7 +149,7 @@
 
 .children .node { // depth 1
   .notes {
-    margin-left:40px;
+    margin-left:@node-depth-1-left-content-pad;
 
     textarea, div {
       padding:0;
@@ -171,13 +171,13 @@
 
   .children { // depth 2
     .notes {
-      margin-left:34px;
+      margin-left:@node-depth-1-left-content-pad;
       .content, div { font-size: .95em; }
     }
 
     .children { // depth 3+
       .notes {
-        margin-left:30px;
+        margin-left:@node-depth-1-left-content-pad;
         .content, div {
             font-size:.85em;
         }
@@ -319,6 +319,7 @@
 .children .node { // depth 1
 
   .bullet-container {
+    cursor:pointer;
     position: absolute;
     height:@node-depth-1-line-height;
     width:@node-depth-1-bullet-icon-outer-circle-diameter;
