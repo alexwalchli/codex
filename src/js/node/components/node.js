@@ -143,15 +143,15 @@ export class Node extends Component {
     let currentlySelectedByAnotherUser = currentlySelectedById && currentlySelectedById !== auth.id
     let currentlySelectedCss = currentlySelectedById && currentlySelectedByAnotherUser ? 'currentlySelected' : null
 
-    // { parentId !== rootNodeId
-    //         ? <div className='vertex-horizontal' />
-    //         : null }
-    //     { parentId !== rootNodeId
-    //         ? <div className='vertex-vertical' />
-    //         : null }
-
     return (
       <div className={bulletClasses}>
+
+        { parentId !== rootNodeId
+            ? <div className='vertex-horizontal' />
+            : null }
+        { parentId !== rootNodeId
+            ? <div className='vertex-vertical' />
+            : null }
 
         { typeof parentId !== 'undefined'
           ? <div className={`depth ${currentlySelectedCss}`}>

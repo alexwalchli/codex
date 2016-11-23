@@ -1,11 +1,15 @@
-@type-scale: 1.250;
+//////////////////////////////////
+// sizing calculations          //
+//////////////////////////////////
+
+@depth-scale: 1.250; 
 
 ////////////////////
 // depth 1 sizing //
 ////////////////////
 
 @node-depth-1-indendation: 60px;
-@node-depth-1-left-content-pad: @node-depth-1-indendation / @type-scale;
+@node-depth-1-left-content-pad: @node-depth-1-indendation / @depth-scale;
 @node-depth-1-line-height: @node-depth-1-indendation;
 @node-depth-1-font-size: 1.8em;
 
@@ -20,44 +24,59 @@
 @node-depth-1-bullet-icon-inner-circle-top: 1 + (@node-depth-1-line-height / 2) - (@node-depth-1-bullet-icon-inner-circle-diameter / 2);
 @node-depth-1-bullet-icon-inner-circle-left: 1 + (@node-depth-1-bullet-icon-outer-circle-diameter / 2) - (@node-depth-1-bullet-icon-inner-circle-diameter / 2);
 
+// no vertices for depth 1
+
 ////////////////////
 // depth 2 sizing //
 ////////////////////
 
-@node-depth-2-indendation: @node-depth-1-indendation / @type-scale;
-@node-depth-2-left-content-pad: @node-depth-1-indendation / @type-scale;
-@node-depth-2-line-height: @node-depth-1-line-height / @type-scale;
-@node-depth-2-font-size: @node-depth-1-font-size / @type-scale;
+@node-depth-2-indendation: @node-depth-1-indendation / @depth-scale;
+@node-depth-2-left-content-pad: @node-depth-1-indendation / @depth-scale;
+@node-depth-2-line-height: @node-depth-1-line-height / @depth-scale;
+@node-depth-2-font-size: @node-depth-1-font-size / @depth-scale;
 
 // bullet icon inner circle
-@node-depth-2-bullet-icon-inner-circle-diameter: @node-depth-1-bullet-icon-inner-circle-diameter / @type-scale;
+@node-depth-2-bullet-icon-inner-circle-diameter: @node-depth-1-bullet-icon-inner-circle-diameter / @depth-scale;
 @node-depth-2-bullet-icon-inner-circle-diameter-no-children: @node-depth-2-bullet-icon-inner-circle-diameter * 1.2;
-@node-depth-2-bullet-icon-inner-circle-top: @node-depth-1-bullet-icon-inner-circle-top / @type-scale;
-@node-depth-2-bullet-icon-inner-circle-left: @node-depth-1-bullet-icon-inner-circle-left / @type-scale;
+@node-depth-2-bullet-icon-inner-circle-top: @node-depth-1-bullet-icon-inner-circle-top / @depth-scale;
+@node-depth-2-bullet-icon-inner-circle-left: @node-depth-1-bullet-icon-inner-circle-left / @depth-scale;
 
 // bullet icon outer circle
-@node-depth-2-bullet-icon-outer-circle-diameter: @node-depth-1-bullet-icon-outer-circle-diameter / @type-scale;
-@node-depth-2-bullet-icon-outer-circle-top: @node-depth-1-bullet-icon-outer-circle-top / @type-scale;
+@node-depth-2-bullet-icon-outer-circle-diameter: @node-depth-1-bullet-icon-outer-circle-diameter / @depth-scale;
+@node-depth-2-bullet-icon-outer-circle-top: @node-depth-1-bullet-icon-outer-circle-top / @depth-scale;
 @node-depth-2-bullet-icon-outer-circle-left: 0;
+
+// vertices
+@node-depth-2-vertical-vertex-left: -1 * (@node-depth-1-indendation - @node-depth-1-bullet-icon-outer-circle-diameter - 2); // -2 for border
+@node-depth-2-horizontal-vertex-left: @node-depth-2-vertical-vertex-left;
+@node-depth-2-horizontal-vertex-width: @node-depth-2-indendation / 2;
+@node-depth-2-horizontal-vertex-top: @node-depth-2-indendation / 2;
 
 ////////////////////
 // depth 3 sizing //
 ////////////////////
 
-@node-depth-3-indendation: @node-depth-2-indendation / @type-scale;
-@node-depth-3-left-content-pad: @node-depth-2-indendation / @type-scale;
-@node-depth-3-line-height: @node-depth-2-line-height / @type-scale;
-@node-depth-3-font-size: @node-depth-2-font-size / @type-scale;
+@node-depth-3-indendation: @node-depth-2-indendation / @depth-scale;
+@node-depth-3-left-content-pad: @node-depth-2-indendation / @depth-scale;
+@node-depth-3-line-height: @node-depth-2-line-height / @depth-scale;
+@node-depth-3-font-size: @node-depth-2-font-size / @depth-scale;
 
-@node-depth-3-bullet-icon-inner-circle-diameter: @node-depth-2-bullet-icon-inner-circle-diameter / @type-scale;
-@node-depth-3-bullet-icon-inner-circle-diameter-no-children: @node-depth-3-bullet-icon-inner-circle-diameter * 1.2;
+@node-depth-3-bullet-icon-inner-circle-diameter: floor(@node-depth-2-bullet-icon-inner-circle-diameter / @depth-scale);
+@node-depth-3-bullet-icon-inner-circle-diameter-no-children: floor(@node-depth-3-bullet-icon-inner-circle-diameter * 1.2);
 
-@node-depth-3-bullet-icon-outer-circle-diameter: @node-depth-2-bullet-icon-outer-circle-diameter / @type-scale;
-@node-depth-3-bullet-icon-outer-circle-top: @node-depth-2-bullet-icon-outer-circle-top / @type-scale;
+@node-depth-3-bullet-icon-outer-circle-diameter: floor(@node-depth-2-bullet-icon-outer-circle-diameter / @depth-scale);
+@node-depth-3-bullet-icon-outer-circle-top: floor(@node-depth-2-bullet-icon-outer-circle-top / @depth-scale);
 @node-depth-3-bullet-icon-outer-circle-left: 0;
-@node-depth-3-bullet-icon-inner-circle-top: @node-depth-2-bullet-icon-inner-circle-top / @type-scale;
-@node-depth-3-bullet-icon-inner-circle-left: @node-depth-2-bullet-icon-inner-circle-left / @type-scale;
+@node-depth-3-bullet-icon-inner-circle-top: floor(@node-depth-2-bullet-icon-inner-circle-top / @depth-scale);
+@node-depth-3-bullet-icon-inner-circle-left: @node-depth-2-bullet-icon-inner-circle-left / @depth-scale;
 
+// vertices
+@node-depth-3-vertical-vertex-left: @node-depth-2-vertical-vertex-left / @depth-scale;
+@node-depth-3-horizontal-vertex-left: @node-depth-2-horizontal-vertex-left / @depth-scale;
+@node-depth-3-horizontal-vertex-width: @node-depth-2-horizontal-vertex-left / @depth-scale;
+@node-depth-3-horizontal-vertex-top: @node-depth-2-horizontal-vertex-top / @depth-scale;
+
+//////////////////////////////////
 
 .node {
   position: relative;
@@ -68,28 +87,49 @@
 //////////////
 
 .children .node { // depth 1
-  .children .node {
-    .vertex-horizontal {
-      height:1px;
-      position: absolute;
-      width:100%;
-      background-color:@secondary-color;
-      top: 18px;
-      width: 45px;
-      left: -56px;
-    }
-    .vertex-vertical {
-      width:1px;
-      height:100%;
-      position: absolute;
-      background-color:@secondary-color;
-      left:-57px;
-      top:0px;
-    }
 
-    &.last-child {
-      > .vertex-vertical {
-        height:19px;
+  // no vertices for depth 1
+
+  .children .node { // depth 2
+    .vertex-horizontal {
+        height:1px;
+        position: absolute;
+        width:100%;
+        background-color:lighten(@secondary-color, 80%);
+        top: @node-depth-2-horizontal-vertex-top;
+        left: @node-depth-2-horizontal-vertex-left;
+        width: @node-depth-2-horizontal-vertex-width;
+      }
+      .vertex-vertical {
+        width:1px;
+        height:100%;
+        position: absolute;
+        background-color:lighten(@secondary-color, 80%);
+        left:@node-depth-2-vertical-vertex-left;
+        top:0px;
+      }
+
+      &.last-child {
+        > .vertex-vertical {
+          height:24px;
+        }
+      }
+
+    .children .node { // depth 3+
+      .vertex-horizontal {
+        top: @node-depth-3-horizontal-vertex-top;
+        left: @node-depth-3-horizontal-vertex-left;
+        width: @node-depth-3-horizontal-vertex-width;
+      }
+      .vertex-vertical {
+        left:@node-depth-3-vertical-vertex-left;
+        top:0px;
+      }
+
+      &.last-child {
+        > .vertex-vertical {
+          height:19px;
+        }
       }
     }
   }
