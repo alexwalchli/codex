@@ -1,6 +1,5 @@
 import { firebaseDb } from '../../firebase'
 import * as userPageFirebaseSubscriptions from '../../userpage/actions/userpage-firebase-subscriptions'
-import * as nodeActionTypes from './node-action-types'
 import * as nodeActions from './node-actions'
 import * as nodeSelectors from '../selectors/node-selectors'
 
@@ -38,14 +37,11 @@ export function subscribeToNodes () {
       })
 
       Promise.all(initialNodePromises).then(() => {
-        dispatch({
-          type: nodeActionTypes.INITIAL_NODE_STATE_LOADED,
-          payload: {
-            rootNodeId: appState.userPages[appState.app.currentUserPageId].rootNodeId,
-            initialTreeState,
-            userId: appState.auth.id
-          }
-        })
+        dispatch(nodeActions.initialTreeStateLoad(
+          appState.userPages[appState.app.currentUserPageId].rootNodeId,
+          initialTreeState,
+          appState.auth.id
+        ))
 
         initialized = true
       })

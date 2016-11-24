@@ -1,5 +1,5 @@
 //////////////////////////////////
-// sizing calculations          //
+//      sizing calculations     //
 //////////////////////////////////
 
 @depth-scale: 1.250; 
@@ -61,6 +61,8 @@
 @node-depth-3-line-height: @node-depth-2-line-height / @depth-scale;
 @node-depth-3-font-size: @node-depth-2-font-size / @depth-scale;
 
+// need to round down the sizes. Shapes with decimal pixels look distorted
+
 @node-depth-3-bullet-icon-inner-circle-diameter: floor(@node-depth-2-bullet-icon-inner-circle-diameter / @depth-scale);
 @node-depth-3-bullet-icon-inner-circle-diameter-no-children: floor(@node-depth-3-bullet-icon-inner-circle-diameter * 1.2);
 
@@ -76,6 +78,7 @@
 @node-depth-3-horizontal-vertex-width: @node-depth-2-horizontal-vertex-left / @depth-scale;
 @node-depth-3-horizontal-vertex-top: @node-depth-2-horizontal-vertex-top / @depth-scale;
 
+//////////////////////////////////
 //////////////////////////////////
 
 .node {

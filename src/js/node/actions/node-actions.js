@@ -1,5 +1,26 @@
 import * as nodeActionTypes from './node-action-types'
 
+// new actions
+
+export const initialTreeStateLoad = (rootNodeId, initialTreeState, userId) => {
+  return {
+    type: nodeActionTypes.INITIAL_TREE_STATE_LOAD,
+    payload: {
+      rootNodeId,
+      initialTreeState,
+      userId
+    }
+  }
+}
+
+export const nodeCreation = (nodeId, originNodeId, originOffset, content, userId) => {
+  return {
+    type: nodeActionTypes.NODE_CREATION,
+    payload: { ...arguments }
+  }
+}
+
+// old types
 export const nodeTransaction = (events) => {
   return {
     type: nodeActionTypes.NODE_TRANSACTION,
