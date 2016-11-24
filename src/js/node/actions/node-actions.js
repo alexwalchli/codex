@@ -2,23 +2,71 @@ import * as nodeActionTypes from './node-action-types'
 
 // new actions
 
-export const initialTreeStateLoad = (rootNodeId, initialTreeState, userId) => {
-  return {
-    type: nodeActionTypes.INITIAL_TREE_STATE_LOAD,
-    payload: {
-      rootNodeId,
-      initialTreeState,
-      userId
-    }
+export const initialTreeStateLoad = (rootNodeId, initialTreeState, userId) => ({
+  type: nodeActionTypes.INITIAL_TREE_STATE_LOAD,
+  payload: {
+    rootNodeId,
+    initialTreeState,
+    userId
   }
-}
+})
 
-export const nodeCreation = (nodeId, originNodeId, originOffset, content, userId) => {
-  return {
-    type: nodeActionTypes.NODE_CREATION,
-    payload: { ...arguments }
+export const nodeCreation = (nodeId, originNodeId, originOffset, content, userPageId, userId) => ({
+  type: nodeActionTypes.NODE_CREATION,
+  payload: {
+    nodeId,
+    originNodeId,
+    originOffset,
+    content,
+    userPageId,
+    userId
   }
-}
+})
+
+export const nodeFocus = (nodeId, focusNotes) => ({
+  type: nodeActionTypes.NODE_FOCUS,
+  undoable: false,
+  payload: {
+    nodeId,
+    focusNotes
+  }
+})
+
+export const nodeUnfocus = (nodeId) => ({
+  type: nodeActionTypes.NODE_UNFOCUS,
+  undoable: false,
+  payload: {
+    nodeId
+  }
+})
+
+export const nodeFocusAbove = (nodeId) => ({
+  type: nodeActionTypes.NODE_UNFOCUS,
+  undoable: false,
+  payload: {
+    nodeId
+  }
+})
+
+export const nodeDemotion = (nodeId, rootNodeId, visibleNodes, userId) => ({
+  type: nodeActionTypes.NODE_DEMOTION,
+  payload: {
+    nodeId,
+    rootNodeId,
+    visibleNodes,
+    userId
+  }
+})
+
+export const nodePromotion = (nodeId, rootNodeId, visibleNodes, userId) => ({
+  type: nodeActionTypes.NODE_PROMOTION,
+  payload: {
+    nodeId,
+    rootNodeId,
+    visibleNodes,
+    userId
+  }
+})
 
 // old types
 export const nodeTransaction = (events) => {
@@ -28,11 +76,11 @@ export const nodeTransaction = (events) => {
   }
 }
 
-export const nodeCreated = (newNode) => ({
-  type: nodeActionTypes.NODE_CREATED,
-  nodeId: newNode.id,
-  payload: newNode
-})
+// export const nodeCreated = (newNode) => ({
+//   type: nodeActionTypes.NODE_CREATED,
+//   nodeId: newNode.id,
+//   payload: newNode
+// })
 
 export const nodeUpdated = (updatedNode) => ({
   type: nodeActionTypes.NODE_UPDATED,
@@ -40,14 +88,14 @@ export const nodeUpdated = (updatedNode) => ({
   payload: updatedNode
 })
 
-export const contentUpdated = (nodeId, content, updatedById) => ({
-  type: nodeActionTypes.CONTENT_UPDATED,
-  nodeId,
-  payload: {
-    content,
-    updatedById
-  }
-})
+// export const contentUpdated = (nodeId, content, updatedById) => ({
+//   type: nodeActionTypes.CONTENT_UPDATED,
+//   nodeId,
+//   payload: {
+//     content,
+//     updatedById
+//   }
+// })
 
 export const childIdsUpdated = (nodeId, newChildIds, updatedById) => ({
   type: nodeActionTypes.CHILD_IDS_UPDATED,
@@ -83,32 +131,32 @@ export const nodeCollapsed = (nodeId, allDescendentIds, userId) => ({
   }
 })
 
-export const nodeFocused = (nodeId, focusNotes) => ({
-  type: nodeActionTypes.NODE_FOCUSED,
-  undoable: false,
-  nodeId,
-  payload: {
-    focusNotes
-  }
-})
+// export const nodeFocused = (nodeId, focusNotes) => ({
+//   type: nodeActionTypes.NODE_FOCUSED,
+//   undoable: false,
+//   nodeId,
+//   payload: {
+//     focusNotes
+//   }
+// })
 
-export const nodeUnfocused = (nodeId) => ({
-  type: nodeActionTypes.NODE_UNFOCUSED,
-  undoable: false,
-  nodeId
-})
+// export const nodeUnfocused = (nodeId) => ({
+//   type: nodeActionTypes.NODE_UNFOCUSED,
+//   undoable: false,
+//   nodeId
+// })
 
-export const nodeDeselected = (nodeId) => ({
-  type: nodeActionTypes.NODE_DESELECTED,
-  undoable: false,
-  nodeId
-})
+// export const nodeDeselected = (nodeId) => ({
+//   type: nodeActionTypes.NODE_DESELECTED,
+//   undoable: false,
+//   nodeId
+// })
 
-export const nodeSelected = (nodeId) => ({
-  type: nodeActionTypes.NODE_SELECTED,
-  undoable: false,
-  nodeId
-})
+// export const nodeSelected = (nodeId) => ({
+//   type: nodeActionTypes.NODE_SELECTED,
+//   undoable: false,
+//   nodeId
+// })
 
 export const nodeParentUpdated = (nodeId, newParentId, updatedById) => ({
   type: nodeActionTypes.NODE_PARENT_UPDATED,

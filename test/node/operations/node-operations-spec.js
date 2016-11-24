@@ -2,6 +2,14 @@ import * as nodeOperations from '../../../src/js/node/operations/node-operations
 import { expect } from 'chai'
 
 describe('nodeOperations', () => {
+  const dummyState = {
+    '1': { id: '1', parentId: undefined, childIds: [ '2', '3', '4', '5' ] },
+    '2': { id: '2', parentId: '1', childIds: [], focused: true },
+    '3': { id: '3', parentId: '1', childIds: [ '4' ] },
+    '4': { id: '4', parentId: '3', childIds: [], selected: true },
+    '5': { id: '5', parentId: '1', childIds: [] }
+  }
+
   const dummyNode = { id: '2', parentId: '1', childIds: [ '3', '4' ] }
 
   describe('create', () => {
@@ -59,6 +67,13 @@ describe('nodeOperations', () => {
       })
     })
   })
+  describe('updateContent', () => {
+    it('should set content to the new content', () => {
+      expect(nodeOperations.updateContent(dummyNode, 'some content')).to.deep.equal({
+        id: '2', parentId: '1', childIds: [ '3', '4' ], content: 'some content'
+      })
+    })
+  })
   describe('deselect', () => {
     it('should set selected to false', () => {
       expect(nodeOperations.deselect(dummyNode)).to.deep.equal({
@@ -74,16 +89,26 @@ describe('nodeOperations', () => {
     })
   })
   describe('focus', () => {
-    it('should set focused to true', () => {
-      expect(nodeOperations.focus(dummyNode)).to.deep.equal({
-        id: '2', parentId: '1', childIds: [ '3', '4' ], focused: true
+    it('should set focused to true and notesFocused to false', () => {
+      expect(nodeOperations.focus(dummyState, '3', false)['3']).to.deep.equal({
+        id: '3', parentId: '1', childIds: [ '4' ], focused: true, notesFocused: false
       })
+    })
+    it('should set focused to false and notesFocused to true when focusNotes true', () => {
+      expect(nodeOperations.focus(dummyState, '3', true)['3']).to.deep.equal({
+        id: '3', parentId: '1', childIds: [ '4' ], focused: false, notesFocused: true
+      })
+    })
+    it('should unfocus the currently focused node and deselect all nodes', () => {
+      const newState = nodeOperations.focus(dummyState, '3', false)
+      expect(newState['2'].focused).to.equal(false)
+      expect(newState['4'].selected).to.equal(false)
     })
   })
   describe('unfocus', () => {
-    it('should set focused to false', () => {
+    it('should set focused and notesFocused to false', () => {
       expect(nodeOperations.unfocus(dummyNode)).to.deep.equal({
-        id: '2', parentId: '1', childIds: [ '3', '4' ], focused: false
+        id: '2', parentId: '1', childIds: [ '3', '4' ], focused: false, notesFocused: false
       })
     })
   })

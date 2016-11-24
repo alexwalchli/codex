@@ -1,14 +1,22 @@
-// import * as nodeActions from '../../../src/js/node/actions/node-actions'
-import { INITIAL_TREE_STATE_LOAD, NODE_CREATION } from '../../../src/js/node/actions/node-action-types'
 import { tree } from '../../../src/js/node/reducers/tree-reducer'
 import * as nodeOperations from '../../../src/js/node/operations/node-operations'
 import * as nodeSelectors from '../../../src/js/node/selectors/node-selectors'
+import * as nodeActions from '../../../src/js/node/actions/node-actions'
 import { expect } from 'chai'
 import sinon from 'sinon'
 
 describe('treeReducer', () => {
+  const dummyState = {
+    '1': { id: '1', parentId: undefined, childIds: [ '2', '3', '4', '5' ] },
+    '2': { id: '2', parentId: '1', childIds: [] },
+    '3': { id: '3', parentId: '1', childIds: [ '4' ] },
+    '4': { id: '4', parentId: '3', childIds: [] },
+    '5': { id: '5', parentId: '1', childIds: [] }
+  }
+
   beforeEach(() => {
     sinon.spy(nodeOperations, 'focus')
+    sinon.spy(nodeOperations, 'unfocus')
     sinon.spy(nodeOperations, 'addChild')
     sinon.spy(nodeOperations, 'create')
     sinon.spy(nodeSelectors, 'getCurrentlySelectedNodeIds')
@@ -17,6 +25,7 @@ describe('treeReducer', () => {
 
   afterEach(() => {
     nodeOperations.focus.restore()
+    nodeOperations.unfocus.restore()
     nodeOperations.addChild.restore()
     nodeOperations.create.restore()
     nodeSelectors.getCurrentlySelectedNodeIds.restore()
@@ -24,35 +33,28 @@ describe('treeReducer', () => {
   })
 
   describe('INITIAL_TREE_STATE_LOAD', () => {
-    const payload = {
-      rootNodeId: '123',
-      initialTreeState: {
-        '123': { id: '123', childIds: [ '456' ] },
-        '456': { id: '456', parentId: '123' }
-      }
+    const rootNodeId = '123'
+    const initialTreeState = {
+      '123': { id: '123', childIds: [ '456' ] },
+      '456': { id: '456', parentId: '123' }
     }
 
     it('should set the state to the initial tree state', () => {
-      const initialTreeStateLoadedAction = {
-        type: INITIAL_TREE_STATE_LOAD,
-        payload
-      }
+      const initialTreeStateLoadedAction = nodeActions.initialTreeStateLoad(rootNodeId, initialTreeState)
+
       const newState = tree(null, initialTreeStateLoadedAction)
 
       expect(newState).to.deep.equal({
         '123': { id: '123', childIds: [ '456' ] },
-        '456': { id: '456', parentId: '123', focused: true }
+        '456': { id: '456', parentId: '123', focused: true, notesFocused: false }
       })
     })
     it('should focus the first child of the root node', () => {
-      const initialTreeStateLoadedAction = {
-        type: INITIAL_TREE_STATE_LOAD,
-        payload
-      }
+      const initialTreeStateLoadedAction = nodeActions.initialTreeStateLoad(rootNodeId, initialTreeState)
 
       tree(null, initialTreeStateLoadedAction)
 
-      expect(nodeOperations.focus).to.have.been.calledWith(payload.initialTreeState['456'])
+      expect(nodeOperations.focus).to.have.been.calledWith(initialTreeStateLoadedAction.payload.initialTreeState, '456', false)
     })
   })
   describe('NODE_CREATION', () => {
@@ -66,36 +68,29 @@ describe('treeReducer', () => {
     }
 
     it('should create the node as a child if the origin node is has children', () => {
-      const nodeCreationAction = {
-        type: NODE_CREATION,
-        payload: {
-          nodeId: '1111',
-          originNodeId: '2',
-          originOffset: 1,
-          content: 'some content',
-          userPageId: 'abc123',
-          userId: 'abc'
-        }
-      }
+      const nodeId = '1111'
+      const originNodeId = '2'
+      const originOffset = 1
+      const content = 'some content'
+      const userPageId = 'abc123'
+      const userId = 'abc'
+      const nodeCreationAction = nodeActions.nodeCreation(nodeId, originNodeId, originOffset, content, userPageId, userId)
 
-      tree(state, nodeCreationAction)
+      const newState = tree(state, nodeCreationAction)
 
+      expect(newState[nodeId]).to.be.defined
       expect(nodeOperations.create).to.have.been.calledWith(
         nodeCreationAction.payload.nodeId, '2', [], nodeCreationAction.payload.content, nodeCreationAction.payload.userId
       )
     })
     it('should create the node as a sibling if the currently selected node is not a parent', () => {
-      const nodeCreationAction = {
-        type: NODE_CREATION,
-        payload: {
-          nodeId: '1111',
-          originNodeId: '3',
-          originOffset: 1,
-          content: 'some content',
-          userPageId: 'abc123',
-          userId: 'abc'
-        }
-      }
+      const nodeId = '1111'
+      const originNodeId = '3'
+      const originOffset = 1
+      const content = 'some content'
+      const userPageId = 'abc123'
+      const userId = 'abc'
+      const nodeCreationAction = nodeActions.nodeCreation(nodeId, originNodeId, originOffset, content, userPageId, userId)
 
       tree(state, nodeCreationAction)
 
@@ -104,17 +99,13 @@ describe('treeReducer', () => {
       )
     })
     it('should create the node as a sibling if the currently selected node is collapsed', () => {
-      const nodeCreationAction = {
-        type: NODE_CREATION,
-        payload: {
-          nodeId: '1111',
-          originNodeId: '4',
-          originOffset: 1,
-          content: 'some content',
-          userPageId: 'abc123',
-          userId: 'abc'
-        }
-      }
+      const nodeId = '1111'
+      const originNodeId = '4'
+      const originOffset = 1
+      const content = 'some content'
+      const userPageId = 'abc123'
+      const userId = 'abc'
+      const nodeCreationAction = nodeActions.nodeCreation(nodeId, originNodeId, originOffset, content, userPageId, userId)
 
       tree(state, nodeCreationAction)
 
@@ -123,68 +114,56 @@ describe('treeReducer', () => {
       )
     })
     it('should focus the new node if the originOffset is greater than 0', () => {
-      const nodeCreationAction = {
-        type: NODE_CREATION,
-        payload: {
-          nodeId: '1111',
-          originNodeId: '4',
-          originOffset: 1,
-          content: 'some content',
-          userPageId: 'abc123',
-          userId: 'abc'
-        }
-      }
+      const nodeId = '1111'
+      const originNodeId = '4'
+      const originOffset = 1
+      const content = 'some content'
+      const userPageId = 'abc123'
+      const userId = 'abc'
+      const nodeCreationAction = nodeActions.nodeCreation(nodeId, originNodeId, originOffset, content, userPageId, userId)
 
       tree(state, nodeCreationAction)
 
       expect(nodeOperations.focus.firstCall.args[0].id).to.equal(nodeCreationAction.payload.nodeId)
     })
     it('should not focus the new node if the originOffset is equal to or less than 0', () => {
-      const nodeCreationAction = {
-        type: NODE_CREATION,
-        payload: {
-          nodeId: '1111',
-          originNodeId: '4',
-          originOffset: 0,
-          content: 'some content',
-          userPageId: 'abc123',
-          userId: 'abc'
-        }
-      }
+      const nodeId = '1111'
+      const originNodeId = '4'
+      const originOffset = 0
+      const content = 'some content'
+      const userPageId = 'abc123'
+      const userId = 'abc'
+      const nodeCreationAction = nodeActions.nodeCreation(nodeId, originNodeId, originOffset, content, userPageId, userId)
 
       tree(state, nodeCreationAction)
 
       expect(nodeOperations.focus).to.not.have.been.called
     })
   })
-  // describe('NODE_FOCUS', () => {
-  //   it('should set the node to focused', () => {
-  //     throw new Error('not impl')
-  //   })
-  // })
-  // describe('NODE_UNFOCUS', () => {
-  //   it('should set the node to unfocused', () => {
-  //     throw new Error('not impl')
-  //   })
-  // })
-  // describe('NODE_FOCUS_ABOVE', () => {
-  //   it('should get the next node above that is visible and focus it', () => {
-  //     throw new Error('not impl')
-  //   })
-  // })
-  // describe('NODE_FOCUS_BELOW', () => {
-  //   it('should get the next node below that is visible and focus it', () => {
-  //     throw new Error('not impl')
-  //   })
-  // })
-  // describe('NODE_DEMOTION', () => {
-  //   it('should reassign the demoted node parentId to its sibling above', () => {
-  //     throw new Error('not impl')
-  //   })
-  //   it('should focus the demoted node', () => {
-  //     throw new Error('not impl')
-  //   })
-  // })
+  describe('NODE_FOCUS', () => {
+    it('should set the node to focused', () => {
+      const newState = tree(dummyState, nodeActions.nodeFocus('2', false))
+
+      expect(nodeOperations.focus.firstCall.args[0]).to.deep.equal(dummyState, '2', false)
+      expect(newState['2'].focused).to.equal(true)
+    })
+  })
+  describe('NODE_UNFOCUS', () => {
+    it('should set the node to unfocused', () => {
+      const newState = tree(dummyState, nodeActions.nodeUnfocus('2'))
+
+      expect(nodeOperations.unfocus.firstCall.args[0]).to.deep.equal(dummyState['2'])
+      expect(newState['2'].focused).to.equal(false)
+    })
+  })
+  describe('NODE_DEMOTION', () => {
+    it('should reassign the demoted node parentId to its sibling above', () => {
+      throw new Error('not impl')
+    })
+    it('should focus the demoted node', () => {
+      throw new Error('not impl')
+    })
+  })
   // describe('NODE_PROMOTION', () => {
   //   it('it should reassign all siblings below to be the promoted nodes children', () => {
   //     throw new Error('not impl')

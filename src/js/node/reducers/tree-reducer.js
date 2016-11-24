@@ -11,8 +11,6 @@ import {
   NODE_CONTENT_UPDATE,
   NODE_FOCUS,
   NODE_UNFOCUS,
-  NODE_FOCUS_ABOVE,
-  NODE_FOCUS_BELOW,
   NODE_DEMOTION,
   NODE_PROMOTION,
   NODE_EXPANSION_TOGGLE,
@@ -31,10 +29,8 @@ export const tree = reducerFactory({
   [INITIAL_TREE_STATE_LOAD]: (state, action) => {
     const { initialTreeState, rootNodeId } = action.payload
     const rootNode = initialTreeState[rootNodeId]
-    const newState = Object.assign({}, action.payload.initialTreeState)
-    newState[rootNode.childIds[0]] = nodeOperations.focus(newState[rootNode.childIds[0]])
 
-    return newState
+    return nodeOperations.focus(action.payload.initialTreeState, rootNode.childIds[0], false)
   },
 
   [NODE_CREATION]: (state, action) => {
@@ -58,8 +54,7 @@ export const tree = reducerFactory({
       newState[nodeId] = nodeOperations.focus(newState[nodeId])
     }
 
-    // TODO: should fire via a store.subscribe
-    nodeFirebaseActions.createNode(newState[nodeId], userPageId, parentOfNewNode.childIds)
+    // TODO: nodeFirebaseActions.createNode(newState[nodeId], userPageId, parentOfNewNode.childIds)
 
     return newState
   },
@@ -80,32 +75,31 @@ export const tree = reducerFactory({
   },
 
   [NODE_CONTENT_UPDATE]: (state, action) => {
-    let newState = Object.assign({}, state)
+    // TODO: nodeFirebaseActions.updateNodeContent(nodeId, newContent, appState.auth.id)
+
     const { nodeId, content } = action.payload
-
-    newState[nodeId] = nodeOperations.updateContent(newState[nodeId], content)
-
-    return newState
+    return Object.assign({}, state, {
+      [nodeId]: nodeOperations.updateContent(state[nodeId], content)
+    })
   },
 
   [NODE_FOCUS]: (state, action) => {
-
+    return nodeOperations.focus(state, action.payload.nodeId, action.payload.focusNotes)
   },
 
   [NODE_UNFOCUS]: (state, action) => {
-
-  },
-
-  [NODE_FOCUS_ABOVE]: (state, action) => {
-
-  },
-
-  [NODE_FOCUS_BELOW]: (state, action) => {
-
+    return Object.assign({}, state, {
+      [action.payload.nodeId]: nodeOperations.unfocus(state[action.payload.nodeId])
+    })
   },
 
   [NODE_DEMOTION]: (state, action) => {
+    const { nodeId, rootNodeId, visibleNodes, userId } = action.payload
+    const siblingAbove = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, state, visibleNodes, nodeId, true)
+    const addAfterLastChildOfSiblingAboveId = siblingAbove.childIds[siblingAbove.childIds.length - 1]
 
+    newState = nodeOperations.reassignParent(state, nodeId, parentId, siblingAbove.id, addAfterLastChildOfSiblingAboveId, userId)))
+    return nodeOperations.focus(newState, nodeId, false)
   },
 
   [NODE_PROMOTION]: (state, action) => {

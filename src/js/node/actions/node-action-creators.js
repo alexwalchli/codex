@@ -12,6 +12,28 @@ export const createNode = (originNodeId, originOffset, content) =>
     dispatch(nodeActions.nodeCreation(newNodeId, originNodeId, originOffset, content, appState.auth.id))
   }
 
+export const nodeFocusAbove = (currentNodeId) =>
+  (dispatch, getState) => {
+    const state = getState()
+    const rootNodeId = nodeSelectors.getRootNodeId(state)
+    const nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.getPresentNodes(state), state.visibleNodes.present, currentNodeId, true)
+
+    if (nodeToFocus) {
+      dispatch(nodeActions.nodeFocus(nodeToFocus.id))
+    }
+  }
+
+export const nodeFocusBelow = (currentNodeId) =>
+  (dispatch, getState) => {
+    const appState = getState()
+    const rootNodeId = nodeSelectors.getRootNodeId(appState)
+    const nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.getPresentNodes(appState), appState.visibleNodes.present, currentNodeId, false)
+
+    if (nodeToFocus) {
+      dispatch(nodeActions.nodeFocus(nodeToFocus.id))
+    }
+  }
+
 // old action creators
 
 function getUpdatedChildIdsForAddition (addChildToNode, newNodeId, createdFromSiblingId, createdFromSiblingOffset) {
@@ -86,65 +108,42 @@ export const generateEventsForReassignParentNode = (dispatch, nodeId, oldParentI
 //     dispatch(nodeActions.nodeTransaction(nodeTransaction))
 //   }
 
-export const updateContent = (nodeId, newContent) =>
-  (dispatch, getState) => {
-    const appState = getState()
-    const node = nodeSelectors.getPresentNodes(appState)[nodeId]
+// export const updateContent = (nodeId, newContent) =>
+//   (dispatch, getState) => {
+//     const appState = getState()
+//     const node = nodeSelectors.getPresentNodes(appState)[nodeId]
 
-    node.taggedByIds.forEach(tagId => {
-      if (!newContent.toLowerCase().includes(tagId)) {
-        dispatch(removeTagFromNode(nodeId, tagId))
-      }
-    })
+//     node.taggedByIds.forEach(tagId => {
+//       if (!newContent.toLowerCase().includes(tagId)) {
+//         dispatch(removeTagFromNode(nodeId, tagId))
+//       }
+//     })
 
-    dispatch(nodeFirebaseActions.updateNodeContent(nodeId, newContent, appState.auth.id))
-    dispatch(nodeActions.contentUpdated(nodeId, newContent, appState.auth.id))
-  }
+//     dispatch(nodeFirebaseActions.updateNodeContent(nodeId, newContent, appState.auth.id))
+//     dispatch(nodeActions.contentUpdated(nodeId, newContent, appState.auth.id))
+//   }
 
-export const focusNode = (nodeId, focusNotes) =>
-  (dispatch, getState) => {
-    const appState = getState()
-    const nodes = nodeSelectors.getPresentNodes(appState)
-    const nodeIdToUnfocus = nodeSelectors.getCurrentlyFocusedNodeId(nodes)
-    let events = []
+// export const focusNode = (nodeId, focusNotes) =>
+//   (dispatch, getState) => {
+//     const appState = getState()
+//     const nodes = nodeSelectors.getPresentNodes(appState)
+//     const nodeIdToUnfocus = nodeSelectors.getCurrentlyFocusedNodeId(nodes)
+//     let events = []
 
-    const nodeIdsToDeselect = nodeSelectors.getCurrentlySelectedNodeIds(nodes)
-    nodeIdsToDeselect.forEach(id => {
-      events.push(nodeActions.nodeDeselected(id))
-    })
+//     const nodeIdsToDeselect = nodeSelectors.getCurrentlySelectedNodeIds(nodes)
+//     nodeIdsToDeselect.forEach(id => {
+//       events.push(nodeActions.nodeDeselected(id))
+//     })
 
-    events.push(nodeActions.nodeUnfocused(nodeIdToUnfocus))
-    events.push(nodeActions.nodeFocused(nodeId, focusNotes))
-    dispatch(nodeActions.nodeTransaction(events))
+//     events.push(nodeActions.nodeUnfocused(nodeIdToUnfocus))
+//     events.push(nodeActions.nodeFocused(nodeId, focusNotes))
+//     dispatch(nodeActions.nodeTransaction(events))
 
-    if (nodeIdToUnfocus) {
-      dispatch(nodeFirebaseActions.updateNodeSelectedByUser(nodeIdToUnfocus, null, null))
-    }
-    dispatch(nodeFirebaseActions.updateNodeSelectedByUser(nodeId, appState.auth.id, appState.auth.displayName))
-  }
-
-// TODO: Combine with focusNodeBelow
-export const focusNodeAbove = (currentNodeId) =>
-  (dispatch, getState) => {
-    const state = getState()
-    const rootNodeId = nodeSelectors.getRootNodeId(state)
-    const nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.getPresentNodes(state), state.visibleNodes.present, currentNodeId, true)
-
-    if (nodeToFocus) {
-      dispatch(nodeActions.nodeFocused(nodeToFocus.id))
-    }
-  }
-
-export const focusNodeBelow = (currentNodeId) =>
-  (dispatch, getState) => {
-    const appState = getState()
-    const rootNodeId = nodeSelectors.getRootNodeId(appState)
-    const nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.getPresentNodes(appState), appState.visibleNodes.present, currentNodeId, false)
-
-    if (nodeToFocus) {
-      dispatch(nodeActions.nodeFocused(nodeToFocus.id))
-    }
-  }
+//     if (nodeIdToUnfocus) {
+//       dispatch(nodeFirebaseActions.updateNodeSelectedByUser(nodeIdToUnfocus, null, null))
+//     }
+//     dispatch(nodeFirebaseActions.updateNodeSelectedByUser(nodeId, appState.auth.id, appState.auth.displayName))
+//   }
 
 export const demoteNode = (nodeId, parentId) =>
   (dispatch, getState) => {

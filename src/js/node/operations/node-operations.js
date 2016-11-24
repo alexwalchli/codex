@@ -1,3 +1,4 @@
+import * as nodeSelectors from '../selectors/node-selectors'
 
 export const create = (id, parentId, childIds, content, createdById) => {
   return {
@@ -49,6 +50,12 @@ export const updateParent = (node, parentId, userId) => {
   })
 }
 
+export const updateContent = (node, content) => {
+  return Object.assign({}, node, {
+    content
+  })
+}
+
 export const select = (node) => {
   return Object.assign({}, node, {
     selected: true
@@ -63,14 +70,29 @@ export const deselect = (node) => {
 
 export const unfocus = (node) => {
   return Object.assign({}, node, {
-    focused: false
+    focused: false,
+    notesFocused: false
   })
 }
 
-export const focus = (node) => {
-  return Object.assign({}, node, {
-    focused: true
+export const focus = (state, nodeId, focusNotes) => {
+  let newState = Object.assign(state)
+  const currentlyFocusedNodeId = nodeSelectors.getCurrentlyFocusedNodeId(state)
+
+  if (currentlyFocusedNodeId) {
+    newState[currentlyFocusedNodeId] = unfocus(newState[currentlyFocusedNodeId])
+  }
+
+  nodeSelectors.getCurrentlySelectedNodeIds(state).forEach(id => {
+    newState[id] = deselect(newState[id])
   })
+
+  newState[nodeId] = Object.assign({}, newState[nodeId], {
+    focused: !focusNotes,
+    notesFocused: focusNotes
+  })
+
+  return newState
 }
 
 export const reassignParent = (state, nodeId, currentParentId, newParentd, addAfterSiblingId, userId) => {
