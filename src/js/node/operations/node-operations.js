@@ -95,6 +95,30 @@ export const focus = (state, nodeId, focusNotes) => {
   return newState
 }
 
+export const expand = (state, nodeIds, userId) => {
+  nodeIds.forEach(nodeId => {
+    state[nodeId] = Object.assign({}, state[nodeId], {
+      collapsedBy: Object.assign({}, state[nodeId].collapsedBy, {
+        [userId]: false
+      })
+    })
+  })
+
+  return state
+}
+
+export const collapse = (state, nodeIds, userId) => {
+  nodeIds.forEach(nodeId => {
+    state[nodeId] = Object.assign({}, state[nodeId], {
+      collapsedBy: Object.assign({}, state[nodeId].collapsedBy, {
+        [userId]: true
+      })
+    })
+  })
+
+  return state
+}
+
 export const reassignParent = (state, nodeId, currentParentId, newParentd, addAfterSiblingId, userId) => {
   let newState = Object.assign(state)
 

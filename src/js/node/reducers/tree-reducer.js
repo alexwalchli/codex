@@ -1,6 +1,5 @@
 // the new tree reducer in progress
 import { reducerFactory } from '../../redux/reducer-factory'
-import * as nodeFirebaseActions from '../actions/node-firebase-actions'
 import * as nodeOperations from '../operations/node-operations'
 import * as nodeSelectors from '../selectors/node-selectors'
 import {
@@ -35,7 +34,7 @@ export const tree = reducerFactory({
 
   [NODE_CREATION]: (state, action) => {
     let newState = Object.assign({}, state)
-    const { nodeId, originNodeId, originOffset, content, userPageId, userId } = action.payload
+    const { nodeId, originNodeId, originOffset, content, userId } = action.payload
     const originNode = state[originNodeId]
     const parentOfNewNode = state[originNode.childIds.length === 0 || originNode.collapsed ? originNode.parentId : originNodeId]
 
@@ -94,20 +93,51 @@ export const tree = reducerFactory({
   },
 
   [NODE_DEMOTION]: (state, action) => {
-    const { nodeId, rootNodeId, visibleNodes, userId } = action.payload
+    // TODO: update Firebase
+
+    const { nodeId, parentId, rootNodeId, visibleNodes, userId } = action.payload
     const siblingAbove = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, state, visibleNodes, nodeId, true)
     const addAfterLastChildOfSiblingAboveId = siblingAbove.childIds[siblingAbove.childIds.length - 1]
 
-    newState = nodeOperations.reassignParent(state, nodeId, parentId, siblingAbove.id, addAfterLastChildOfSiblingAboveId, userId)))
+    const newState = nodeOperations.reassignParent(state, nodeId, parentId, siblingAbove.id, addAfterLastChildOfSiblingAboveId, userId)
     return nodeOperations.focus(newState, nodeId, false)
   },
 
   [NODE_PROMOTION]: (state, action) => {
+    // TODO: update Firebase
 
+    let newState = Object.assign({}, state)
+    const { nodeId, parentId, userId } = action.payload
+    const parentNode = state[parentId]
+    const siblingIds = parentNode.childIds
+
+    // reassign all siblings below to the promoted node
+    for (let i = siblingIds.indexOf(nodeId) + 1; i < siblingIds.length; i++) {
+      let sibling = newState[siblingIds[i]]
+      newState = nodeOperations.reassignParent(newState, sibling.id, sibling.parentId, nodeId, userId)
+    }
+
+    // reassign the node to its parent's parent
+    nodeOperations.reassignParent(newState, nodeId, parentNode.id, parentNode.parentId, parentId, userId)
+
+    return nodeOperations.focus(newState, nodeId, false)
   },
 
   [NODE_EXPANSION_TOGGLE]: (state, action) => {
+    let newState = Object.assign({}, state)
+    const { nodeId, forceToggleChildrenExpansion, userId } = action.payload
+    const allDescendantIds = forceToggleChildrenExpansion
+                              ? nodeSelectors.getAllDescendantIds(state, nodeId)
+                              : nodeSelectors.getAllUncollapsedDescedantIds(nodeId, state, nodeId)
+    if (state[nodeId].collapsedBy[userId]) {
+      // TODO: dispatch(nodeFirebaseActions.expandNode(nodeId, state.auth.id)))
+      newState = nodeOperations.expand(newState, [ nodeId, ...allDescendantIds ], userId)
+    } else {
+      // TODO: dispatch(nodeFirebaseActions.collapseNode(nodeId, state.auth.id))
+      newState = nodeOperations.collapse(newState, [ nodeId, ...allDescendantIds ], userId)
+    }
 
+    return newState
   },
 
   [NODE_SELECTION]: (state, action) => {

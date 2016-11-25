@@ -145,16 +145,16 @@ export const generateEventsForReassignParentNode = (dispatch, nodeId, oldParentI
 //     dispatch(nodeFirebaseActions.updateNodeSelectedByUser(nodeId, appState.auth.id, appState.auth.displayName))
 //   }
 
-export const demoteNode = (nodeId, parentId) =>
-  (dispatch, getState) => {
-    const appState = getState()
-    const rootNodeId = nodeSelectors.getRootNodeId(appState)
-    const siblingAbove = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.getPresentNodes(appState), appState.visibleNodes.present, nodeId, true)
-    const addAfterLastChildOfSiblingAboveId = siblingAbove.childIds[siblingAbove.childIds.length - 1]
+// export const demoteNode = (nodeId, parentId) =>
+//   (dispatch, getState) => {
+//     const appState = getState()
+//     const rootNodeId = nodeSelectors.getRootNodeId(appState)
+//     const siblingAbove = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.getPresentNodes(appState), appState.visibleNodes.present, nodeId, true)
+//     const addAfterLastChildOfSiblingAboveId = siblingAbove.childIds[siblingAbove.childIds.length - 1]
 
-    dispatch(nodeActions.nodeTransaction(generateEventsForReassignParentNode(dispatch, nodeId, parentId, siblingAbove.id, addAfterLastChildOfSiblingAboveId, appState)))
-    dispatch(nodeActions.nodeFocused(nodeId))
-  }
+//     dispatch(nodeActions.nodeTransaction(generateEventsForReassignParentNode(dispatch, nodeId, parentId, siblingAbove.id, addAfterLastChildOfSiblingAboveId, appState)))
+//     dispatch(nodeActions.nodeFocused(nodeId))
+//   }
 
 export const promoteNode = (nodeId, parentId) =>
   (dispatch, getState) => {

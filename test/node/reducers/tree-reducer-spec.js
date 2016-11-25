@@ -7,11 +7,18 @@ import sinon from 'sinon'
 
 describe('treeReducer', () => {
   const dummyState = {
-    '1': { id: '1', parentId: undefined, childIds: [ '2', '3', '4', '5' ] },
+    '1': { id: '1', parentId: undefined, childIds: [ '2', '3', '5' ] },
     '2': { id: '2', parentId: '1', childIds: [] },
     '3': { id: '3', parentId: '1', childIds: [ '4' ] },
     '4': { id: '4', parentId: '3', childIds: [] },
     '5': { id: '5', parentId: '1', childIds: [] }
+  }
+  const dummyVisibleNodes = {
+    '1': true,
+    '2': true,
+    '3': true,
+    '4': true,
+    '5': true
   }
 
   beforeEach(() => {
@@ -19,6 +26,7 @@ describe('treeReducer', () => {
     sinon.spy(nodeOperations, 'unfocus')
     sinon.spy(nodeOperations, 'addChild')
     sinon.spy(nodeOperations, 'create')
+    sinon.spy(nodeSelectors, 'getNextNodeThatIsVisible')
     sinon.spy(nodeSelectors, 'getCurrentlySelectedNodeIds')
     sinon.spy(nodeSelectors, 'getCurrentlyFocusedNodeId')
   })
@@ -28,6 +36,7 @@ describe('treeReducer', () => {
     nodeOperations.unfocus.restore()
     nodeOperations.addChild.restore()
     nodeOperations.create.restore()
+    nodeSelectors.getNextNodeThatIsVisible.restore()
     nodeSelectors.getCurrentlySelectedNodeIds.restore()
     nodeSelectors.getCurrentlyFocusedNodeId.restore()
   })
@@ -157,29 +166,70 @@ describe('treeReducer', () => {
     })
   })
   describe('NODE_DEMOTION', () => {
-    it('should reassign the demoted node parentId to its sibling above', () => {
-      throw new Error('not impl')
-    })
-    it('should focus the demoted node', () => {
-      throw new Error('not impl')
+    // TODO: instead of demoting to the node above, which could cause the node to be demoted several levels
+    // should it only get demoted 1 level, to its next sibling above, if possible?
+    it('should reassign the demoted node parentId to the node above and focus it', () => {
+      const nodeDemotionAction = nodeActions.nodeDemotion('5', '1', '1', dummyVisibleNodes, 'user123')
+
+      const newState = tree(dummyState, nodeDemotionAction)
+
+      expect(newState['5'].parentId).to.equal('4')
+      expect(newState['5'].focused).to.equal(true)
+      expect(nodeOperations.focus.firstCall.args[1]).to.equal('5')
     })
   })
-  // describe('NODE_PROMOTION', () => {
-  //   it('it should reassign all siblings below to be the promoted nodes children', () => {
-  //     throw new Error('not impl')
-  //   })
-  //   it('should focus the demoted node', () => {
-  //     throw new Error('not impl')
-  //   })
-  // })
-  // describe('NODE_EXPANSION_TOGGLE', () => {
-  //   it('should expand the node and its uncollapsed descendents if it is currently collapsed by the current user', () => {
-  //     throw new Error('not impl')
-  //   })
-  //   it('should collapse the node and its expanded descendents if it is currently collapsed by the current user', () => {
-  //     throw new Error('not impl')
-  //   })
-  // })
+  describe('NODE_PROMOTION', () => {
+    it('it should reassign all siblings below to be the promoted nodes children and focus the promoted node', () => {
+      const state = {
+        '1': { id: '1', parentId: undefined, childIds: [ '2' ] },
+        '2': { id: '2', parentId: '1', childIds: ['3', '4', '5'] },
+        '3': { id: '3', parentId: '2', childIds: [] },
+        '4': { id: '4', parentId: '2', childIds: [] },
+        '5': { id: '5', parentId: '2', childIds: [] }
+      }
+      const nodePromotionAction = nodeActions.nodePromotion('4', '2', '1', dummyVisibleNodes, 'user123')
+
+      const newState = tree(state, nodePromotionAction)
+
+      expect(newState['5'].parentId).to.equal('4')
+      expect(newState['4'].focused).to.equal(true)
+      expect(newState['4'].parentId).to.equal('1')
+      expect(newState['2'].childIds).to.deep.equal(['3'])
+      expect(newState['1'].childIds).to.deep.equal(['2', '4'])
+    })
+  })
+  describe('NODE_EXPANSION_TOGGLE', () => {
+    it('should expand the node and its collapsed descendents if it is currently collapsed by the current user', () => {
+      const state = {
+        '1': { id: '1', parentId: undefined, childIds: [ '2' ] },
+        '2': { id: '2', parentId: '1', childIds: ['3', '4', '5'], collapsedBy: { 'user123': true } },
+        '3': { id: '3', parentId: '2', childIds: [] },
+        '4': { id: '4', parentId: '2', childIds: ['5'], collapsedBy: { 'user123': true } },
+        '5': { id: '5', parentId: '4', childIds: [] }
+      }
+      const nodeExpansionToggleAction = nodeActions.nodeExpansionToggle('2', true, 'user123')
+
+      const newState = tree(state, nodeExpansionToggleAction)
+
+      expect(newState['2'].collapsedBy).to.deep.equal({ 'user123': false })
+      expect(newState['4'].collapsedBy).to.deep.equal({ 'user123': false })
+    })
+    it('should collapse the node and its expanded descendents if it is currently collapsed by the current user', () => {
+      const state = {
+        '1': { id: '1', parentId: undefined, childIds: [ '2' ] },
+        '2': { id: '2', parentId: '1', childIds: ['3', '4', '5'], collapsedBy: { 'user123': false } },
+        '3': { id: '3', parentId: '2', childIds: [] },
+        '4': { id: '4', parentId: '2', childIds: ['5'], collapsedBy: { 'user123': false } },
+        '5': { id: '5', parentId: '4', childIds: [] }
+      }
+      const nodeExpansionToggleAction = nodeActions.nodeExpansionToggle('2', true, 'user123')
+
+      const newState = tree(state, nodeExpansionToggleAction)
+
+      expect(newState['2'].collapsedBy).to.deep.equal({ 'user123': true })
+      expect(newState['4'].collapsedBy).to.deep.equal({ 'user123': true })
+    })
+  })
   // describe('NODE_SELECTION', () => {
   //   it('should select the node and all its descendants', () => {
   //     throw new Error('not impl')

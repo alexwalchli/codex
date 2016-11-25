@@ -105,6 +105,38 @@ describe('nodeOperations', () => {
       expect(newState['4'].selected).to.equal(false)
     })
   })
+  describe('expand', () => {
+    it('should set all nodes uncollapsed for the user', () => {
+      const state = {
+        '1': { id: '1', parentId: undefined, childIds: [ '2' ] },
+        '2': { id: '2', parentId: '1', childIds: ['3', '4', '5'], collapsedBy: { 'user123': true } },
+        '3': { id: '3', parentId: '2', childIds: [] },
+        '4': { id: '4', parentId: '2', childIds: ['5'], collapsedBy: { 'user123': true } },
+        '5': { id: '5', parentId: '4', childIds: [] }
+      }
+
+      const newState = nodeOperations.expand(state, [ '2', '4' ], 'user456')
+
+      expect(newState['2'].collapsedBy).to.deep.equal({ 'user123': true, 'user456': false })
+      expect(newState['4'].collapsedBy).to.deep.equal({ 'user123': true, 'user456': false })
+    })
+  })
+  describe('collapse', () => {
+    it('should set all nodes collapsed for the user', () => {
+      const state = {
+        '1': { id: '1', parentId: undefined, childIds: [ '2' ] },
+        '2': { id: '2', parentId: '1', childIds: ['3', '4', '5'], collapsedBy: { 'user123': true } },
+        '3': { id: '3', parentId: '2', childIds: [] },
+        '4': { id: '4', parentId: '2', childIds: ['5'], collapsedBy: { 'user123': true } },
+        '5': { id: '5', parentId: '4', childIds: [] }
+      }
+
+      const newState = nodeOperations.collapse(state, [ '2', '4' ], 'user456')
+
+      expect(newState['2'].collapsedBy).to.deep.equal({ 'user123': true, 'user456': true })
+      expect(newState['4'].collapsedBy).to.deep.equal({ 'user123': true, 'user456': true })
+    })
+  })
   describe('unfocus', () => {
     it('should set focused and notesFocused to false', () => {
       expect(nodeOperations.unfocus(dummyNode)).to.deep.equal({

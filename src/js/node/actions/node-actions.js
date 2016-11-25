@@ -48,22 +48,33 @@ export const nodeFocusAbove = (nodeId) => ({
   }
 })
 
-export const nodeDemotion = (nodeId, rootNodeId, visibleNodes, userId) => ({
+export const nodeDemotion = (nodeId, parentId, rootNodeId, visibleNodes, userId) => ({
   type: nodeActionTypes.NODE_DEMOTION,
   payload: {
     nodeId,
+    parentId,
     rootNodeId,
     visibleNodes,
     userId
   }
 })
 
-export const nodePromotion = (nodeId, rootNodeId, visibleNodes, userId) => ({
+export const nodePromotion = (nodeId, parentId, rootNodeId, visibleNodes, userId) => ({
   type: nodeActionTypes.NODE_PROMOTION,
   payload: {
     nodeId,
+    parentId,
     rootNodeId,
     visibleNodes,
+    userId
+  }
+})
+
+export const nodeExpansionToggle = (nodeId, forceToggleChildrenExpansion, userId) => ({
+  type: nodeActionTypes.NODE_EXPANSION_TOGGLE,
+  payload: {
+    nodeId,
+    forceToggleChildrenExpansion,
     userId
   }
 })
