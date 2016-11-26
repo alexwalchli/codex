@@ -4,21 +4,26 @@ import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 import configureStore from './redux/configure-store'
 import App from './app/components/app'
-import { subscribeToAuthStateChanged } from './auth/actions/auth-firebase-subscriptions'
+import { subscribeToAuthStateChanged } from './auth/subscriptions/auth-subscriptions'
 
 require('../less/app.less')
 
-const store = configureStore({
-  tree: {},
-  auth: {},
-  userPages: {}
-})
+startApplication()
 
-render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
-  document.getElementById('root')
-)
+function startApplication () {
+  const store = configureStore({
+    tree: {},
+    auth: {},
+    userPages: {}
+  })
 
-subscribeToAuthStateChanged(store.dispatch)
+  render(
+    <Provider store={store}>
+      <App />
+    </Provider>,
+    document.getElementById('root')
+  )
+
+  subscribeToAuthStateChanged(store.dispatch)
+}
+

@@ -1,7 +1,5 @@
 import * as nodeActionTypes from './node-action-types'
 
-// new actions
-
 export const initialTreeStateLoad = (rootNodeId, initialTreeState, userId) => ({
   type: nodeActionTypes.INITIAL_TREE_STATE_LOAD,
   payload: {
@@ -23,6 +21,24 @@ export const nodeCreation = (nodeId, originNodeId, originOffset, content, userPa
   }
 })
 
+export const nodeContentUpdate = (nodeId, content, userId) => ({
+  type: nodeActionTypes.NODE_CONTENT_UPDATE,
+  payload: {
+    nodeId,
+    content,
+    userId
+  }
+})
+
+export const nodeNotesUpdate = (nodeId, notes, userId) => ({
+  type: nodeActionTypes.NODE_NOTES_UPDATE,
+  payload: {
+    nodeId,
+    notes,
+    userId
+  }
+})
+
 export const nodeFocus = (nodeId, focusNotes) => ({
   type: nodeActionTypes.NODE_FOCUS,
   undoable: false,
@@ -40,30 +56,20 @@ export const nodeUnfocus = (nodeId) => ({
   }
 })
 
-export const nodeFocusAbove = (nodeId) => ({
-  type: nodeActionTypes.NODE_UNFOCUS,
-  undoable: false,
-  payload: {
-    nodeId
-  }
-})
-
-export const nodeDemotion = (nodeId, parentId, rootNodeId, visibleNodes, userId) => ({
+export const nodeDemotion = (nodeId, rootNodeId, visibleNodes, userId) => ({
   type: nodeActionTypes.NODE_DEMOTION,
   payload: {
     nodeId,
-    parentId,
     rootNodeId,
     visibleNodes,
     userId
   }
 })
 
-export const nodePromotion = (nodeId, parentId, rootNodeId, visibleNodes, userId) => ({
+export const nodePromotion = (nodeId, rootNodeId, visibleNodes, userId) => ({
   type: nodeActionTypes.NODE_PROMOTION,
   payload: {
     nodeId,
-    parentId,
     rootNodeId,
     visibleNodes,
     userId
@@ -79,194 +85,54 @@ export const nodeExpansionToggle = (nodeId, forceToggleChildrenExpansion, userId
   }
 })
 
-// old types
-export const nodeTransaction = (events) => {
-  return {
-    type: nodeActionTypes.NODE_TRANSACTION,
-    payload: events
-  }
-}
-
-// export const nodeCreated = (newNode) => ({
-//   type: nodeActionTypes.NODE_CREATED,
-//   nodeId: newNode.id,
-//   payload: newNode
-// })
-
-export const nodeUpdated = (updatedNode) => ({
-  type: nodeActionTypes.NODE_UPDATED,
-  nodeId: updatedNode.id,
-  payload: updatedNode
-})
-
-// export const contentUpdated = (nodeId, content, updatedById) => ({
-//   type: nodeActionTypes.CONTENT_UPDATED,
-//   nodeId,
-//   payload: {
-//     content,
-//     updatedById
-//   }
-// })
-
-export const childIdsUpdated = (nodeId, newChildIds, updatedById) => ({
-  type: nodeActionTypes.CHILD_IDS_UPDATED,
-  nodeId,
+export const nodeExpansion = (nodeId, descendantIds, uncollapsedChildren, userId) => ({
+  type: nodeActionTypes.NODE_EXPANSION,
   payload: {
-    newChildIds,
-    updatedById
-  }
-})
-
-export const nodesDeleted = (nodeIds) => ({
-  type: nodeActionTypes.NODES_DELETED,
-  payload: {
-    nodeIds
-  }
-})
-
-export const nodeExpanded = (nodeId, allDescendentIds, userId) => ({
-  type: nodeActionTypes.NODE_EXPANDED,
-  nodeId,
-  payload: {
-    allDescendentIds,
+    nodeId,
+    descendantIds,
     userId
   }
 })
 
-export const nodeCollapsed = (nodeId, allDescendentIds, userId) => ({
-  type: nodeActionTypes.NODE_COLLAPSED,
-  nodeId,
+export const nodeCollapse = (nodeId, descendantIds, userId) => ({
+  type: nodeActionTypes.NODE_COLLAPSE,
   payload: {
-    allDescendentIds,
+    nodeId,
+    descendantIds,
     userId
   }
 })
 
-// export const nodeFocused = (nodeId, focusNotes) => ({
-//   type: nodeActionTypes.NODE_FOCUSED,
-//   undoable: false,
-//   nodeId,
-//   payload: {
-//     focusNotes
-//   }
-// })
-
-// export const nodeUnfocused = (nodeId) => ({
-//   type: nodeActionTypes.NODE_UNFOCUSED,
-//   undoable: false,
-//   nodeId
-// })
-
-// export const nodeDeselected = (nodeId) => ({
-//   type: nodeActionTypes.NODE_DESELECTED,
-//   undoable: false,
-//   nodeId
-// })
-
-// export const nodeSelected = (nodeId) => ({
-//   type: nodeActionTypes.NODE_SELECTED,
-//   undoable: false,
-//   nodeId
-// })
-
-export const nodeParentUpdated = (nodeId, newParentId, updatedById) => ({
-  type: nodeActionTypes.NODE_PARENT_UPDATED,
-  nodeId,
+export const nodeSelection = (nodeId) => ({
+  type: nodeActionTypes.NODE_SELECTION,
   payload: {
-    newParentId,
-    updatedById
+    nodeId
   }
 })
 
-export const nodesSearched = (nodeIds) => ({
-  type: nodeActionTypes.NODES_SEARCHED,
-  undoable: false,
+export const nodeDeselection = (nodeId) => ({
+  type: nodeActionTypes.NODE_DESELECTION,
   payload: {
-    resultingNodeIds: nodeIds
+    nodeId
   }
 })
 
-export const nodeWidgetsUpdated = (nodeId, widgets) => ({
-  type: nodeActionTypes.NODE_WIDGETS_UPDATED,
-  nodeId,
-  widgets
-})
-
-export const nodeWidgetDataUpdating = (nodeId) => ({
-  type: nodeActionTypes.NODE_WIDGETS_UPDATING,
-  nodeId
-})
-
-export const closeAllMenusAndDeselectAllNodes = (excludeNodeId) => ({
-  type: nodeActionTypes.CLOSE_ALL_NODE_MENUS_AND_DESELECT_ALL_NODES,
-  undoable: false,
+export const nodeCompletionToggle = (nodeId, userId) => ({
+  type: nodeActionTypes.NODE_COMPLETION_TOGGLE,
   payload: {
-    excludeNodeId
+    nodeId,
+    userId
   }
 })
 
-export const nodeCompleteToggled = (nodeId) => ({
-  type: nodeActionTypes.NODE_COMPLETE_TOGGLED,
-  nodeId
+export const nodeUpdateFromSubscription = (node) => ({
+  type: nodeActionTypes.NODE_UPDATE_FROM_SUBSCRIPTION,
+  payload: { ...node }
 })
 
-export const nodesCompleted = (nodeIds) => ({
-  type: nodeActionTypes.NODES_COMPLETED,
+export const nodeDeletionFromSubscription = (nodeId) => ({
+  type: nodeActionTypes.NODE_DELETION_FROM_SUBSCRIPTION,
   payload: {
-    nodeIds
-  }
-})
-
-export const nodeNotesUpdated = (nodeId, notes) => ({
-  type: nodeActionTypes.NODE_NOTES_UPDATED,
-  nodeId,
-  payload: {
-    notes
-  }
-})
-
-export const nodeDisplayModeUpdated = (nodeId, mode) => ({
-  type: nodeActionTypes.NODE_DISPLAY_MODE_UPDATED,
-  nodeId,
-  payload: {
-    mode
-  }
-})
-
-export const nodeMenuToggled = (nodeId) => ({
-  type: nodeActionTypes.NODE_MENU_TOGGLED,
-  nodeId,
-  undoable: false
-})
-
-export const removeChildNode = (nodeId, childId) => ({
-  type: nodeActionTypes.REMOVE_CHILD_NODE,
-  nodeId,
-  payload: {
-    childId
-  }
-})
-
-export const nodeTagsUpdated = (nodeId, updatedTagIds) => ({
-  type: nodeActionTypes.NODE_TAGS_UPDATED,
-  nodeId,
-  payload: {
-    updatedTagIds
-  }
-})
-
-export const tagAdded = (nodeId, tagId) => ({
-  type: nodeActionTypes.TAG_ADDED,
-  nodeId,
-  payload: {
-    tagId
-  }
-})
-
-export const tagRemoved = (nodeId, tagId) => ({
-  type: nodeActionTypes.TAG_REMOVED,
-  nodeId,
-  payload: {
-    tagId
+    nodeId
   }
 })

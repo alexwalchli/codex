@@ -8,10 +8,10 @@ import sinon from 'sinon'
 describe('treeReducer', () => {
   const dummyState = {
     '1': { id: '1', parentId: undefined, childIds: [ '2', '3', '5' ] },
-    '2': { id: '2', parentId: '1', childIds: [] },
-    '3': { id: '3', parentId: '1', childIds: [ '4' ] },
-    '4': { id: '4', parentId: '3', childIds: [] },
-    '5': { id: '5', parentId: '1', childIds: [] }
+    '2': { id: '2', parentId: '1', childIds: [], collapsedBy: {} },
+    '3': { id: '3', parentId: '1', childIds: [ '4' ], collapsedBy: {} },
+    '4': { id: '4', parentId: '3', childIds: [], collapsedBy: {} },
+    '5': { id: '5', parentId: '1', childIds: [], collapsedBy: {} }
   }
   const dummyVisibleNodes = {
     '1': true,
@@ -149,6 +149,14 @@ describe('treeReducer', () => {
       expect(nodeOperations.focus).to.not.have.been.called
     })
   })
+  describe('NODE_CONTENT_UPDATE', () => {
+    it('should set the node to content and set updatedById', () => {
+      const newState = tree(dummyState, nodeActions.nodeContentUpdate('2', 'new content', 'user123'))
+
+      expect(newState['2'].content).to.equal('new content')
+      expect(newState['2'].updatedById).to.equal('user123')
+    })
+  })
   describe('NODE_FOCUS', () => {
     it('should set the node to focused', () => {
       const newState = tree(dummyState, nodeActions.nodeFocus('2', false))
@@ -169,7 +177,7 @@ describe('treeReducer', () => {
     // TODO: instead of demoting to the node above, which could cause the node to be demoted several levels
     // should it only get demoted 1 level, to its next sibling above, if possible?
     it('should reassign the demoted node parentId to the node above and focus it', () => {
-      const nodeDemotionAction = nodeActions.nodeDemotion('5', '1', '1', dummyVisibleNodes, 'user123')
+      const nodeDemotionAction = nodeActions.nodeDemotion('5', '1', dummyVisibleNodes, 'user123')
 
       const newState = tree(dummyState, nodeDemotionAction)
 
@@ -230,31 +238,55 @@ describe('treeReducer', () => {
       expect(newState['4'].collapsedBy).to.deep.equal({ 'user123': true })
     })
   })
-  // describe('NODE_SELECTION', () => {
-  //   it('should select the node and all its descendants', () => {
-  //     throw new Error('not impl')
-  //   })
-  // })
-  // describe('NODE_DESELECTION', () => {
-  //   it('should deselect the node and all its descendants', () => {
-  //     throw new Error('not impl')
-  //   })
-  // })
-  // describe('NODE_COMPLETION_TOGGLE', () => {
-  //   it('should toggle the nodes complete attribute', () => {
-  //     throw new Error('not impl')
-  //   })
-  // })
+  describe('NODE_SELECTION', () => {
+    it('should select the node and all its descendants', () => {
+      const nodeSelectionAction = nodeActions.nodeSelection('3')
+
+      const newState = tree(dummyState, nodeSelectionAction)
+
+      expect(newState['3'].selected).to.equal(true)
+      expect(newState['4'].selected).to.equal(true)
+    })
+  })
+  describe('NODE_DESELECTION', () => {
+    it('should deselect the node and all its descendants', () => {
+      const nodeDeselectionAction = nodeActions.nodeDeselection('3')
+
+      const newState = tree(dummyState, nodeDeselectionAction)
+
+      expect(newState['3'].selected).to.equal(false)
+      expect(newState['4'].selected).to.equal(false)
+    })
+  })
+  describe('NODE_COMPLETION_TOGGLE', () => {
+    it('should toggle the node completed', () => {
+      const nodeCompletionToggle = nodeActions.nodeCompletionToggle('2', 'user123')
+
+      let newState = tree(dummyState, nodeCompletionToggle)
+
+      expect(newState['2'].completed).to.equal(true)
+      expect(newState['2'].updatedById).to.equal('user123')
+
+      newState = tree(newState, nodeCompletionToggle)
+
+      expect(newState['2'].completed).to.equal(false)
+      expect(newState['2'].updatedById).to.equal('user123')
+    })
+  })
+  describe('NODE_NOTES_UPDATE', () => {
+    it('should update the node notes', () => {
+      const newState = tree(dummyState, nodeActions.nodeNotesUpdate('2', 'new notes', 'user123'))
+
+      expect(newState['2'].notes).to.equal('new notes')
+      expect(newState['2'].updatedById).to.equal('user123')
+    })
+  })
   // describe('NODES_COMPLETION', () => {
   //   it('should set all nodes to complete', () => {
   //     throw new Error('not impl')
   //   })
   // })
-  // describe('NODE_NOTES_UPDATE', () => {
-  //   it('should update the node notes', () => {
-  //     throw new Error('not impl')
-  //   })
-  // })
+
   // describe('NODE_DISPLAY_MODE_UPDATE', () => {
   //   it('should update the node display mode', () => {
   //     throw new Error('not impl')

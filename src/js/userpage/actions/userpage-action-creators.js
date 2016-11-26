@@ -1,26 +1,25 @@
 /* global confirm */
 
-import { firebaseDb } from '../../firebase/'
 import * as appActions from '../../app/actions/app-actions'
 import nodeFactory from '../../node/helpers/node-factory'
+import nodeRepository from '../../node/repositories/node-repository'
 import userPageFactory from '../helpers/userpage-factory'
 import * as nodeSelectors from '../../node/selectors/node-selectors'
-import * as userPageFirebaseActions from './userpage-firebase-actions'
 import * as userPageActions from './userpage-actions'
+import * as userPageRepository from '../repositories/userpage-repository'
 
-export const createNewUserPage = (title) =>
+export const createUserPage = (title) =>
   (dispatch, getState) => {
-    // create new root node
-    let appState = getState()
-    let rootNodeId = firebaseDb.ref('nodes').push().key
-    let firstNodeId = firebaseDb.ref('nodes').push().key
-    let newUserPageId = firebaseDb.ref('userPages').push().key
+    const state = getState()
+    const rootNodeId = nodeRepository.getNewNodeId()
+    const firstNodeId = nodeRepository.getNewNodeId()
+    const newUserPageId = nodeRepository.getNewNodeId()
 
-    let newRootNode = nodeFactory(rootNodeId, null, [firstNodeId], '', appState.auth.id)
-    let newFirstNode = nodeFactory(firstNodeId, rootNodeId, [], '', appState.auth.id)
-    let newUserPage = userPageFactory(newUserPageId, rootNodeId, appState.auth.id)
+    const newRootNode = nodeFactory(rootNodeId, null, [firstNodeId], '', state.auth.id)
+    const newFirstNode = nodeFactory(firstNodeId, rootNodeId, [], '', state.auth.id)
+    const newUserPage = userPageFactory(newUserPageId, rootNodeId, state.auth.id)
 
-    userPageFirebaseActions.createUserPage(newUserPage, newRootNode, newFirstNode)
+    userPageRepository.createUserPage(newUserPage, newRootNode, newFirstNode)
       .then(snapshot => {
         dispatch(appActions.navigateToUserPage(newUserPageId))
       })
@@ -28,40 +27,40 @@ export const createNewUserPage = (title) =>
 
 export const initializeUserHomePage = () =>
   (dispatch, getState) => {
-    let appState = getState()
-    let rootNodeId = firebaseDb.ref('nodes').push().key
-    let firstNodeId = firebaseDb.ref('nodes').push().key
-    let homeUserPageId = firebaseDb.ref('userPages').push().key
+    const state = getState()
+    const rootNodeId = nodeRepository.getNewNodeId()
+    const firstNodeId = nodeRepository.getNewNodeId()
+    const homeUserPageId = userPageRepository.getNewUserPageId()
 
-    let newRootNode = nodeFactory(rootNodeId, null, [firstNodeId], '', appState.auth.id)
-    let newFirstNode = nodeFactory(firstNodeId, rootNodeId, [], '', appState.auth.id)
-    let newUserPage = userPageFactory(homeUserPageId, rootNodeId, appState.auth.id, 'Home', true)
+    const newRootNode = nodeFactory(rootNodeId, null, [firstNodeId], '', state.auth.id)
+    const newFirstNode = nodeFactory(firstNodeId, rootNodeId, [], '', state.auth.id)
+    const newUserPage = userPageFactory(homeUserPageId, rootNodeId, state.auth.id, 'Home', true)
 
-    userPageFirebaseActions.createUserPage(newUserPage, newRootNode, newFirstNode)
-            .then(snapshot => {
-              dispatch(appActions.navigateToUserPage(homeUserPageId))
-            })
+    userPageRepository.createUserPage(newUserPage, newRootNode, newFirstNode)
+      .then(snapshot => {
+        dispatch(appActions.navigateToUserPage(homeUserPageId))
+      })
   }
 
 export const deleteUserPage = (userPageId) =>
   (dispatch, getState) => {
     if (confirm('Are you sure?')) {
-      const appState = getState()
-      let userPage = appState.userPages[userPageId]
-      let rootNode = appState.nodes[userPage.rootNodeId]
-      let auth = appState.auth
+      const state = getState()
+      const userPage = state.userPages[userPageId]
+      const rootNode = state.nodes[userPage.rootNodeId]
+      const auth = state.auth
 
-      userPageFirebaseActions.deleteUserPage(userPage, rootNode, auth)
-      dispatch(appActions.navigateToUserPage(nodeSelectors.dictionaryToArray(appState.userPages).find(u => u.isHome).id))
-      dispatch(userPageActions.userPageDeleted(userPageId))
+      userPageRepository.deleteUserPage(userPage, rootNode, auth)
+      dispatch(appActions.navigateToUserPage(nodeSelectors.dictionaryToArray(state.userPages).find(u => u.isHome).id))
+      dispatch(userPageActions.userPageDeletion(userPageId))
     }
   }
 
 export const updateUserPageName = (userPageId, newUserPageName) =>
   (dispatch, getState) => {
-    const appState = getState()
-    dispatch(userPageFirebaseActions.updateUserPageName(appState.userPages[userPageId], newUserPageName))
-    dispatch(userPageActions.userPageNameUpdated(userPageId, newUserPageName))
+    const state = getState()
+    userPageRepository.updateUserPageName(state.userPages[userPageId], newUserPageName)
+    dispatch(userPageActions.userPageNameUpdate(userPageId, newUserPageName))
   }
 
 export const shareUserPage = (userPageId, emails) =>
@@ -69,9 +68,11 @@ export const shareUserPage = (userPageId, emails) =>
     if (!emails) {
       return
     }
-    const appState = getState()
-    let emailsArr = emails.split(',')
-    let userPage = appState.userPages[userPageId]
-    let allDescendantIds = nodeSelectors.getAllDescendantIds(nodeSelectors.getPresentNodes(appState), userPage.rootNodeId)
-    dispatch(userPageFirebaseActions.shareUserPage(userPage, allDescendantIds, emailsArr, appState.auth))
+
+    const state = getState()
+    const emailsArr = emails.split(',')
+    const userPage = state.userPages[userPageId]
+    const allDescendantIds = nodeSelectors.getAllDescendantIds(nodeSelectors.getPresentNodes(state), userPage.rootNodeId)
+
+    userPageRepository.shareUserPage(userPage, allDescendantIds, emailsArr, state.auth)
   }

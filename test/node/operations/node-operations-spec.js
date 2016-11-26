@@ -69,22 +69,29 @@ describe('nodeOperations', () => {
   })
   describe('updateContent', () => {
     it('should set content to the new content', () => {
-      expect(nodeOperations.updateContent(dummyNode, 'some content')).to.deep.equal({
-        id: '2', parentId: '1', childIds: [ '3', '4' ], content: 'some content'
+      expect(nodeOperations.updateContent(dummyNode, 'some content', 'user123')).to.deep.equal({
+        id: '2', parentId: '1', childIds: [ '3', '4' ], content: 'some content', updatedById: 'user123'
+      })
+    })
+  })
+  describe('updateNotes', () => {
+    it('should set notes to the new notes', () => {
+      expect(nodeOperations.updateNotes(dummyNode, 'some notes', 'user123')).to.deep.equal({
+        id: '2', parentId: '1', childIds: [ '3', '4' ], notes: 'some notes', updatedById: 'user123'
       })
     })
   })
   describe('deselect', () => {
-    it('should set selected to false', () => {
-      expect(nodeOperations.deselect(dummyNode)).to.deep.equal({
-        id: '2', parentId: '1', childIds: [ '3', '4' ], selected: false
+    it('should set selected to false on all nodes', () => {
+      expect(nodeOperations.deselect(dummyState, [ '2' ])['2']).to.deep.equal({
+        id: '2', parentId: '1', childIds: [], focused: true, selected: false
       })
     })
   })
   describe('select', () => {
-    it('should set selected to true', () => {
-      expect(nodeOperations.select(dummyNode)).to.deep.equal({
-        id: '2', parentId: '1', childIds: [ '3', '4' ], selected: true
+    it('should set selected to true on all nodes', () => {
+      expect(nodeOperations.select(dummyState, [ '2' ])['2']).to.deep.equal({
+        id: '2', parentId: '1', childIds: [], focused: true, selected: true
       })
     })
   })

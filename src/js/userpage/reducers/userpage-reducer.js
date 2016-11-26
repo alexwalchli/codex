@@ -1,21 +1,28 @@
-import * as userpageActionTypes from '../actions/userpage-action-types'
+import reducerFactory from '../../redux/reducer-factory'
+import {
+  USER_PAGE_CREATION,
+  USER_PAGE_NAME_UPDATE,
+  USER_PAGE_DELETION
+} from '../actions/userpage-action-types.js'
 
-export function userPages (state = {}, action) {
-  var newState = Object.assign({}, state)
+export const userPage = reducerFactory({
 
-  switch (action.type) {
-    case userpageActionTypes.USER_PAGE_CREATED:
-      newState[action.payload.id] = Object.assign({}, action.payload)
-      return newState
-    case userpageActionTypes.USER_PAGE_NAME_UPDATED:
-      newState[action.payload.userPageId] = Object.assign({}, newState[action.payload.userPageId], {
-        title: action.payload.newUserPageName
-      })
-      return newState
-    case userpageActionTypes.USER_PAGE_DELETED:
-      delete newState[action.payload.userPageId]
-      return newState
-    default:
-      return newState
+  [USER_PAGE_CREATION]: (state, action) => {
+    return Object.assign({}, state, {
+      [action.payload.id]: action.payload
+    })
+  },
+
+  [USER_PAGE_NAME_UPDATE]: (state, action) => {
+    let newState = Object.assign({}, state)
+    newState[action.payload.userPageId].title = action.payload.newUserPageName
+    return newState
+  },
+
+  [USER_PAGE_DELETION]: (state, action) => {
+    let newState = Object.assign({}, state)
+    delete newState[action.payload.userPageId]
+    return newState
   }
-}
+
+})

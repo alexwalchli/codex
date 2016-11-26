@@ -50,22 +50,40 @@ export const updateParent = (node, parentId, userId) => {
   })
 }
 
-export const updateContent = (node, content) => {
+export const updateContent = (node, content, userId) => {
   return Object.assign({}, node, {
-    content
+    content,
+    updatedById: userId
   })
 }
 
-export const select = (node) => {
+export const updateNotes = (node, notes, userId) => {
   return Object.assign({}, node, {
-    selected: true
+    notes,
+    updatedById: userId
   })
 }
 
-export const deselect = (node) => {
-  return Object.assign({}, node, {
-    selected: false
+export const select = (state, nodeIds) => {
+  let newState = Object.assign({}, state)
+  nodeIds.forEach(nodeId => {
+    newState[nodeId] = Object.assign({}, newState[nodeId], {
+      selected: true
+    })
   })
+
+  return newState
+}
+
+export const deselect = (state, nodeIds) => {
+  let newState = Object.assign({}, state)
+  nodeIds.forEach(nodeId => {
+    newState[nodeId] = Object.assign({}, newState[nodeId], {
+      selected: false
+    })
+  })
+
+  return newState
 }
 
 export const unfocus = (node) => {
@@ -84,7 +102,7 @@ export const focus = (state, nodeId, focusNotes) => {
   }
 
   nodeSelectors.getCurrentlySelectedNodeIds(state).forEach(id => {
-    newState[id] = deselect(newState[id])
+    newState = deselect(state, [ id ])
   })
 
   newState[nodeId] = Object.assign({}, newState[nodeId], {
@@ -127,4 +145,11 @@ export const reassignParent = (state, nodeId, currentParentId, newParentd, addAf
   newState[newParentd] = addChild(newState[newParentd], nodeId, addAfterSiblingId, 1, userId)
 
   return newState
+}
+
+export const complete = (node, userId) => {
+  return Object.assign({}, node, {
+    completed: !node.completed,
+    updatedById: userId
+  })
 }

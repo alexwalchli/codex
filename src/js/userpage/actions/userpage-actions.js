@@ -1,27 +1,21 @@
 import * as userPageActionTypes from './userpage-action-types'
 
-export function userPageCreated (userPage) {
-  return {
-    type: userPageActionTypes.USER_PAGE_CREATED,
-    payload: userPage
-  }
-}
+export const userPageCreation = (userPage) => ({
+  type: userPageActionTypes.USER_PAGE_CREATION,
+  payload: userPage
+})
 
-export function userPageDeleted (userPageId) {
-  return {
-    type: userPageActionTypes.USER_PAGE_DELETED,
-    payload: {
-      userPageId
-    }
+export const userPageDeletion = (userPageId) => ({
+  type: userPageActionTypes.USER_PAGE_DELETION,
+  payload: {
+    userPageId
   }
-}
+})
 
-export function userPageNameUpdated (userPageId, newUserPageName) {
-  return {
-    type: userPageActionTypes.USER_PAGE_NAME_UPDATED,
-    payload: {
-      userPageId,
-      newUserPageName
-    }
+export const userPageNameUpdate = (userPageId, newUserPageName) => ({
+  type: userPageActionTypes.USER_PAGE_NAME_UPDATE,
+  payload: {
+    userPageId,
+    newUserPageName
   }
-}
+})

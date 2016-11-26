@@ -13,6 +13,8 @@ import {
   NODE_DEMOTION,
   NODE_PROMOTION,
   NODE_EXPANSION_TOGGLE,
+  NODE_EXPANSION,
+  NODE_COLLAPSE,
   NODE_SELECTION,
   NODE_DESELECTION,
   NODE_COMPLETION_TOGGLE,
@@ -76,9 +78,9 @@ export const tree = reducerFactory({
   [NODE_CONTENT_UPDATE]: (state, action) => {
     // TODO: nodeFirebaseActions.updateNodeContent(nodeId, newContent, appState.auth.id)
 
-    const { nodeId, content } = action.payload
+    const { nodeId, content, userId } = action.payload
     return Object.assign({}, state, {
-      [nodeId]: nodeOperations.updateContent(state[nodeId], content)
+      [nodeId]: nodeOperations.updateContent(state[nodeId], content, userId)
     })
   },
 
@@ -95,11 +97,11 @@ export const tree = reducerFactory({
   [NODE_DEMOTION]: (state, action) => {
     // TODO: update Firebase
 
-    const { nodeId, parentId, rootNodeId, visibleNodes, userId } = action.payload
+    const { nodeId, rootNodeId, visibleNodes, userId } = action.payload
     const siblingAbove = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, state, visibleNodes, nodeId, true)
     const addAfterLastChildOfSiblingAboveId = siblingAbove.childIds[siblingAbove.childIds.length - 1]
 
-    const newState = nodeOperations.reassignParent(state, nodeId, parentId, siblingAbove.id, addAfterLastChildOfSiblingAboveId, userId)
+    const newState = nodeOperations.reassignParent(state, nodeId, state[nodeId].parentId, siblingAbove.id, addAfterLastChildOfSiblingAboveId, userId)
     return nodeOperations.focus(newState, nodeId, false)
   },
 
@@ -107,7 +109,8 @@ export const tree = reducerFactory({
     // TODO: update Firebase
 
     let newState = Object.assign({}, state)
-    const { nodeId, parentId, userId } = action.payload
+    const { nodeId, userId } = action.payload
+    const parentId = state[nodeId].parentId
     const parentNode = state[parentId]
     const siblingIds = parentNode.childIds
 
@@ -140,16 +143,41 @@ export const tree = reducerFactory({
     return newState
   },
 
-  [NODE_SELECTION]: (state, action) => {
+  [NODE_COLLAPSE]: (state, action) => {
+    const { nodeId, forceCollapseChildren, userId } = action.payload
+    const allDescendantIds = forceCollapseChildren
+                              ? nodeSelectors.getAllDescendantIds(state, nodeId)
+                              : nodeSelectors.getAllUncollapsedDescedantIds(nodeId, state, nodeId)
+    return nodeOperations.collapse(state, [ nodeId, ...allDescendantIds ], userId)
+  },
 
+  [NODE_EXPANSION]: (state, action) => {
+    const { nodeId, forceCollapseChildren, userId } = action.payload
+    const allDescendantIds = forceCollapseChildren
+                              ? nodeSelectors.getAllDescendantIds(state, nodeId)
+                              : nodeSelectors.getAllUncollapsedDescedantIds(nodeId, state, nodeId)
+    return nodeOperations.expand(state, [ nodeId, ...allDescendantIds ], userId)
+  },
+
+  [NODE_SELECTION]: (state, action) => {
+    const { nodeId } = action.payload
+    const allDescendentIds = nodeSelectors.getAllDescendantIds(state, nodeId)
+
+    return nodeOperations.select(state, [ nodeId, ...allDescendentIds ])
   },
 
   [NODE_DESELECTION]: (state, action) => {
+    const { nodeId } = action.payload
+    const allDescendentIds = nodeSelectors.getAllDescendantIds(state, nodeId)
 
+    return nodeOperations.deselect(state, [ nodeId, ...allDescendentIds ])
   },
 
   [NODE_COMPLETION_TOGGLE]: (state, action) => {
-
+    const { nodeId, userId } = action.payload
+    return Object.assign({}, state, {
+      [nodeId]: nodeOperations.complete(state[nodeId], userId)
+    })
   },
 
   [NODES_COMPLETION]: (state, action) => {
@@ -157,7 +185,10 @@ export const tree = reducerFactory({
   },
 
   [NODE_NOTES_UPDATE]: (state, action) => {
-
+    const { nodeId, notes, userId } = action.payload
+    return Object.assign({}, state, {
+      [nodeId]: nodeOperations.updateNotes(state[nodeId], notes, userId)
+    })
   },
 
   [NODE_DISPLAY_MODE_UPDATE]: (state, action) => {

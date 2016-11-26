@@ -1,20 +1,13 @@
+import nodeSnapshotUnwrapper from '../helpers/node-snapshot-unwrapper'
 import { firebaseDb } from '../../firebase'
 import * as firebaseRequestQueueActionCreators from '../../requestqueue/actions/firebase-request-queue-action-creators'
 
-function unwrapNodeSnapshot (nodeSnapshot) {
-  let node = nodeSnapshot.val()
-  node.childIds = node.childIds || []
-  return node
+export const getNode = (nodeId) => {
+  return firebaseDb.ref(`nodes/${nodeId}`).once('value').then(nodeSnapshotUnwrapper.unwrap)
 }
 
 export function getNewNodeId () {
   return firebaseDb.ref('nodes').push().key
-}
-
-export function getNodeSnapshot (nodeId) {
-  return firebaseDb.ref(`nodes/${nodeId}`).once('value').then(snapshot => {
-    return unwrapNodeSnapshot(snapshot)
-  })
 }
 
 export function createNode (node, userPageId, updatedParentChildIds) {
@@ -217,4 +210,3 @@ export function expandNode (nodeId, userId) {
     }))
   }
 }
-

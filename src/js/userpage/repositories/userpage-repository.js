@@ -1,5 +1,16 @@
 import { firebaseDb } from '../../firebase'
 import userPageFactory from '../helpers/userpage-factory'
+import { dictionaryToArray } from '../../node/selectors/node-selectors'
+
+export const getUserPages = (userId) => {
+  return firebaseDb.ref('userPages/' + userId).once('value').then(snapshot => {
+    return dictionaryToArray(snapshot.val())
+  })
+}
+
+export const getNewUserPageId = () => {
+  return firebaseDb.ref('userPages').push().key
+}
 
 export function createUserPage (userPage, rootNode, firstNode) {
   let createUserPagesAndInitialNodesUpdates = {}

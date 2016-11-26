@@ -58,8 +58,8 @@ export class PagesSidePanel extends Component {
   }
 
   onClickCreateNewUserPage () {
-    const { createNewUserPage } = this.props
-    createNewUserPage()
+    const { createUserPage } = this.props
+    createUserPage()
   }
 
   editPageName (userPageId) {
