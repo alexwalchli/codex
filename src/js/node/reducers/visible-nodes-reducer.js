@@ -7,7 +7,7 @@ import {
 import * as nodeSelectors from '../selectors/node-selectors'
 import reducerFactory from '../../redux/reducer-factory'
 
-export const visibleNodes = reducerFactory({
+export const visibleNodes = reducerFactory({}, {
   [INITIAL_TREE_STATE_LOAD]: (state, action) => {
     let newState = Object.assign({}, state)
     nodeSelectors.dictionaryToArray(action.payload.initialTreeState).forEach(node => {
@@ -46,10 +46,9 @@ export const visibleNodes = reducerFactory({
     return newState
   },
   [NODE_EXPANSION]: (state, action) => {
-    // TODO: set all descendants to visible EXCEPT nodes under a collapsed node
     let newState = Object.assign({}, state)
 
-    action.payload.descendantIds.forEach(id => {
+    action.payload.uncollapsedDescendantIds.forEach(id => {
       newState[id] = true
     })
 

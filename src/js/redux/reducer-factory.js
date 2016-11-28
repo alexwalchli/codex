@@ -1,5 +1,5 @@
-export const reducerFactory = (actionHandlerMapping) =>
-  (state, action) => {
+export const reducerFactory = (initialState, actionHandlerMapping) =>
+  (state = initialState, action) => {
     if (action === null) {
       return state
     }
@@ -10,3 +10,4 @@ export const reducerFactory = (actionHandlerMapping) =>
     return handler(state, action)
   }
 
+export default reducerFactory

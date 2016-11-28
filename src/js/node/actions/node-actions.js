@@ -85,11 +85,12 @@ export const nodeExpansionToggle = (nodeId, forceToggleChildrenExpansion, userId
   }
 })
 
-export const nodeExpansion = (nodeId, descendantIds, uncollapsedChildren, userId) => ({
+export const nodeExpansion = (nodeId, descendantIds, uncollapsedDescendantIds, userId) => ({
   type: nodeActionTypes.NODE_EXPANSION,
   payload: {
     nodeId,
     descendantIds,
+    uncollapsedDescendantIds,
     userId
   }
 })

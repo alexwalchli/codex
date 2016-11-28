@@ -25,7 +25,7 @@ import {
   NODE_TAG_REMOVAL
 } from '../actions/node-action-types'
 
-export const tree = reducerFactory({
+export const tree = reducerFactory({}, {
 
   [INITIAL_TREE_STATE_LOAD]: (state, action) => {
     const { initialTreeState, rootNodeId } = action.payload

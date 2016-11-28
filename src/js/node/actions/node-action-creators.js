@@ -32,7 +32,7 @@ export const focusNodeAbove = (currentNodeId) =>
     const state = getState()
     const rootNodeId = nodeSelectors.getRootNodeId(state)
     const nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.getPresentNodes(state), state.visibleNodes.present, currentNodeId, true)
-    console.log(nodeToFocus)
+
     if (nodeToFocus) {
       dispatch(nodeActions.nodeFocus(nodeToFocus.id))
     }

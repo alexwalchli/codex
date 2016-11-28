@@ -1,15 +1,15 @@
 import * as appActionTypes from './app-action-types'
 
-export const toggleShareDropdown = () => ({
-  type: appActionTypes.TOGGLE_SHARE_DROPDOWN
+export const shareDropdownToggle = () => ({
+  type: appActionTypes.SHARE_DROPDOWN_TOGGLE
 })
 
-export const sidePanelToggled = () => ({
-  type: appActionTypes.SIDE_PANEL_TOGGLED
+export const sidePanelToggle = () => ({
+  type: appActionTypes.SIDE_PANEL_TOGGLE
 })
 
-export const navigatedToUserPage = (userPageId) => ({
-  type: appActionTypes.NAVIGATED_TO_USER_PAGE,
+export const userPageNavigation = (userPageId) => ({
+  type: appActionTypes.USER_PAGE_NAVIGATION,
   payload: {
     userPageId
   }

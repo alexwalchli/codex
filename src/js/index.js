@@ -12,8 +12,10 @@ startApplication()
 
 function startApplication () {
   const store = configureStore({
+    app: {},
     tree: {},
     auth: {},
+    visibleNodes: {},
     userPages: {}
   })
 

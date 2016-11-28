@@ -3,7 +3,7 @@ import { firebaseDb } from '../../firebase'
 import * as firebaseRequestQueueActionCreators from '../../requestqueue/actions/firebase-request-queue-action-creators'
 
 export const getNode = (nodeId) => {
-  return firebaseDb.ref(`nodes/${nodeId}`).once('value').then(nodeSnapshotUnwrapper.unwrap)
+  return firebaseDb.ref(`nodes/${nodeId}`).once('value').then(nodeSnapshotUnwrapper)
 }
 
 export function getNewNodeId () {

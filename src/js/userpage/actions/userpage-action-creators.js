@@ -13,11 +13,11 @@ export const createUserPage = (title) =>
     const state = getState()
     const rootNodeId = nodeRepository.getNewNodeId()
     const firstNodeId = nodeRepository.getNewNodeId()
-    const newUserPageId = nodeRepository.getNewNodeId()
+    const newUserPageId = userPageRepository.getNewUserPageId()
 
     const newRootNode = nodeFactory(rootNodeId, null, [firstNodeId], '', state.auth.id)
     const newFirstNode = nodeFactory(firstNodeId, rootNodeId, [], '', state.auth.id)
-    const newUserPage = userPageFactory(newUserPageId, rootNodeId, state.auth.id)
+    const newUserPage = userPageFactory(newUserPageId, rootNodeId, state.auth.id, title, false)
 
     userPageRepository.createUserPage(newUserPage, newRootNode, newFirstNode)
       .then(snapshot => {
@@ -44,16 +44,14 @@ export const initializeUserHomePage = () =>
 
 export const deleteUserPage = (userPageId) =>
   (dispatch, getState) => {
-    if (confirm('Are you sure?')) {
-      const state = getState()
-      const userPage = state.userPages[userPageId]
-      const rootNode = state.nodes[userPage.rootNodeId]
-      const auth = state.auth
+    const state = getState()
+    const userPage = state.userPages[userPageId]
+    const rootNode = state.nodes[userPage.rootNodeId]
+    const auth = state.auth
 
-      userPageRepository.deleteUserPage(userPage, rootNode, auth)
-      dispatch(appActions.navigateToUserPage(nodeSelectors.dictionaryToArray(state.userPages).find(u => u.isHome).id))
-      dispatch(userPageActions.userPageDeletion(userPageId))
-    }
+    userPageRepository.deleteUserPage(userPage, rootNode, auth)
+    dispatch(appActions.navigateToUserPage(nodeSelectors.dictionaryToArray(state.userPages).find(u => u.isHome).id))
+    dispatch(userPageActions.userPageDeletion(userPageId))
   }
 
 export const updateUserPageName = (userPageId, newUserPageName) =>

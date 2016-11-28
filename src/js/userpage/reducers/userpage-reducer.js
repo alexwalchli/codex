@@ -5,7 +5,7 @@ import {
   USER_PAGE_DELETION
 } from '../actions/userpage-action-types.js'
 
-export const userPage = reducerFactory({
+export const userPages = reducerFactory({}, {
 
   [USER_PAGE_CREATION]: (state, action) => {
     return Object.assign({}, state, {

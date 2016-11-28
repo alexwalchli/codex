@@ -6,7 +6,7 @@ import * as appActions from './app-actions'
 export const navigateToUserPage = (userPageId) =>
   (dispatch, getState) => {
     const state = getState()
-    dispatch(appActions.navigatedToUserPage(userPageId))
+    dispatch(appActions.userPageNavigation(userPageId))
     nodeSubscriptions.initializeNodeSubscriptions(userPageId, state.auth.id)
       .then(initialTreeState => {
         dispatch(nodeActions.initialTreeStateLoad(nodeSelectors.getRootNodeId(state), initialTreeState, state.auth.id))
@@ -15,5 +15,5 @@ export const navigateToUserPage = (userPageId) =>
 
 export const togglePagesSidePanel = () =>
   (dispatch, getState) => {
-    dispatch(appActions.sidePanelToggled())
+    dispatch(appActions.sidePanelToggle())
   }

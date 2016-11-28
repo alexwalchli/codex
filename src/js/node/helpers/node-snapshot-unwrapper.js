@@ -1,4 +1,4 @@
-const unwrap = (nodeSnapshot) => {
+const nodeSnapshotUnwrapper = (nodeSnapshot) => {
   // firebase does not store empty arrays or objects, so initialize as empty if they are undefined
 
   let node = nodeSnapshot.val()
@@ -9,4 +9,4 @@ const unwrap = (nodeSnapshot) => {
   return node
 }
 
-export default unwrap
+export default nodeSnapshotUnwrapper
