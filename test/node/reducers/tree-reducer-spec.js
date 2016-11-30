@@ -79,11 +79,12 @@ describe('treeReducer', () => {
     it('should create the node as a child if the origin node is has children', () => {
       const nodeId = '1111'
       const originNodeId = '2'
+      const parentId = '2'
       const originOffset = 1
       const content = 'some content'
       const userPageId = 'abc123'
       const userId = 'abc'
-      const nodeCreationAction = nodeActions.nodeCreation(nodeId, originNodeId, originOffset, content, userPageId, userId)
+      const nodeCreationAction = nodeActions.nodeCreation(nodeId, originNodeId, parentId, null, parentId, originOffset, content, userPageId, userId)
 
       const newState = tree(state, nodeCreationAction)
 
@@ -95,11 +96,12 @@ describe('treeReducer', () => {
     it('should create the node as a sibling if the currently selected node is not a parent', () => {
       const nodeId = '1111'
       const originNodeId = '3'
+      const parentId = '1'
       const originOffset = 1
       const content = 'some content'
       const userPageId = 'abc123'
       const userId = 'abc'
-      const nodeCreationAction = nodeActions.nodeCreation(nodeId, originNodeId, originOffset, content, userPageId, userId)
+      const nodeCreationAction = nodeActions.nodeCreation(nodeId, originNodeId, parentId, null, parentId, originOffset, content, userPageId, userId)
 
       tree(state, nodeCreationAction)
 
@@ -110,11 +112,12 @@ describe('treeReducer', () => {
     it('should create the node as a sibling if the currently selected node is collapsed', () => {
       const nodeId = '1111'
       const originNodeId = '4'
+      const parentId = '1'
       const originOffset = 1
       const content = 'some content'
       const userPageId = 'abc123'
       const userId = 'abc'
-      const nodeCreationAction = nodeActions.nodeCreation(nodeId, originNodeId, originOffset, content, userPageId, userId)
+      const nodeCreationAction = nodeActions.nodeCreation(nodeId, originNodeId, parentId, null, parentId, originOffset, content, userPageId, userId)
 
       tree(state, nodeCreationAction)
 
@@ -125,24 +128,26 @@ describe('treeReducer', () => {
     it('should focus the new node if the originOffset is greater than 0', () => {
       const nodeId = '1111'
       const originNodeId = '4'
+      const parentId = '1'
       const originOffset = 1
       const content = 'some content'
       const userPageId = 'abc123'
       const userId = 'abc'
-      const nodeCreationAction = nodeActions.nodeCreation(nodeId, originNodeId, originOffset, content, userPageId, userId)
+      const nodeCreationAction = nodeActions.nodeCreation(nodeId, originNodeId, parentId, null, parentId, originOffset, content, userPageId, userId)
 
-      tree(state, nodeCreationAction)
+      const newState = tree(state, nodeCreationAction)
 
-      expect(nodeOperations.focus.firstCall.args[0].id).to.equal(nodeCreationAction.payload.nodeId)
+      expect(newState[nodeId].focused).to.equal(true)
     })
     it('should not focus the new node if the originOffset is equal to or less than 0', () => {
       const nodeId = '1111'
       const originNodeId = '4'
+      const parentId = '1'
       const originOffset = 0
       const content = 'some content'
       const userPageId = 'abc123'
       const userId = 'abc'
-      const nodeCreationAction = nodeActions.nodeCreation(nodeId, originNodeId, originOffset, content, userPageId, userId)
+      const nodeCreationAction = nodeActions.nodeCreation(nodeId, originNodeId, parentId, null, parentId, originOffset, content, userPageId, userId)
 
       tree(state, nodeCreationAction)
 
@@ -150,11 +155,11 @@ describe('treeReducer', () => {
     })
   })
   describe('NODE_CONTENT_UPDATE', () => {
-    it('should set the node to content and set updatedById', () => {
+    it('should set the node to content and set lastUpdatedById', () => {
       const newState = tree(dummyState, nodeActions.nodeContentUpdate('2', 'new content', 'user123'))
 
       expect(newState['2'].content).to.equal('new content')
-      expect(newState['2'].updatedById).to.equal('user123')
+      expect(newState['2'].lastUpdatedById).to.equal('user123')
     })
   })
   describe('NODE_FOCUS', () => {
@@ -195,7 +200,7 @@ describe('treeReducer', () => {
         '4': { id: '4', parentId: '2', childIds: [] },
         '5': { id: '5', parentId: '2', childIds: [] }
       }
-      const nodePromotionAction = nodeActions.nodePromotion('4', '2', '1', dummyVisibleNodes, 'user123')
+      const nodePromotionAction = nodeActions.nodePromotion('4', ['3', '4', '5'], '2', '1', dummyVisibleNodes, 'user123')
 
       const newState = tree(state, nodePromotionAction)
 
@@ -265,12 +270,12 @@ describe('treeReducer', () => {
       let newState = tree(dummyState, nodeCompletionToggle)
 
       expect(newState['2'].completed).to.equal(true)
-      expect(newState['2'].updatedById).to.equal('user123')
+      expect(newState['2'].lastUpdatedById).to.equal('user123')
 
       newState = tree(newState, nodeCompletionToggle)
 
       expect(newState['2'].completed).to.equal(false)
-      expect(newState['2'].updatedById).to.equal('user123')
+      expect(newState['2'].lastUpdatedById).to.equal('user123')
     })
   })
   describe('NODE_NOTES_UPDATE', () => {
@@ -278,7 +283,7 @@ describe('treeReducer', () => {
       const newState = tree(dummyState, nodeActions.nodeNotesUpdate('2', 'new notes', 'user123'))
 
       expect(newState['2'].notes).to.equal('new notes')
-      expect(newState['2'].updatedById).to.equal('user123')
+      expect(newState['2'].lastUpdatedById).to.equal('user123')
     })
   })
   // describe('NODES_COMPLETION', () => {

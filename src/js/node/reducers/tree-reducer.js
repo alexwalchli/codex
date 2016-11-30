@@ -36,26 +36,17 @@ export const tree = reducerFactory({}, {
 
   [NODE_CREATION]: (state, action) => {
     let newState = Object.assign({}, state)
-    const { nodeId, originNodeId, originOffset, content, userId } = action.payload
-    const originNode = state[originNodeId]
-    const parentOfNewNode = state[originNode.childIds.length === 0 || originNode.collapsed ? originNode.parentId : originNodeId]
+    const { nodeId, originNodeId, originOffset, content, parentId, nodeIdsToDeselect, nodeIdToUnfocus, userId } = action.payload
+    const parentNode = state[parentId]
 
-    newState[nodeId] = nodeOperations.create(nodeId, parentOfNewNode.id, [], content, userId)
-    newState[parentOfNewNode.id] = nodeOperations.addChild(parentOfNewNode, nodeId, originNodeId, originOffset)
+    newState[nodeId] = nodeOperations.create(nodeId, parentNode.id, [], content, userId)
+    newState[parentNode.id] = nodeOperations.addChild(parentNode, nodeId, originNodeId, originOffset, userId)
 
     if (originOffset > 0) {
-      const nodeIdsToDeselect = nodeSelectors.getCurrentlySelectedNodeIds(state)
-      const nodeIdToUnfocus = nodeSelectors.getCurrentlyFocusedNodeId(state)
-
       newState[nodeIdToUnfocus] = nodeOperations.unfocus(newState[nodeIdToUnfocus])
-      nodeIdsToDeselect.forEach(nodeIdToUnfocus => {
-        newState[nodeId] = nodeOperations.deselectNode(newState[nodeIdToUnfocus])
-      })
-
-      newState[nodeId] = nodeOperations.focus(newState[nodeId])
+      newState = nodeOperations.deselect(newState, nodeIdsToDeselect)
+      newState = nodeOperations.focus(newState, nodeId, false)
     }
-
-    // TODO: nodeFirebaseActions.createNode(newState[nodeId], userPageId, parentOfNewNode.childIds)
 
     return newState
   },
@@ -72,12 +63,16 @@ export const tree = reducerFactory({}, {
   },
 
   [NODE_DELETION]: (state, action) => {
+    const { nodeId, parentId, userId } = action.payload
+    let newState = Object.assign({}, state)
+    newState[parentId] = nodeOperations.removeChild(newState[parentId], nodeId, userId)
 
+    return Object.assign({}, state, {
+      [nodeId]: nodeOperations.deleteNode(state[nodeId])
+    })
   },
 
   [NODE_CONTENT_UPDATE]: (state, action) => {
-    // TODO: nodeFirebaseActions.updateNodeContent(nodeId, newContent, appState.auth.id)
-
     const { nodeId, content, userId } = action.payload
     return Object.assign({}, state, {
       [nodeId]: nodeOperations.updateContent(state[nodeId], content, userId)
@@ -98,10 +93,15 @@ export const tree = reducerFactory({}, {
     // TODO: update Firebase
 
     const { nodeId, rootNodeId, visibleNodes, userId } = action.payload
+    const currentParentId = state[nodeId].parentId
     const siblingAbove = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, state, visibleNodes, nodeId, true)
+    const newParentId = siblingAbove.id
     const addAfterLastChildOfSiblingAboveId = siblingAbove.childIds[siblingAbove.childIds.length - 1]
 
-    const newState = nodeOperations.reassignParent(state, nodeId, state[nodeId].parentId, siblingAbove.id, addAfterLastChildOfSiblingAboveId, userId)
+    // nodeRepository.reassignParentNode(nodeId, currentParentId, newParentId, updatedChildIdsForOldParent, updatedChildIdsForNewParent, userId)
+
+    const newState = nodeOperations.reassignParent(state, nodeId, currentParentId, newParentId, addAfterLastChildOfSiblingAboveId, userId)
+
     return nodeOperations.focus(newState, nodeId, false)
   },
 
@@ -109,10 +109,7 @@ export const tree = reducerFactory({}, {
     // TODO: update Firebase
 
     let newState = Object.assign({}, state)
-    const { nodeId, userId } = action.payload
-    const parentId = state[nodeId].parentId
-    const parentNode = state[parentId]
-    const siblingIds = parentNode.childIds
+    const { nodeId, userId, currentParentId, newParentId, siblingIds } = action.payload
 
     // reassign all siblings below to the promoted node
     for (let i = siblingIds.indexOf(nodeId) + 1; i < siblingIds.length; i++) {
@@ -121,7 +118,7 @@ export const tree = reducerFactory({}, {
     }
 
     // reassign the node to its parent's parent
-    nodeOperations.reassignParent(newState, nodeId, parentNode.id, parentNode.parentId, parentId, userId)
+    nodeOperations.reassignParent(newState, nodeId, currentParentId, newParentId, currentParentId, userId)
 
     return nodeOperations.focus(newState, nodeId, false)
   },

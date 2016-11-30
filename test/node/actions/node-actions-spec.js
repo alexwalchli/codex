@@ -22,17 +22,22 @@ describe('node actions', () => {
     it('should create a nodeCreation action', () => {
       const nodeId = '2'
       const originNodeId = '1'
+      const parentId = '1'
+      const nodeIdsToDeselect = [ '4', '5' ]
       const originOffset = 1
       const content = 'some content'
       const userPageId = '123'
       const userId = 'user123'
 
-      expect(nodeActions.nodeCreation(nodeId, originNodeId, originOffset, content, userPageId, userId))
+      expect(nodeActions.nodeCreation(nodeId, originNodeId, parentId, nodeIdsToDeselect, parentId, originOffset, content, userPageId, userId))
         .to.deep.equal({
           type: nodeActionTypes.NODE_CREATION,
           payload: {
             nodeId,
             originNodeId,
+            parentId,
+            nodeIdsToDeselect,
+            nodeIdToUnfocus: parentId,
             originOffset,
             content,
             userPageId,
@@ -128,16 +133,20 @@ describe('node actions', () => {
   describe('nodePromotion', () => {
     it('should create a nodePromotion action', () => {
       const nodeId = '2'
-      const rootNodeId = '0'
+      const siblingIds = [ '3', '4' ]
+      const currentParentId = '1'
+      const newParentId = '0'
       const visibleNodes = {}
       const userId = 'user123'
 
-      expect(nodeActions.nodePromotion(nodeId, rootNodeId, visibleNodes, userId))
+      expect(nodeActions.nodePromotion(nodeId, siblingIds, currentParentId, newParentId, visibleNodes, userId))
         .to.deep.equal({
           type: nodeActionTypes.NODE_PROMOTION,
           payload: {
             nodeId,
-            rootNodeId,
+            siblingIds,
+            currentParentId,
+            newParentId,
             visibleNodes,
             userId
           }

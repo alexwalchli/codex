@@ -68,9 +68,9 @@ export class BulletEditContentView extends Component {
   }
 
   submitContent () {
-    const { id, content, updateContent } = this.props
+    const { id, content, updateNodeContent } = this.props
     if (this.state.content !== content) {
-      updateContent(id, this.state.content.trim())
+      updateNodeContent(id, this.state.content.trim())
     }
   }
 

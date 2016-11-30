@@ -1,11 +1,11 @@
+import * as nodeSelectors from '../selectors/node-selectors'
+import reducerFactory from '../../redux/reducer-factory'
 import {
   NODE_CREATION,
   NODE_COLLAPSE,
   NODE_EXPANSION,
   NODE_DELETION,
   INITIAL_TREE_STATE_LOAD } from '../actions/node-action-types'
-import * as nodeSelectors from '../selectors/node-selectors'
-import reducerFactory from '../../redux/reducer-factory'
 
 export const visibleNodes = reducerFactory({}, {
   [INITIAL_TREE_STATE_LOAD]: (state, action) => {
@@ -14,6 +14,10 @@ export const visibleNodes = reducerFactory({}, {
       if (node.id === action.payload.rootNodeId) {
         newState[action.payload.rootNodeId] = true
         return
+      }
+
+      if (node.deleted) {
+        newState[node.id] = false
       }
 
       // if this node is collapsed set all descendants to hidden
@@ -37,26 +41,24 @@ export const visibleNodes = reducerFactory({}, {
     })
   },
   [NODE_COLLAPSE]: (state, action) => {
-    let newState = Object.assign({}, state)
-
-    action.payload.descendantIds.forEach(id => {
-      newState[id] = false
-    })
-
-    return newState
+    const { descendantIds } = action.payload
+    return descendantIds.reduce((acc, id) => {
+      acc[id] = false
+      return acc
+    }, Object.assign({}, state))
   },
   [NODE_EXPANSION]: (state, action) => {
-    let newState = Object.assign({}, state)
-
-    action.payload.uncollapsedDescendantIds.forEach(id => {
-      newState[id] = true
-    })
-
-    return newState
+    const { uncollapsedDescendantIds } = action.payload
+    return uncollapsedDescendantIds.reduce((acc, id) => {
+      acc[id] = true
+      return acc
+    }, Object.assign({}, state))
   },
   [NODE_DELETION]: (state, action) => {
-    return Object.assign({}, state, {
-      [action.payload.nodeId]: false
-    })
+    const { nodeId, allDescendantIds } = action.payload
+    return [ nodeId, ...allDescendantIds ].reduce((acc, nid) => {
+      acc[nid] = false
+      return acc
+    }, Object.assign({}, state))
   }
 })

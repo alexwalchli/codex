@@ -9,14 +9,27 @@ export const initialTreeStateLoad = (rootNodeId, initialTreeState, userId) => ({
   }
 })
 
-export const nodeCreation = (nodeId, originNodeId, originOffset, content, userPageId, userId) => ({
+export const nodeCreation = (nodeId, originNodeId, parentId, nodeIdsToDeselect, nodeIdToUnfocus, originOffset, content, userPageId, userId) => ({
   type: nodeActionTypes.NODE_CREATION,
   payload: {
     nodeId,
     originNodeId,
+    parentId,
+    nodeIdsToDeselect,
+    nodeIdToUnfocus,
     originOffset,
     content,
     userPageId,
+    userId
+  }
+})
+
+export const nodeDeletion = (nodeId, parentId, allDescendantIds, userId) => ({
+  type: nodeActionTypes.NODE_DELETION,
+  payload: {
+    nodeId,
+    parentId,
+    allDescendantIds,
     userId
   }
 })
@@ -66,11 +79,13 @@ export const nodeDemotion = (nodeId, rootNodeId, visibleNodes, userId) => ({
   }
 })
 
-export const nodePromotion = (nodeId, rootNodeId, visibleNodes, userId) => ({
+export const nodePromotion = (nodeId, siblingIds, currentParentId, newParentId, visibleNodes, userId) => ({
   type: nodeActionTypes.NODE_PROMOTION,
   payload: {
     nodeId,
-    rootNodeId,
+    siblingIds,
+    currentParentId,
+    newParentId,
     visibleNodes,
     userId
   }

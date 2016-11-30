@@ -1,14 +1,12 @@
-/* global confirm */
-
 import * as appActions from '../../app/actions/app-actions'
-import nodeFactory from '../../node/helpers/node-factory'
-import nodeRepository from '../../node/repositories/node-repository'
-import userPageFactory from '../helpers/userpage-factory'
+import { nodeFactory } from '../../node/helpers/node-factory'
+import * as nodeRepository from '../../node/repositories/node-repository'
 import * as nodeSelectors from '../../node/selectors/node-selectors'
+import { userPageFactory } from '../helpers/userpage-factory'
 import * as userPageActions from './userpage-actions'
 import * as userPageRepository from '../repositories/userpage-repository'
 
-export const createUserPage = (title) =>
+export const createUserPage = (title, isHomePage) =>
   (dispatch, getState) => {
     const state = getState()
     const rootNodeId = nodeRepository.getNewNodeId()
@@ -17,28 +15,11 @@ export const createUserPage = (title) =>
 
     const newRootNode = nodeFactory(rootNodeId, null, [firstNodeId], '', state.auth.id)
     const newFirstNode = nodeFactory(firstNodeId, rootNodeId, [], '', state.auth.id)
-    const newUserPage = userPageFactory(newUserPageId, rootNodeId, state.auth.id, title, false)
+    const newUserPage = userPageFactory(newUserPageId, rootNodeId, state.auth.id, title, isHomePage)
 
     userPageRepository.createUserPage(newUserPage, newRootNode, newFirstNode)
       .then(snapshot => {
-        dispatch(appActions.navigateToUserPage(newUserPageId))
-      })
-  }
-
-export const initializeUserHomePage = () =>
-  (dispatch, getState) => {
-    const state = getState()
-    const rootNodeId = nodeRepository.getNewNodeId()
-    const firstNodeId = nodeRepository.getNewNodeId()
-    const homeUserPageId = userPageRepository.getNewUserPageId()
-
-    const newRootNode = nodeFactory(rootNodeId, null, [firstNodeId], '', state.auth.id)
-    const newFirstNode = nodeFactory(firstNodeId, rootNodeId, [], '', state.auth.id)
-    const newUserPage = userPageFactory(homeUserPageId, rootNodeId, state.auth.id, 'Home', true)
-
-    userPageRepository.createUserPage(newUserPage, newRootNode, newFirstNode)
-      .then(snapshot => {
-        dispatch(appActions.navigateToUserPage(homeUserPageId))
+        dispatch(appActions.userPageNavigation(newUserPageId))
       })
   }
 
@@ -46,11 +27,11 @@ export const deleteUserPage = (userPageId) =>
   (dispatch, getState) => {
     const state = getState()
     const userPage = state.userPages[userPageId]
-    const rootNode = state.nodes[userPage.rootNodeId]
+    const rootNode = state.tree.present[userPage.rootNodeId]
     const auth = state.auth
 
     userPageRepository.deleteUserPage(userPage, rootNode, auth)
-    dispatch(appActions.navigateToUserPage(nodeSelectors.dictionaryToArray(state.userPages).find(u => u.isHome).id))
+    dispatch(appActions.userPageNavigation(nodeSelectors.dictionaryToArray(state.userPages).find(u => u.isHome).id))
     dispatch(userPageActions.userPageDeletion(userPageId))
   }
 

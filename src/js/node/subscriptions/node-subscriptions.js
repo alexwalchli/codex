@@ -21,7 +21,7 @@ export const initializeNodeSubscriptions = (userPageId, userId) => {
           nodeRepository.getNode(nodeId)
               .then(node => {
                 initialTreeState[nodeId] = node
-                subscribeToNodeUpdated(node.id)
+                subscribeToNodeUpdated(nodeId)
                 resolve()
               })
         })

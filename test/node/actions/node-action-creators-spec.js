@@ -18,6 +18,7 @@ describe('nodeActionCreators', () => {
       childIds: [],
       collapsedBy: { '111': true },
       focused: true,
+      notesFocused: false,
       completed: true,
       taggedByIds: []
     },
@@ -54,6 +55,9 @@ describe('nodeActionCreators', () => {
   }
   const getState = () => {
     return {
+      auth: {
+        id: userId
+      },
       app: {
         currentUserPageId: currentUserPageId
       },
@@ -63,13 +67,14 @@ describe('nodeActionCreators', () => {
       userPages: {
         [currentUserPageId]: { id: currentUserPageId, rootNodeId: '1' }
       },
-      visibleNodes: { present: visibleNodes },
-      auth: { id: userId }
+      visibleNodes: { present: visibleNodes }
     }
   }
 
   beforeEach(() => {
     sinon.stub(nodeRepository, 'getNewNodeId', () => (newNodeId))
+    sinon.stub(nodeRepository, 'updateNodes', () => {})
+    sinon.stub(nodeRepository, 'createNode', () => {})
     sinon.stub(nodeSelectors, 'getNextNodeThatIsVisible', () => (nodes['123']))
     sinon.spy(nodeActions, 'nodeCreation')
     sinon.spy(nodeActions, 'nodeFocus')
@@ -82,6 +87,8 @@ describe('nodeActionCreators', () => {
 
   afterEach(() => {
     nodeRepository.getNewNodeId.restore()
+    nodeRepository.createNode.restore()
+    nodeRepository.updateNodes.restore()
     nodeSelectors.getNextNodeThatIsVisible.restore()
     nodeActions.nodeCreation.restore()
     nodeActions.nodeFocus.restore()
@@ -101,7 +108,26 @@ describe('nodeActionCreators', () => {
       nodeActionCreators.createNode('123', 1, 'some content')(dispatch, getState)
 
       expect(dispatch).to.have.been.called
-      expect(nodeActions.nodeCreation).to.have.been.calledWith(newNodeId, originNodeId, originOffset, content, currentUserPageId, userId)
+      expect(nodeActions.nodeCreation).to.have.been.calledWith(
+        newNodeId,
+        originNodeId,
+        '1',
+        [],
+        '123',
+        originOffset,
+        content,
+        currentUserPageId,
+        userId)
+    })
+    it('should create the node as a child if the origin node is has children', () => {
+    })
+    it('should create the node as a sibling if the currently selected node is not a parent', () => {
+    })
+    it('should create the node as a sibling if the currently selected node is collapsed', () => {
+    })
+    it('should focus the new node if the originOffset is greater than 0', () => {
+    })
+    it('should not focus the new node if the originOffset is equal to or less than 0', () => {
     })
   })
   describe('focusNode', () => {
@@ -162,13 +188,25 @@ describe('nodeActionCreators', () => {
     })
   })
   describe('promoteNode', () => {
-    it('should dispatch a nodePromotion action', () => {
+    it('should dispatch a nodePromotion action and update persistence', () => {
       const nodeId = '321'
+      const state = getState()
+      const node = nodes[nodeId]
+      const parentNode = nodes[node.parentId]
+      const currentParentId = parentNode.id
+      const newParentId = parentNode.parentId
+      const siblingIds = parentNode.childIds
 
       nodeActionCreators.promoteNode(nodeId)(dispatch, getState)
 
       expect(dispatch).to.have.been.called
-      expect(nodeActions.nodePromotion).to.have.been.calledWith(nodeId, '1', visibleNodes, userId)
+      expect(nodeActions.nodePromotion).to.have.been.calledWith(nodeId, siblingIds, currentParentId, newParentId, visibleNodes, state.auth.id)
+      expect(nodeRepository.updateNodes).to.have.been.calledWith([
+        nodes[currentParentId],
+        nodes[newParentId],
+        nodes[nodeId],
+        ...siblingIds.map(siblingId => nodes[siblingId])
+      ])
     })
   })
   describe('selectNode', () => {

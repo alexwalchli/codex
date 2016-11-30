@@ -1,6 +1,7 @@
 import { firebaseDb } from '../../firebase'
 import userPageFactory from '../helpers/userpage-factory'
 import { dictionaryToArray } from '../../node/selectors/node-selectors'
+import { queuedRequest } from '../../requestqueue/queued-request'
 
 export const getUserPages = (userId) => {
   return firebaseDb.ref('userPages/' + userId).once('value').then(snapshot => {
@@ -12,7 +13,7 @@ export const getNewUserPageId = () => {
   return firebaseDb.ref('userPages').push().key
 }
 
-export function createUserPage (userPage, rootNode, firstNode) {
+export const createUserPage = queuedRequest((userPage, rootNode, firstNode) => {
   let createUserPagesAndInitialNodesUpdates = {}
   createUserPagesAndInitialNodesUpdates[`nodes/${rootNode.id}`] = rootNode
   createUserPagesAndInitialNodesUpdates[`nodes/${firstNode.id}`] = firstNode
@@ -30,13 +31,13 @@ export function createUserPage (userPage, rootNode, firstNode) {
 
       return firebaseDb.ref().update(manyToManyConnectionDbUpdates)
     })
-}
+})
 
-export function updateUserPageName (userPage, newUserPageName) {
+export const updateUserPageName = queuedRequest((userPage, newUserPageName) => {
   return firebaseDb.ref(`userPages/${userPage.createdById}/${userPage.id}`).update({ title: newUserPageName })
-}
+})
 
-export function deleteUserPage (userPage, rootNode, auth) {
+export const deleteUserPage = queuedRequest((userPage, rootNode, auth) => {
   let dbUpdates = {}
   dbUpdates[`userPages/${auth.id}/${userPage.id}/deleted`] = true
 
@@ -54,9 +55,9 @@ export function deleteUserPage (userPage, rootNode, auth) {
     //   dbUpdates[`node_users/${descedantId}/${auth.id}`] = null
     // })
   }
-}
+})
 
-export function shareUserPage (userPage, allDescendantIds, emails, auth) {
+export const shareUserPage = queuedRequest((userPage, allDescendantIds, emails, auth) => {
   let newUserPageUpdates = {}
   let manyToManyConnectionDbUpdates = {}
   let shareUserPagePromises = []
@@ -101,7 +102,7 @@ export function shareUserPage (userPage, allDescendantIds, emails, auth) {
       firebaseDb.ref().update(manyToManyConnectionDbUpdates)
     })
   })
-}
+})
 
 export function createEmailUser (email, userId) {
   email = email.replace(/\./g, ',')

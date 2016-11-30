@@ -7,9 +7,10 @@ export const create = (id, parentId, childIds, content, createdById) => {
     childIds: childIds || [],
     content: content || '',
     createdById,
-    visible: true,
     collapsedBy: {},
-    taggedByIds: []
+    taggedByIds: [],
+    focused: false,
+    notesFocused: false
   }
 }
 
@@ -32,35 +33,42 @@ export const addChild = (parentNode, childNodeId, originNodeId, originOffset, us
 
   return Object.assign({}, parentNode, {
     childIds: updatedChildIds,
-    updatedById: userId
+    lastUpdatedById: userId
   })
 }
 
 export const removeChild = (parentNode, childNodeId, userId) => {
   return Object.assign({}, parentNode, {
     childIds: parentNode.childIds.filter(id => id !== childNodeId),
-    updatedById: userId
+    lastUpdatedById: userId
   })
 }
 
 export const updateParent = (node, parentId, userId) => {
   return Object.assign({}, node, {
     parentId,
-    updatedById: userId
+    lastUpdatedById: userId
   })
 }
 
 export const updateContent = (node, content, userId) => {
   return Object.assign({}, node, {
     content,
-    updatedById: userId
+    lastUpdatedById: userId
   })
 }
 
 export const updateNotes = (node, notes, userId) => {
   return Object.assign({}, node, {
     notes,
-    updatedById: userId
+    lastUpdatedById: userId
+  })
+}
+
+export const deleteNode = (node, userId) => {
+  return Object.assign({}, node, {
+    deleted: true,
+    lastUpdatedById: userId
   })
 }
 
@@ -76,14 +84,14 @@ export const select = (state, nodeIds) => {
 }
 
 export const deselect = (state, nodeIds) => {
-  let newState = Object.assign({}, state)
-  nodeIds.forEach(nodeId => {
-    newState[nodeId] = Object.assign({}, newState[nodeId], {
-      selected: false
-    })
-  })
+  if (!nodeIds) {
+    return state
+  }
 
-  return newState
+  return nodeIds.reduce((acc, id) => {
+    acc[id].selected = false
+    return acc
+  }, Object.assign({}, state))
 }
 
 export const unfocus = (node) => {
@@ -93,7 +101,7 @@ export const unfocus = (node) => {
   })
 }
 
-export const focus = (state, nodeId, focusNotes) => {
+export const focus = (state, nodeId, focusNotes = false) => {
   let newState = Object.assign(state)
   const currentlyFocusedNodeId = nodeSelectors.getCurrentlyFocusedNodeId(state)
 
@@ -150,6 +158,6 @@ export const reassignParent = (state, nodeId, currentParentId, newParentd, addAf
 export const complete = (node, userId) => {
   return Object.assign({}, node, {
     completed: !node.completed,
-    updatedById: userId
+    lastUpdatedById: userId
   })
 }

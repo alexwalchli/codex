@@ -26,7 +26,8 @@ describe('nodeOperations', () => {
           childIds,
           content,
           createdById,
-          visible: true,
+          notesFocused: false,
+          focused: false,
           collapsedBy: {},
           taggedByIds: []
         })
@@ -49,35 +50,35 @@ describe('nodeOperations', () => {
     it('should prepend child ID if no originNodeId or originOffset is specified', () => {
       expect(nodeOperations.addChild(parentNode, '5').childIds).to.deep.equal([ '5', '2', '3', '4' ])
     })
-    it('should set updatedById', () => {
-      expect(nodeOperations.addChild(parentNode, '5', null, null, 'abc').updatedById).to.deep.equal('abc')
+    it('should set lastUpdatedById', () => {
+      expect(nodeOperations.addChild(parentNode, '5', null, null, 'abc').lastUpdatedById).to.deep.equal('abc')
     })
   })
   describe('removeChild', () => {
     it('should remove the child ID from childIds', () => {
       expect(nodeOperations.removeChild(dummyNode, '4', 'user123')).to.deep.equal({
-        id: '2', parentId: '1', childIds: [ '3' ], updatedById: 'user123'
+        id: '2', parentId: '1', childIds: [ '3' ], lastUpdatedById: 'user123'
       })
     })
   })
   describe('updateParent', () => {
     it('should set to the new parent ID', () => {
       expect(nodeOperations.updateParent(dummyNode, '1111', 'user123')).to.deep.equal({
-        id: '2', parentId: '1111', childIds: [ '3', '4' ], updatedById: 'user123'
+        id: '2', parentId: '1111', childIds: [ '3', '4' ], lastUpdatedById: 'user123'
       })
     })
   })
   describe('updateContent', () => {
     it('should set content to the new content', () => {
       expect(nodeOperations.updateContent(dummyNode, 'some content', 'user123')).to.deep.equal({
-        id: '2', parentId: '1', childIds: [ '3', '4' ], content: 'some content', updatedById: 'user123'
+        id: '2', parentId: '1', childIds: [ '3', '4' ], content: 'some content', lastUpdatedById: 'user123'
       })
     })
   })
   describe('updateNotes', () => {
     it('should set notes to the new notes', () => {
       expect(nodeOperations.updateNotes(dummyNode, 'some notes', 'user123')).to.deep.equal({
-        id: '2', parentId: '1', childIds: [ '3', '4' ], notes: 'some notes', updatedById: 'user123'
+        id: '2', parentId: '1', childIds: [ '3', '4' ], notes: 'some notes', lastUpdatedById: 'user123'
       })
     })
   })
@@ -164,11 +165,11 @@ describe('nodeOperations', () => {
       const newState = nodeOperations.reassignParent(state, '5', '1', '3', '4', 'user123')
 
       expect(newState).to.deep.equal({
-        '1': { id: '1', parentId: undefined, childIds: [ '2', '3', '4' ], updatedById: 'user123' },
+        '1': { id: '1', parentId: undefined, childIds: [ '2', '3', '4' ], lastUpdatedById: 'user123' },
         '2': { id: '2', parentId: '1', childIds: [] },
-        '3': { id: '3', parentId: '1', childIds: [ '4', '5' ], updatedById: 'user123' },
+        '3': { id: '3', parentId: '1', childIds: [ '4', '5' ], lastUpdatedById: 'user123' },
         '4': { id: '4', parentId: '3', childIds: [] },
-        '5': { id: '5', parentId: '3', childIds: [], updatedById: 'user123' }
+        '5': { id: '5', parentId: '3', childIds: [], lastUpdatedById: 'user123' }
       })
     })
   })

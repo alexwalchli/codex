@@ -9,7 +9,7 @@ export const navigateToUserPage = (userPageId) =>
     dispatch(appActions.userPageNavigation(userPageId))
     nodeSubscriptions.initializeNodeSubscriptions(userPageId, state.auth.id)
       .then(initialTreeState => {
-        dispatch(nodeActions.initialTreeStateLoad(nodeSelectors.getRootNodeId(state), initialTreeState, state.auth.id))
+        dispatch(nodeActions.initialTreeStateLoad(nodeSelectors.getRootNodeId(getState()), initialTreeState, state.auth.id))
       })
   }
 

@@ -6,20 +6,54 @@ import * as nodeRepository from '../repositories/node-repository'
 export const createNode = (originNodeId, originOffset, content) =>
   (dispatch, getState) => {
     const state = getState()
+    const treeState = nodeSelectors.getPresentNodes(state)
     const newNodeId = nodeRepository.getNewNodeId()
-    dispatch(nodeActions.nodeCreation(newNodeId, originNodeId, originOffset, content, state.app.currentUserPageId, state.auth.id))
+    const originNode = treeState[originNodeId]
+    const parentId = originNode.childIds.length === 0 || originNode.collapsed ? originNode.parentId : originNodeId
+    let nodeIdsToDeselect = []
+    let nodeIdToUnfocus = null
+    if (originOffset > 0) {
+      nodeIdsToDeselect = nodeSelectors.getCurrentlySelectedNodeIds(treeState)
+      nodeIdToUnfocus = nodeSelectors.getCurrentlyFocusedNodeId(treeState)
+    }
+
+    dispatch(nodeActions.nodeCreation(
+      newNodeId,
+      originNodeId,
+      parentId,
+      nodeIdsToDeselect,
+      nodeIdToUnfocus,
+      originOffset,
+      content,
+      state.app.currentUserPageId,
+      state.auth.id))
+
+    const newState = getState()
+    const newTreeState = nodeSelectors.getPresentNodes(newState)
+    nodeRepository.createNode(newTreeState[newNodeId], state.app.currentUserPageId, newTreeState[parentId].childIds)
   }
 
 export const deleteNode = (nodeId, content) =>
   (dispatch, getState) => {
     const state = getState()
-    dispatch(nodeActions.nodeDeletion(nodeId, content, state.auth.id))
+    const treeState = nodeSelectors.getPresentNodes(state)
+    const allDescendantIds = nodeSelectors.getAllDescendantIds(treeState, nodeId)
+    const parentId = treeState[nodeId].parentId
+
+    dispatch(nodeActions.nodeDeletion(nodeId, parentId, allDescendantIds, state.auth.id))
+
+    const newState = getState()
+    const newTreeState = nodeSelectors.getPresentNodes(newState)
+    nodeRepository.deleteNode(nodeId, parentId, newTreeState[parentId].childIds, allDescendantIds, state.auth.id)
   }
 
 export const updateNodeContent = (nodeId, content) =>
   (dispatch, getState) => {
     const state = getState()
+
     dispatch(nodeActions.nodeContentUpdate(nodeId, content, state.auth.id))
+
+    nodeRepository.updateNode(nodeSelectors.getPresentNodes(getState())[nodeId])
   }
 
 export const focusNode = (nodeId, focusNotes) =>
@@ -60,9 +94,18 @@ export const demoteNode = (nodeId) =>
 export const promoteNode = (nodeId) =>
   (dispatch, getState) => {
     const state = getState()
-    const rootNodeId = nodeSelectors.getRootNodeId(state)
+    const treeState = nodeSelectors.getPresentNodes(state)
+    const node = treeState[nodeId]
+    const parentNode = treeState[node.parentId]
+    const currentParentId = parentNode.id
+    const newParentId = parentNode.parentId
+    const siblingIds = parentNode.childIds
 
-    dispatch(nodeActions.nodePromotion(nodeId, rootNodeId, state.visibleNodes.present, state.auth.id))
+    dispatch(nodeActions.nodePromotion(nodeId, siblingIds, currentParentId, newParentId, state.visibleNodes.present, state.auth.id))
+
+    const newTreeState = nodeSelectors.getPresentNodes(getState())
+    const updatedNodes = [newTreeState[currentParentId], newTreeState[newParentId], newTreeState[nodeId], ...siblingIds.map(siblingId => newTreeState[siblingId])]
+    nodeRepository.updateNodes(updatedNodes)
   }
 
 export const toggleNodeExpansion = (nodeId) =>
