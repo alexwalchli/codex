@@ -1,6 +1,6 @@
-import { Component } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import * as authActions from '../actions/auth-actions'
+import * as authActionCreators from '../actions/auth-action-creators'
 
 export class SignIn extends Component {
 
@@ -33,5 +33,5 @@ function mapStateToProps (state, ownProps) {
   return state
 }
 
-const ConnectedSignIn = connect(mapStateToProps, authActions)(SignIn)
+const ConnectedSignIn = connect(mapStateToProps, authActionCreators)(SignIn)
 export default ConnectedSignIn

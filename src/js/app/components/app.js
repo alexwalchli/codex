@@ -12,8 +12,8 @@ import * as nodeActions from '../../node/actions/node-actions'
 export class App extends Component {
 
   onClick (e) {
-    const { closeAllMenusAndDeselectAllNodes } = this.props
-    closeAllMenusAndDeselectAllNodes()
+    // const { closeAllMenusAndDeselectAllNodes } = this.props
+    // closeAllMenusAndDeselectAllNodes()
   }
 
   render () {

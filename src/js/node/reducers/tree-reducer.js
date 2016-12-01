@@ -51,25 +51,27 @@ export const tree = reducerFactory({}, {
     return newState
   },
 
-  [NODES_DELETION]: (state, action) => {
-    let newState = Object.assign({}, state)
-    const { nodeIds } = action.payload.nodeIds
+  // TODO:
+  // [NODES_DELETION]: (state, action) => {
+  //   let newState = Object.assign({}, state)
+  //   const { nodeIds } = action.payload.nodeIds
 
-    nodeIds.forEach(nodeId => {
-      newState[nodeId] = nodeOperations.deleteNode(newState[nodeId])
-    })
+  //   nodeIds.forEach(nodeId => {
+  //     newState[nodeId] = nodeOperations.deleteNode(newState[nodeId])
+  //   })
 
-    return newState
-  },
+  //   return newState
+  // },
 
   [NODE_DELETION]: (state, action) => {
-    const { nodeId, parentId, userId } = action.payload
-    let newState = Object.assign({}, state)
-    newState[parentId] = nodeOperations.removeChild(newState[parentId], nodeId, userId)
-
-    return Object.assign({}, state, {
-      [nodeId]: nodeOperations.deleteNode(state[nodeId])
-    })
+    const { nodeId, parentId, allDescendantIds, userId } = action.payload
+    return [nodeId, ...allDescendantIds].reduce((acc, nid) => {
+      const parentId = acc[nid].parentId
+      acc[parentId] = nodeOperations.removeChild(acc[parentId], nid, userId)
+      acc[nid] =  nodeOperations.deleteNode(acc[nodeId])
+      acc[nid] = nodeOperations.unfocus(acc[nid])
+      return acc
+    }, Object.assign({}, state))
   },
 
   [NODE_CONTENT_UPDATE]: (state, action) => {
@@ -90,15 +92,8 @@ export const tree = reducerFactory({}, {
   },
 
   [NODE_DEMOTION]: (state, action) => {
-    // TODO: update Firebase
-
-    const { nodeId, rootNodeId, visibleNodes, userId } = action.payload
-    const currentParentId = state[nodeId].parentId
-    const siblingAbove = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, state, visibleNodes, nodeId, true)
-    const newParentId = siblingAbove.id
-    const addAfterLastChildOfSiblingAboveId = siblingAbove.childIds[siblingAbove.childIds.length - 1]
-
-    // nodeRepository.reassignParentNode(nodeId, currentParentId, newParentId, updatedChildIdsForOldParent, updatedChildIdsForNewParent, userId)
+    const { nodeId, rootNodeId, currentParentId, newParentId, 
+            addAfterLastChildOfSiblingAboveId, visibleNodes, userId } = action.payload
 
     const newState = nodeOperations.reassignParent(state, nodeId, currentParentId, newParentId, addAfterLastChildOfSiblingAboveId, userId)
 
@@ -106,8 +101,6 @@ export const tree = reducerFactory({}, {
   },
 
   [NODE_PROMOTION]: (state, action) => {
-    // TODO: update Firebase
-
     let newState = Object.assign({}, state)
     const { nodeId, userId, currentParentId, newParentId, siblingIds } = action.payload
 

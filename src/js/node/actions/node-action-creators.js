@@ -37,6 +37,12 @@ export const deleteNode = (nodeId, content) =>
   (dispatch, getState) => {
     const state = getState()
     const treeState = nodeSelectors.getPresentNodes(state)
+
+    if(Object.keys(treeState).length === 2) {
+      // this is the last node before the root
+      return;
+    }
+
     const allDescendantIds = nodeSelectors.getAllDescendantIds(treeState, nodeId)
     const parentId = treeState[nodeId].parentId
 
@@ -86,9 +92,34 @@ export const focusNodeBelow = (currentNodeId) =>
 export const demoteNode = (nodeId) =>
   (dispatch, getState) => {
     const state = getState()
+    const treeState = nodeSelectors.getPresentNodes(state)
     const rootNodeId = nodeSelectors.getRootNodeId(state)
+    const currentParentId = treeState[nodeId].parentId
+    const nodeAbove = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, treeState, state.visibleNodes.present, nodeId, true)
+    if(!nodeAbove || nodeAbove.id === currentParentId) {
+      // can't demote the node when there isn't a sibling above to attach it too
+      return;
+    }
+    const newParentId = nodeAbove.id
+    const addAfterLastChildOfSiblingAboveId = nodeAbove.childIds[nodeAbove.childIds.length - 1]
 
-    dispatch(nodeActions.nodeDemotion(nodeId, rootNodeId, state.visibleNodes.present, state.auth.id))
+    dispatch(nodeActions.nodeDemotion(
+      nodeId,
+      rootNodeId,
+      currentParentId,
+      newParentId,
+      addAfterLastChildOfSiblingAboveId,
+      state.visibleNodes.present,
+      state.auth.id))
+
+    const newTreeState = nodeSelectors.getPresentNodes(getState())
+    nodeRepository.reassignParentNode(
+      nodeId,
+      currentParentId,
+      newParentId,
+      newTreeState[currentParentId].childIds,
+      newTreeState[newParentId].childIds,
+      state.auth.id)
   }
 
 export const promoteNode = (nodeId) =>
@@ -103,9 +134,15 @@ export const promoteNode = (nodeId) =>
 
     dispatch(nodeActions.nodePromotion(nodeId, siblingIds, currentParentId, newParentId, state.visibleNodes.present, state.auth.id))
 
+    // TODO: Clean this the f up
     const newTreeState = nodeSelectors.getPresentNodes(getState())
-    const updatedNodes = [newTreeState[currentParentId], newTreeState[newParentId], newTreeState[nodeId], ...siblingIds.map(siblingId => newTreeState[siblingId])]
-    nodeRepository.updateNodes(updatedNodes)
+    const oldParentForSiblings = newTreeState[currentParentId]
+    const promotedNode = newTreeState[nodeId]
+    siblingIds.forEach(siblingId => {
+      nodeRepository.reassignParentNode(siblingId, currentParentId, nodeId, oldParentForSiblings.childIds, promotedNode.childIds, state.auth.id)
+    })
+    const newParentForPromotedNode = newTreeState[newParentId]
+    nodeRepository.reassignParentNode(nodeId, currentParentId, newParentId, oldParentForSiblings.childIds, newParentForPromotedNode.childIds, state.auth.id)
   }
 
 export const toggleNodeExpansion = (nodeId) =>
@@ -121,6 +158,9 @@ export const toggleNodeExpansion = (nodeId) =>
     } else {
       dispatch(nodeActions.nodeCollapse(nodeId, allDescendentIds, state.auth.id))
     }
+
+    const newTreeState = nodeSelectors.getPresentNodes(getState())
+    nodeRepository.updateNode(newTreeState[nodeId])
   }
 
 export const selectNode = (nodeId) =>

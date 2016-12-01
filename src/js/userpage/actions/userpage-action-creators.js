@@ -1,4 +1,4 @@
-import * as appActions from '../../app/actions/app-actions'
+import * as appActionCreators from '../../app/actions/app-action-creators'
 import { nodeFactory } from '../../node/helpers/node-factory'
 import * as nodeRepository from '../../node/repositories/node-repository'
 import * as nodeSelectors from '../../node/selectors/node-selectors'
@@ -19,7 +19,7 @@ export const createUserPage = (title, isHomePage) =>
 
     userPageRepository.createUserPage(newUserPage, newRootNode, newFirstNode)
       .then(snapshot => {
-        dispatch(appActions.userPageNavigation(newUserPageId))
+        dispatch(appActionCreators.navigateToUserPage(newUserPageId))
       })
   }
 
@@ -31,7 +31,7 @@ export const deleteUserPage = (userPageId) =>
     const auth = state.auth
 
     userPageRepository.deleteUserPage(userPage, rootNode, auth)
-    dispatch(appActions.userPageNavigation(nodeSelectors.dictionaryToArray(state.userPages).find(u => u.isHome).id))
+    dispatch(appActionCreators.navigateToUserPage(nodeSelectors.dictionaryToArray(state.userPages).find(u => u.isHome).id))
     dispatch(userPageActions.userPageDeletion(userPageId))
   }
 

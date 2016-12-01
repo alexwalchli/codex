@@ -69,11 +69,14 @@ export const nodeUnfocus = (nodeId) => ({
   }
 })
 
-export const nodeDemotion = (nodeId, rootNodeId, visibleNodes, userId) => ({
+export const nodeDemotion = (nodeId, rootNodeId, currentParentId, newParentId, addAfterLastChildOfSiblingAboveId, visibleNodes, userId) => ({
   type: nodeActionTypes.NODE_DEMOTION,
   payload: {
     nodeId,
     rootNodeId,
+    currentParentId,
+    newParentId,
+    addAfterLastChildOfSiblingAboveId,
     visibleNodes,
     userId
   }

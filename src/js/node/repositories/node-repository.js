@@ -13,7 +13,7 @@ export const createNode = queuedRequest((node, userPageId, updatedParentChildIds
   return firebaseDb.ref('node_userPages_users/' + node.parentId).once('value').then(parentNodeUserPagesUsersSnapshot => {
     const parentNodeUserPagesUsers = parentNodeUserPagesUsersSnapshot.val()
     const nodeUpdates = {
-      [`nodes/${node.id}`]: node,
+      [`nodes/${node.id}`]: filterOutUserSpecificAttributes(node),
       [`nodes/${node.parentId}/childIds`]: updatedParentChildIds,
       [`nodes/${node.parentId}/lastUpdatedById`]: node.createdById
     }
@@ -32,17 +32,23 @@ export const createNode = queuedRequest((node, userPageId, updatedParentChildIds
 
 export const updateNode = queuedRequest((node) => {
   const nodeRef = firebaseDb.ref(`nodes/${node.id}`)
-  return nodeRef.update(node)
+  return nodeRef.update(filterOutUserSpecificAttributes(node))
 })
 
 export const updateNodes = queuedRequest((nodes) => {
   const nodeUpdates = nodes.reduce((acc, node) => {
-    acc[`nodes/${node.id}`] = node
+    acc[`nodes/${node.id}`] = filterOutUserSpecificAttributes(node)
     return acc
   }, {})
 
   return firebaseDb.ref().update(nodeUpdates)
 })
+
+function filterOutUserSpecificAttributes(node){
+  delete node.focused
+  delete node.notesFocused
+  return node
+}
 
 // export const updateNodeComplete = queuedRequest((nodeId, complete, userId) => {
 //   return firebaseDb.ref().update({
@@ -115,22 +121,29 @@ export const deleteNode = queuedRequest((nodeId, parentId, updatedParentChildIds
   })
 })
 
-export const deleteNodes = queuedRequest((nodesToDelete = [], userId) => {
-  let dbUpdates = {}
-  nodesToDelete.forEach(nodeToDelete => {
-    dbUpdates[`nodes/${nodeToDelete.id}/deleted`] = true
-    dbUpdates[`nodes/${nodeToDelete.id}/lastUpdatedById/`] = userId
-    dbUpdates[`nodes/${nodeToDelete.parentId}/childIds/`] = nodesToDelete.parentNode
-    dbUpdates[`nodes/${nodeToDelete.parentId}/lastUpdatedById/`] = userId
+// TODO: In order to support undo functionality there's a delete flag on nodes
+// but we'll need to clean up eventually 
+export const permanentlyDeleteNode = queuedRequest((nodeId) => {
 
-    nodeToDelete.allDescendentIds.forEach(descedantId => {
-      dbUpdates[`nodes/${descedantId}/deleted`] = true
-      dbUpdates[`nodes/${descedantId}/lastUpdatedById/`] = userId
-    })
-  })
-
-  return firebaseDb.ref().update(dbUpdates)
 })
+
+// TODO:
+// export const deleteNodes = queuedRequest((nodesToDelete = [], userId) => {
+//   let dbUpdates = {}
+//   nodesToDelete.forEach(nodeToDelete => {
+//     dbUpdates[`nodes/${nodeToDelete.id}/deleted`] = true
+//     dbUpdates[`nodes/${nodeToDelete.id}/lastUpdatedById/`] = userId
+//     dbUpdates[`nodes/${nodeToDelete.parentId}/childIds/`] = nodesToDelete.parentNode
+//     dbUpdates[`nodes/${nodeToDelete.parentId}/lastUpdatedById/`] = userId
+
+//     nodeToDelete.allDescendentIds.forEach(descedantId => {
+//       dbUpdates[`nodes/${descedantId}/deleted`] = true
+//       dbUpdates[`nodes/${descedantId}/lastUpdatedById/`] = userId
+//     })
+//   })
+
+//   return firebaseDb.ref().update(dbUpdates)
+// })
 
 // export const completeNodes = queuedRequest((nodeIds, userId) => {
 //   let dbUpdates = {}
