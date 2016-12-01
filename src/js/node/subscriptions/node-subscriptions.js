@@ -20,8 +20,13 @@ export const initializeNodeSubscriptions = (userPageId, userId) => {
         let nodePromise = new Promise((resolve, reject) => {
           nodeRepository.getNode(nodeId)
               .then(node => {
-                initialTreeState[nodeId] = node
-                subscribeToNodeUpdated(nodeId)
+                // clean up nodes each time we initialize subs
+                if(node.deleted) {
+                  nodeRepository.permanentlyDeleteNode(nodeId, userPageId, userId)
+                } else {
+                  initialTreeState[nodeId] = node
+                  subscribeToNodeUpdated(nodeId)
+                }
                 resolve()
               })
         })
@@ -31,6 +36,8 @@ export const initializeNodeSubscriptions = (userPageId, userId) => {
       Promise.all(initialNodePromises).then(() => {
         resolve(initialTreeState)
         // initialized = true
+      }).catch(error => {
+        console.error('Error while initializing node subscriptions: ' + error.message)
       })
     })
   })
