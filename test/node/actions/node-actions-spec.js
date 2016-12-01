@@ -114,16 +114,20 @@ describe('node actions', () => {
   describe('nodeDemotion', () => {
     it('should create a nodeDemotion action', () => {
       const nodeId = '2'
-      const rootNodeId = '0'
+      const currentParentId = '1'
+      const newParentId = '3'
+      const addNodeAfterNewSiblingId = null
       const visibleNodes = {}
       const userId = 'user123'
 
-      expect(nodeActions.nodeDemotion(nodeId, rootNodeId, visibleNodes, userId))
+      expect(nodeActions.nodeDemotion(nodeId, currentParentId, newParentId, addNodeAfterNewSiblingId, visibleNodes, userId))
         .to.deep.equal({
           type: nodeActionTypes.NODE_DEMOTION,
           payload: {
             nodeId,
-            rootNodeId,
+            currentParentId,
+            newParentId,
+            addNodeAfterNewSiblingId,
             visibleNodes,
             userId
           }

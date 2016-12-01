@@ -1,6 +1,6 @@
 import * as nodeActions from '../../../src/js/node/actions/node-actions'
 import * as nodeActionCreators from '../../../src/js/node/actions/node-action-creators'
-import * as nodeSelectors from '../../../src/js/node/selectors/node-selectors'
+// import * as nodeSelectors from '../../../src/js/node/selectors/node-selectors'
 import * as nodeRepository from '../../../src/js/node/repositories/node-repository'
 import sinon from 'sinon'
 import { expect } from 'chai'
@@ -11,12 +11,12 @@ describe('nodeActionCreators', () => {
   const currentUserPageId = 54321
   const dispatch = sinon.spy()
   const nodes = {
-    '1': { id: '1', childIds: ['123', '321'] },
+    '1': { id: '1', childIds: ['123', '321', '456'] },
     '123': {
       id: '123',
       parentId: '1',
       childIds: [],
-      collapsedBy: { '111': true },
+      collapsedBy: {},
       focused: true,
       notesFocused: false,
       completed: true,
@@ -48,6 +48,7 @@ describe('nodeActionCreators', () => {
     }
   }
   const visibleNodes = {
+    '1': true,
     '123': true,
     '321': true,
     '456': true,
@@ -64,18 +65,17 @@ describe('nodeActionCreators', () => {
       tree: {
         present: nodes
       },
-      userPages: {
-        [currentUserPageId]: { id: currentUserPageId, rootNodeId: '1' }
-      },
+      userPages: [{ id: currentUserPageId, rootNodeId: '1' }],
       visibleNodes: { present: visibleNodes }
     }
   }
 
   beforeEach(() => {
+    dispatch.reset()
     sinon.stub(nodeRepository, 'getNewNodeId', () => (newNodeId))
     sinon.stub(nodeRepository, 'updateNodes', () => {})
     sinon.stub(nodeRepository, 'createNode', () => {})
-    sinon.stub(nodeSelectors, 'getNextNodeThatIsVisible', () => (nodes['123']))
+    sinon.stub(nodeRepository, 'reassignParentNode', () => {})
     sinon.spy(nodeActions, 'nodeCreation')
     sinon.spy(nodeActions, 'nodeFocus')
     sinon.spy(nodeActions, 'nodeContentUpdate')
@@ -89,7 +89,7 @@ describe('nodeActionCreators', () => {
     nodeRepository.getNewNodeId.restore()
     nodeRepository.createNode.restore()
     nodeRepository.updateNodes.restore()
-    nodeSelectors.getNextNodeThatIsVisible.restore()
+    nodeRepository.reassignParentNode.restore()
     nodeActions.nodeCreation.restore()
     nodeActions.nodeFocus.restore()
     nodeActions.nodeContentUpdate.restore()
@@ -158,7 +158,7 @@ describe('nodeActionCreators', () => {
       nodeActionCreators.focusNodeBelow(nodeId)(dispatch, getState)
 
       expect(dispatch).to.have.been.called
-      expect(nodeActions.nodeFocus).to.have.been.calledWith('123')
+      expect(nodeActions.nodeFocus).to.have.been.calledWith('456')
     })
   })
   describe('updateNodeContent', () => {
@@ -178,36 +178,73 @@ describe('nodeActionCreators', () => {
   //   })
   // })
   describe('demoteNode', () => {
-    it('should dispatch a demoteNode action', () => {
+    it('should not dispatch a nodeDemotion and not update persistence if there is not a node above to attach to', () => {
+      const nodeId = '123'
+
+      nodeActionCreators.demoteNode(nodeId)(dispatch, getState)
+
+      expect(dispatch).to.not.have.been.called
+      expect(nodeRepository.reassignParentNode).to.not.have.been.called
+    })
+    it('should dispatch a nodeDemotion action and update persistence', () => {
       const nodeId = '321'
 
       nodeActionCreators.demoteNode(nodeId)(dispatch, getState)
 
       expect(dispatch).to.have.been.called
-      expect(nodeActions.nodeDemotion).to.have.been.calledWith(nodeId, '1', visibleNodes, userId)
+      expect(nodeActions.nodeDemotion).to.have.been.calledWith(
+        nodeId,
+        '1',
+        '1',
+        '123',
+        undefined,
+        visibleNodes,
+        userId)
+      expect(nodeRepository.reassignParentNode).to.have.been.calledWith(
+        nodeId,
+        '1',
+        '123',
+        [ '123', '321', '456' ],
+        [ '321' ],
+        userId
+      )
     })
   })
   describe('promoteNode', () => {
-    it('should dispatch a nodePromotion action and update persistence', () => {
-      const nodeId = '321'
-      const state = getState()
+    it('should not dispatch or update persistence if the node has the root node as a parent', () => {
+      const nodeId = '123'
       const node = nodes[nodeId]
       const parentNode = nodes[node.parentId]
       const currentParentId = parentNode.id
       const newParentId = parentNode.parentId
       const siblingIds = parentNode.childIds
 
-      nodeActionCreators.promoteNode(nodeId)(dispatch, getState)
+      nodeActionCreators.promoteNode(nodeId, siblingIds, currentParentId, newParentId, visibleNodes, userId)(dispatch, getState)
 
-      expect(dispatch).to.have.been.called
-      expect(nodeActions.nodePromotion).to.have.been.calledWith(nodeId, siblingIds, currentParentId, newParentId, visibleNodes, state.auth.id)
-      expect(nodeRepository.updateNodes).to.have.been.calledWith([
-        nodes[currentParentId],
-        nodes[newParentId],
-        nodes[nodeId],
-        ...siblingIds.map(siblingId => nodes[siblingId])
-      ])
+      expect(dispatch).to.not.have.been.called
+      expect(nodeRepository.reassignParentNode).to.not.have.been.called
     })
+    // it('should dispatch a nodePromotion action and update persistence', () => {
+    //   const nodeId = '456'
+    //   const node = nodes[nodeId]
+    //   const parentNode = nodes[node.parentId]
+    //   const currentParentId = parentNode.id
+    //   const newParentId = parentNode.parentId
+    //   const siblingIds = parentNode.childIds
+
+    //   nodeActionCreators.promoteNode(nodeId, siblingIds, currentParentId, newParentId, visibleNodes, userId)(dispatch, getState)
+
+    //   expect(dispatch).to.not.have.been.called
+    //   expect(nodeRepository.reassignParentNode).to.not.have.been.called
+    //   // expect(dispatch).to.have.been.called
+    //   // expect(nodeActions.nodePromotion).to.have.been.calledWith(nodeId, siblingIds, currentParentId, newParentId, visibleNodes, state.auth.id)
+    //   // expect(nodeRepository.updateNodes).to.have.been.calledWith([
+    //   //   nodes[currentParentId],
+    //   //   nodes[newParentId],
+    //   //   nodes[nodeId],
+    //   //   ...siblingIds.map(siblingId => nodes[siblingId])
+    //   // ])
+    // })
   })
   describe('selectNode', () => {
     it('should dispatch a nodeSelection action', () => {

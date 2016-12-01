@@ -22,7 +22,9 @@ import {
   NODE_NOTES_UPDATE,
   NODE_DISPLAY_MODE_UPDATE,
   NODE_TAG_ADDITION,
-  NODE_TAG_REMOVAL
+  NODE_TAG_REMOVAL,
+  NODE_UPSERT_FROM_SUBSCRIPTION,
+  NODE_DELETION_FROM_SUBSCRIPTION
 } from '../actions/node-action-types'
 
 export const tree = reducerFactory({}, {
@@ -51,26 +53,22 @@ export const tree = reducerFactory({}, {
     return newState
   },
 
-  // TODO:
-  // [NODES_DELETION]: (state, action) => {
-  //   let newState = Object.assign({}, state)
-  //   const { nodeIds } = action.payload.nodeIds
+  [NODE_DELETION_FROM_SUBSCRIPTION]: (state, action) => {
 
-  //   nodeIds.forEach(nodeId => {
-  //     newState[nodeId] = nodeOperations.deleteNode(newState[nodeId])
-  //   })
+  },
 
-  //   return newState
-  // },
+  [NODE_UPSERT_FROM_SUBSCRIPTION]: (state, action) => {
+
+  },
+
+  [NODES_DELETION]: (state, action) => {
+
+  },
 
   [NODE_DELETION]: (state, action) => {
     const { nodeId, parentId, allDescendantIds, userId } = action.payload
     return [nodeId, ...allDescendantIds].reduce((acc, nid) => {
-      const parentId = acc[nid].parentId
-      acc[parentId] = nodeOperations.removeChild(acc[parentId], nid, userId)
-      acc[nid] =  nodeOperations.deleteNode(acc[nodeId])
-      acc[nid] = nodeOperations.unfocus(acc[nid])
-      return acc
+      return nodeOperations.deleteNode(acc, nodeId, parentId, userId)
     }, Object.assign({}, state))
   },
 
@@ -92,10 +90,10 @@ export const tree = reducerFactory({}, {
   },
 
   [NODE_DEMOTION]: (state, action) => {
-    const { nodeId, rootNodeId, currentParentId, newParentId, 
-            addAfterLastChildOfSiblingAboveId, visibleNodes, userId } = action.payload
+    const { nodeId, currentParentId, newParentId,
+            addNodeAfterNewSiblingId, userId } = action.payload
 
-    const newState = nodeOperations.reassignParent(state, nodeId, currentParentId, newParentId, addAfterLastChildOfSiblingAboveId, userId)
+    const newState = nodeOperations.reassignParent(state, nodeId, currentParentId, newParentId, addNodeAfterNewSiblingId, userId)
 
     return nodeOperations.focus(newState, nodeId, false)
   },

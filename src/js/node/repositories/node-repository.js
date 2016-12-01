@@ -1,6 +1,7 @@
 import nodeSnapshotUnwrapper from '../helpers/node-snapshot-unwrapper'
 import { firebaseDb } from '../../firebase'
 import { queuedRequest } from '../../requestqueue/queued-request'
+
 export const getNode = (nodeId) => {
   return firebaseDb.ref(`nodes/${nodeId}`).once('value').then(nodeSnapshotUnwrapper)
 }
@@ -44,7 +45,7 @@ export const updateNodes = queuedRequest((nodes) => {
   return firebaseDb.ref().update(nodeUpdates)
 })
 
-function filterOutUserSpecificAttributes(node){
+function filterOutUserSpecificAttributes (node) {
   delete node.focused
   delete node.notesFocused
   return node
@@ -122,11 +123,11 @@ export const deleteNode = queuedRequest((nodeId, parentId, updatedParentChildIds
 })
 
 // TODO: In order to support undo functionality there's a delete flag on nodes
-// but we'll need to clean up eventually 
+// but we'll need to clean up eventually
 export const permanentlyDeleteNode = queuedRequest((nodeId, userPageId, userId) => {
   const removal = {
     [`nodes/${nodeId}`]: null,
-    [`node_users/${nodeId}/${userId}`] : null,
+    [`node_users/${nodeId}/${userId}`]: null,
     [`node_userPages_users/${nodeId}/${userPageId}/${userId}`]: null,
     [`userPage_users_nodes/${userPageId}/${userId}/${nodeId}`]: null
   }

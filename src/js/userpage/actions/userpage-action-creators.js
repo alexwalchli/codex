@@ -30,9 +30,10 @@ export const deleteUserPage = (userPageId) =>
     const rootNode = state.tree.present[userPage.rootNodeId]
     const auth = state.auth
 
-    userPageRepository.deleteUserPage(userPage, rootNode, auth)
     dispatch(appActionCreators.navigateToUserPage(nodeSelectors.dictionaryToArray(state.userPages).find(u => u.isHome).id))
     dispatch(userPageActions.userPageDeletion(userPageId))
+
+    userPageRepository.deleteUserPage(userPage, rootNode, auth)
   }
 
 export const updateUserPageName = (userPageId, newUserPageName) =>

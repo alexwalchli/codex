@@ -4,7 +4,7 @@ import * as userPageActions from '../../../src/js/userpage/actions/userpage-acti
 import * as userPageFactory from '../../../src/js/userpage/helpers/userpage-factory'
 import * as nodeRepository from '../../../src/js/node/repositories/node-repository'
 import * as nodeFactory from '../../../src/js/node/helpers/node-factory'
-import * as appActions from '../../../src/js/app/actions/app-actions'
+import * as appActionCreators from '../../../src/js/app/actions/app-action-creators'
 import sinon from 'sinon'
 import { expect } from 'chai'
 
@@ -32,7 +32,7 @@ describe('userPageActionCreators', () => {
   const newNode = {}
   const newUserPageId = 'userPage123'
   const newUserPage = {}
-  const navigateToUserPageActionStub = { navigateToUserPage: true }
+  const userPageNavigationActionStub = { navigateToUserPage: true }
   const userPageDeletionActionStub = { userPageDeletion: true }
   const userPageNameUpdateActionStub = { userPageNameUpdate: true }
   beforeEach(() => {
@@ -43,7 +43,7 @@ describe('userPageActionCreators', () => {
     sinon.stub(userPageRepository, 'createUserPage', (newUserPage, newRootNode, newFirstNode) => (Promise.resolve(newUserPage)))
     sinon.stub(userPageRepository, 'deleteUserPage', (userPageId) => (Promise.resolve()))
     sinon.stub(userPageRepository, 'updateUserPageName', (userPageId, name) => (Promise.resolve()))
-    sinon.stub(appActions, 'userPageNavigation', () => (navigateToUserPageActionStub))
+    sinon.stub(appActionCreators, 'navigateToUserPage', () => (userPageNavigationActionStub))
     sinon.stub(userPageActions, 'userPageDeletion', () => (userPageDeletionActionStub))
     sinon.stub(userPageActions, 'userPageNameUpdate', () => (userPageNameUpdateActionStub))
   })
@@ -54,7 +54,7 @@ describe('userPageActionCreators', () => {
     userPageFactory.userPageFactory.restore()
     userPageRepository.getNewUserPageId.restore()
     userPageRepository.createUserPage.restore()
-    appActions.userPageNavigation.restore()
+    appActionCreators.navigateToUserPage.restore()
     userPageRepository.deleteUserPage.restore()
     userPageRepository.updateUserPageName.restore()
     userPageActions.userPageDeletion.restore()
@@ -71,8 +71,8 @@ describe('userPageActionCreators', () => {
       expect(userPageRepository.createUserPage).to.have.been.calledWith(newUserPage, newNode, newNode)
 
       setTimeout(() => {
-        expect(appActions.userPageNavigation).to.have.been.calledWith(newUserPageId)
-        expect(dispatch).to.have.been.calledWith(navigateToUserPageActionStub)
+        expect(appActionCreators.navigateToUserPage).to.have.been.calledWith(newUserPageId)
+        expect(dispatch).to.have.been.calledWith(userPageNavigationActionStub)
         done()
       }, 0)
     })
@@ -82,9 +82,9 @@ describe('userPageActionCreators', () => {
       userPageActionCreators.deleteUserPage('1')(dispatch, getState)
 
       expect(userPageRepository.deleteUserPage).to.have.been.calledWith(userPage, rootNode, auth)
-      expect(appActions.userPageNavigation).to.have.been.calledWith('1')
+      expect(appActionCreators.navigateToUserPage).to.have.been.calledWith('1')
       expect(userPageActions.userPageDeletion).to.have.been.calledWith('1')
-      expect(dispatch).to.have.been.calledWith(navigateToUserPageActionStub)
+      expect(dispatch).to.have.been.calledWith(userPageNavigationActionStub)
       expect(dispatch).to.have.been.calledWith(userPageDeletionActionStub)
     })
   })

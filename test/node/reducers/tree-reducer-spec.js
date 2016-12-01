@@ -182,7 +182,7 @@ describe('treeReducer', () => {
     // TODO: instead of demoting to the node above, which could cause the node to be demoted several levels
     // should it only get demoted 1 level, to its next sibling above, if possible?
     it('should reassign the demoted node parentId to the node above and focus it', () => {
-      const nodeDemotionAction = nodeActions.nodeDemotion('5', '1', dummyVisibleNodes, 'user123')
+      const nodeDemotionAction = nodeActions.nodeDemotion('5', '1', '4', null, dummyVisibleNodes, 'user123')
 
       const newState = tree(dummyState, nodeDemotionAction)
 

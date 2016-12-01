@@ -21,7 +21,7 @@ export const initializeNodeSubscriptions = (userPageId, userId) => {
           nodeRepository.getNode(nodeId)
               .then(node => {
                 // clean up nodes each time we initialize subs
-                if(node.deleted) {
+                if (node.deleted) {
                   nodeRepository.permanentlyDeleteNode(nodeId, userPageId, userId)
                 } else {
                   initialTreeState[nodeId] = node

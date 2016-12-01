@@ -63,7 +63,7 @@ export function getCurrentlyFocusedNodeId (nodes) {
 export function getNextNodeThatIsVisible (rootNodeId, nodes, visibleNodes, currentNodeId, searchAbove = true) {
   const allNodeIdsOrdered = getAllNodeIdsOrdered(nodes, rootNodeId)
   const currentNodeIndex = allNodeIdsOrdered.indexOf(currentNodeId)
-
+  console.log(allNodeIdsOrdered)
   if (searchAbove) {
     for (let j = currentNodeIndex - 1; j > 0; j--) {
       let node = nodes[allNodeIdsOrdered[j]]

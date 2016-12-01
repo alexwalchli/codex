@@ -65,11 +65,12 @@ export const updateNotes = (node, notes, userId) => {
   })
 }
 
-export const deleteNode = (node, userId) => {
-  return Object.assign({}, node, {
-    deleted: true,
-    lastUpdatedById: userId
-  })
+export const deleteNode = (state, nodeId, parentId, userId) => {
+  let newState = Object.assign({}, state)
+  newState[parentId] = removeChild(newState[parentId], nodeId, userId)
+  newState[nodeId].deleted = true
+  newState[nodeId] = unfocus(newState[nodeId])
+  return newState
 }
 
 export const select = (state, nodeIds) => {
