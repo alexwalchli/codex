@@ -6,7 +6,7 @@ import * as nodeRepository from '../repositories/node-repository'
 export const createNode = (originNodeId, originOffset, content) =>
   (dispatch, getState) => {
     const state = getState()
-    const treeState = nodeSelectors.getPresentNodes(state)
+    const treeState = nodeSelectors.currentTreeState(state)
     const newNodeId = nodeRepository.getNewNodeId()
     const originNode = treeState[originNodeId]
     const parentId = originNode.childIds.length === 0 || originNode.collapsed ? originNode.parentId : originNodeId
@@ -29,14 +29,14 @@ export const createNode = (originNodeId, originOffset, content) =>
       state.auth.id))
 
     const newState = getState()
-    const newTreeState = nodeSelectors.getPresentNodes(newState)
+    const newTreeState = nodeSelectors.currentTreeState(newState)
     nodeRepository.createNode(newTreeState[newNodeId], state.app.currentUserPageId, newTreeState[parentId].childIds)
   }
 
 export const deleteNode = (nodeId) =>
   (dispatch, getState) => {
     const state = getState()
-    const treeState = nodeSelectors.getPresentNodes(state)
+    const treeState = nodeSelectors.currentTreeState(state)
 
     if (Object.keys(treeState).length === 2) {
       // this is the last node before the root
@@ -49,14 +49,14 @@ export const deleteNode = (nodeId) =>
     dispatch(nodeActions.nodeDeletion(nodeId, parentId, allDescendantIds, state.auth.id))
 
     const newState = getState()
-    const newTreeState = nodeSelectors.getPresentNodes(newState)
+    const newTreeState = nodeSelectors.currentTreeState(newState)
     nodeRepository.deleteNode(nodeId, parentId, newTreeState[parentId].childIds, allDescendantIds, state.auth.id)
   }
 
 export const deleteNodes = (nodeIds) =>
   (dispatch, getState) => {
     const state = getState()
-    const treeState = nodeSelectors.getPresentNodes(state)
+    const treeState = nodeSelectors.currentTreeState(state)
     if (nodeIds.length - 2 > Object.keys(treeState).length) {
       // need to add back an initial node if they delete everything
     }
@@ -72,7 +72,7 @@ export const updateNodeContent = (nodeId, content) =>
 
     dispatch(nodeActions.nodeContentUpdate(nodeId, content, state.auth.id))
 
-    nodeRepository.updateNode(nodeSelectors.getPresentNodes(getState())[nodeId])
+    nodeRepository.updateNode(nodeSelectors.currentTreeState(getState())[nodeId])
   }
 
 export const focusNode = (nodeId, focusNotes) =>
@@ -84,7 +84,7 @@ export const focusNodeAbove = (currentNodeId) =>
   (dispatch, getState) => {
     const state = getState()
     const rootNodeId = nodeSelectors.getRootNodeId(state)
-    const nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.getPresentNodes(state), state.visibleNodes.present, currentNodeId, true)
+    const nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.currentTreeState(state), state.visibleNodes.present, currentNodeId, true)
 
     if (nodeToFocus) {
       dispatch(nodeActions.nodeFocus(nodeToFocus.id))
@@ -95,7 +95,7 @@ export const focusNodeBelow = (currentNodeId) =>
   (dispatch, getState) => {
     const state = getState()
     const rootNodeId = nodeSelectors.getRootNodeId(state)
-    const nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.getPresentNodes(state), state.visibleNodes.present, currentNodeId, false)
+    const nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.currentTreeState(state), state.visibleNodes.present, currentNodeId, false)
 
     if (nodeToFocus) {
       dispatch(nodeActions.nodeFocus(nodeToFocus.id))
@@ -105,7 +105,7 @@ export const focusNodeBelow = (currentNodeId) =>
 export const demoteNode = (nodeId) =>
   (dispatch, getState) => {
     const state = getState()
-    const treeState = nodeSelectors.getPresentNodes(state)
+    const treeState = nodeSelectors.currentTreeState(state)
     const rootNodeId = nodeSelectors.getRootNodeId(state)
     const currentParentId = treeState[nodeId].parentId
     const addAfterSibling = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, treeState, state.visibleNodes.present, nodeId, true)
@@ -126,7 +126,7 @@ export const demoteNode = (nodeId) =>
       state.visibleNodes.present,
       state.auth.id))
 
-    const newTreeState = nodeSelectors.getPresentNodes(getState())
+    const newTreeState = nodeSelectors.currentTreeState(getState())
     nodeRepository.reassignParentNode(
       nodeId,
       currentParentId,
@@ -139,7 +139,7 @@ export const demoteNode = (nodeId) =>
 export const promoteNode = (nodeId) =>
   (dispatch, getState) => {
     const state = getState()
-    const treeState = nodeSelectors.getPresentNodes(state)
+    const treeState = nodeSelectors.currentTreeState(state)
     const node = treeState[nodeId]
     const parentNode = treeState[node.parentId]
     const currentParentId = parentNode.id
@@ -152,10 +152,8 @@ export const promoteNode = (nodeId) =>
 
     dispatch(nodeActions.nodePromotion(nodeId, siblingIds, currentParentId, newParentId, state.visibleNodes.present, state.auth.id))
 
-    nodeSync.promoteNode(getState, nodeId, currentParentId, )
-
-    // side effect, syncAction, syncNodes, 
-    const newTreeState = nodeSelectors.getPresentNodes(getState())
+    // side effect, syncAction, syncNodes,
+    const newTreeState = nodeSelectors.currentTreeState(getState())
     const oldParentForSiblings = newTreeState[currentParentId]
     const promotedNode = newTreeState[nodeId]
     siblingIds.forEach(siblingId => {
@@ -168,18 +166,18 @@ export const promoteNode = (nodeId) =>
 export const toggleNodeExpansion = (nodeId) =>
   (dispatch, getState) => {
     const state = getState()
-    const nodes = nodeSelectors.getPresentNodes(state)
+    const nodes = nodeSelectors.currentTreeState(state)
     const allDescendentIds = nodeSelectors.getAllDescendantIds(nodes, nodeId)
     const rootNodeId = nodeSelectors.getRootNodeId(state)
     const allUncollapsedDescendantIds = nodeSelectors.getAllUncollapsedDescedantIds(rootNodeId, nodes, nodeId, state.auth.id)
 
-    if (nodeSelectors.getPresentNodes(state)[nodeId].collapsedBy[state.auth.id]) {
+    if (nodeSelectors.currentTreeState(state)[nodeId].collapsedBy[state.auth.id]) {
       dispatch(nodeActions.nodeExpansion(nodeId, allDescendentIds, allUncollapsedDescendantIds, state.auth.id))
     } else {
       dispatch(nodeActions.nodeCollapse(nodeId, allDescendentIds, state.auth.id))
     }
 
-    const newTreeState = nodeSelectors.getPresentNodes(getState())
+    const newTreeState = nodeSelectors.currentTreeState(getState())
     nodeRepository.updateNode(newTreeState[nodeId])
   }
 
@@ -234,7 +232,7 @@ export const toggleNodeMenu = (nodeId) =>
 //   const updatedById = appState.auth.id
 
 //   // remove child from its current parent
-//   let oldParentChildIds = nodeSelectors.getPresentNodes(appState)[oldParentId].childIds
+//   let oldParentChildIds = nodeSelectors.currentTreeState(appState)[oldParentId].childIds
 //   let updatedChildIdsForOldParent = oldParentChildIds.filter(id => id !== nodeId)
 //   optimisticEvents.push(nodeActions.childIdsUpdated(oldParentId, updatedChildIdsForOldParent, updatedById))
 
@@ -255,7 +253,7 @@ export const toggleNodeMenu = (nodeId) =>
 // // export const createNode = (originNodeId, originOffset, content) =>
 // //   (dispatch, getState) => {
 // //     const appState = getState()
-// //     const nodes = nodeSelectors.getPresentNodes(appState)
+// //     const nodes = nodeSelectors.currentTreeState(appState)
 // //     const originNode = nodes[originNodeId]
 // //     const parentOfNewNode = nodes[originNode.childIds.length === 0 || originNode.collapsed ? originNode.parentId : originNodeId]
 // //     const newNodeId = nodeFirebaseActions.getNewNodeId()
@@ -283,7 +281,7 @@ export const toggleNodeMenu = (nodeId) =>
 // // export const updateContent = (nodeId, newContent) =>
 // //   (dispatch, getState) => {
 // //     const appState = getState()
-// //     const node = nodeSelectors.getPresentNodes(appState)[nodeId]
+// //     const node = nodeSelectors.currentTreeState(appState)[nodeId]
 
 // //     node.taggedByIds.forEach(tagId => {
 // //       if (!newContent.toLowerCase().includes(tagId)) {
@@ -298,7 +296,7 @@ export const toggleNodeMenu = (nodeId) =>
 // // export const focusNode = (nodeId, focusNotes) =>
 // //   (dispatch, getState) => {
 // //     const appState = getState()
-// //     const nodes = nodeSelectors.getPresentNodes(appState)
+// //     const nodes = nodeSelectors.currentTreeState(appState)
 // //     const nodeIdToUnfocus = nodeSelectors.getCurrentlyFocusedNodeId(nodes)
 // //     let events = []
 
@@ -321,7 +319,7 @@ export const toggleNodeMenu = (nodeId) =>
 // //   (dispatch, getState) => {
 // //     const appState = getState()
 // //     const rootNodeId = nodeSelectors.getRootNodeId(appState)
-// //     const siblingAbove = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.getPresentNodes(appState), appState.visibleNodes.present, nodeId, true)
+// //     const siblingAbove = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.currentTreeState(appState), appState.visibleNodes.present, nodeId, true)
 // //     const addAfterLastChildOfSiblingAboveId = siblingAbove.childIds[siblingAbove.childIds.length - 1]
 
 // //     dispatch(nodeActions.nodeTransaction(generateEventsForReassignParentNode(dispatch, nodeId, parentId, siblingAbove.id, addAfterLastChildOfSiblingAboveId, appState)))
@@ -331,7 +329,7 @@ export const toggleNodeMenu = (nodeId) =>
 // export const promoteNode = (nodeId, parentId) =>
 //   (dispatch, getState) => {
 //     const appState = getState()
-//     const nodes = nodeSelectors.getPresentNodes(appState)
+//     const nodes = nodeSelectors.currentTreeState(appState)
 //     const parentNode = nodes[parentId]
 //     const siblingIds = parentNode.childIds
 //     let optimisticEvents = []
@@ -348,7 +346,7 @@ export const toggleNodeMenu = (nodeId) =>
 
 // export const deleteNode = (nodeId) =>
 //   (dispatch, getState) => {
-//     let nodes = nodeSelectors.getPresentNodes(getState())
+//     let nodes = nodeSelectors.currentTreeState(getState())
 //     if (Object.keys(nodes).length > 2) {
 //       const appState = getState()
 //       let nodeToDelete = nodes[nodeId]
@@ -363,7 +361,7 @@ export const toggleNodeMenu = (nodeId) =>
 
 // export const deleteNodes = (nodeIds) => (dispatch, getState) => {
 //   const appState = getState()
-//   const nodes = nodeSelectors.getPresentNodes(appState)
+//   const nodes = nodeSelectors.currentTreeState(appState)
 
 //   let reducerTransaction = []
 //   let nodesToDeleteFromDatabase = []
@@ -393,7 +391,7 @@ export const toggleNodeMenu = (nodeId) =>
 // export const toggleNodeExpansion = (nodeId, forceToggleChildrenExpansion) =>
 //   (dispatch, getState) => {
 //     const appState = getState()
-//     const nodes = nodeSelectors.getPresentNodes(appState)
+//     const nodes = nodeSelectors.currentTreeState(appState)
 //     const allDescendentIds = forceToggleChildrenExpansion
 //                               ? nodeSelectors.getAllDescendantIds(nodes, nodeId)
 //                               : nodeSelectors.getAllUncollapsedDescedantIds(nodeId, nodes, nodeId)
@@ -409,7 +407,7 @@ export const toggleNodeMenu = (nodeId) =>
 // export const searchNodes = (query) =>
 //   (dispatch, getState) => {
 //     const appState = getState()
-//     let nodes = nodeSelectors.dictionaryToArray(nodeSelectors.getPresentNodes(appState))
+//     let nodes = nodeSelectors.dictionaryToArray(nodeSelectors.currentTreeState(appState))
 //     let resultingNodeIds = nodes.filter(node => {
 //       if (node.id === nodeSelectors.getRootNodeId(appState)) {
 //         return true
@@ -429,8 +427,8 @@ export const toggleNodeMenu = (nodeId) =>
 // export const undo = () =>
 //   (dispatch, getState) => {
 //     // const appState = getState()
-//     // const currentTreeState = getPresentNodes(appState)
-//     // const undoneTreeState = getPresentNodes(appState)
+//     // const currentTreeState = currentTreeState(appState)
+//     // const undoneTreeState = currentTreeState(appState)
 
 //     dispatch(ActionCreators.undo())
 //     // let differences = treeDiffer(currentTreeState, undoneTreeState)
@@ -440,8 +438,8 @@ export const toggleNodeMenu = (nodeId) =>
 // export const redo = () =>
 //   (dispatch) => {
 //     // const appState = getState()
-//     // const currentTreeState = getPresentNodes(appState)
-//     // const redoneTreeState = getPresentNodes(appState)
+//     // const currentTreeState = currentTreeState(appState)
+//     // const redoneTreeState = currentTreeState(appState)
 
 //     dispatch(ActionCreators.redo())
 //     // let differences = treeDiffer(currentTreeState, redoneTreeState)
@@ -451,7 +449,7 @@ export const toggleNodeMenu = (nodeId) =>
 //   (dispatch, getState) => {
 //     // TODO: let other collaborators know this user has selected this node
 //     const appState = getState()
-//     const allDescendentIds = nodeSelectors.getAllDescendantIds(nodeSelectors.getPresentNodes(appState), nodeId)
+//     const allDescendentIds = nodeSelectors.getAllDescendantIds(nodeSelectors.currentTreeState(appState), nodeId)
 //     let reducerTransaction = []
 
 //     reducerTransaction.push(nodeActions.nodeSelected(nodeId))
@@ -466,7 +464,7 @@ export const toggleNodeMenu = (nodeId) =>
 //   (dispatch, getState) => {
 //     // TODO: let other collaborators know this user has deselected this node
 //     const appState = getState()
-//     const allDescendentIds = nodeSelectors.getAllDescendantIds(nodeSelectors.getPresentNodes(appState), nodeId)
+//     const allDescendentIds = nodeSelectors.getAllDescendantIds(nodeSelectors.currentTreeState(appState), nodeId)
 //     let reducerTransaction = []
 
 //     reducerTransaction.push(nodeActions.nodeDeselected(nodeId))
@@ -486,7 +484,7 @@ export const toggleNodeMenu = (nodeId) =>
 // export const toggleNodeComplete = (nodeId) =>
 //   (dispatch, getState) => {
 //     const appState = getState()
-//     const node = nodeSelectors.getPresentNodes(appState)[nodeId]
+//     const node = nodeSelectors.currentTreeState(appState)[nodeId]
 
 //     dispatch(nodeActions.nodeCompleteToggled(nodeId))
 //     dispatch(nodeFirebaseActions.updateNodeComplete(nodeId, !node.completed, appState.auth.id))

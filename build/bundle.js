@@ -3348,7 +3348,7 @@
 	  var updatedById = appState.auth.id;
 	
 	  // remove child from its current parent
-	  var oldParentChildIds = nodeSelectors.getPresentNodes(appState)[oldParentId].childIds;
+	  var oldParentChildIds = nodeSelectors.currentTreeState(appState)[oldParentId].childIds;
 	  var updatedChildIdsForOldParent = oldParentChildIds.filter(function (id) {
 	    return id !== nodeId;
 	  });
@@ -3371,7 +3371,7 @@
 	// export const createNode = (originNodeId, originOffset, content) =>
 	//   (dispatch, getState) => {
 	//     const appState = getState()
-	//     const nodes = nodeSelectors.getPresentNodes(appState)
+	//     const nodes = nodeSelectors.currentTreeState(appState)
 	//     const originNode = nodes[originNodeId]
 	//     const parentOfNewNode = nodes[originNode.childIds.length === 0 || originNode.collapsed ? originNode.parentId : originNodeId]
 	//     const newNodeId = nodeFirebaseActions.getNewNodeId()
@@ -3399,7 +3399,7 @@
 	var updateContent = exports.updateContent = function updateContent(nodeId, newContent) {
 	  return function (dispatch, getState) {
 	    var appState = getState();
-	    var node = nodeSelectors.getPresentNodes(appState)[nodeId];
+	    var node = nodeSelectors.currentTreeState(appState)[nodeId];
 	
 	    node.taggedByIds.forEach(function (tagId) {
 	      if (!newContent.toLowerCase().includes(tagId)) {
@@ -3415,7 +3415,7 @@
 	var focusNode = exports.focusNode = function focusNode(nodeId, focusNotes) {
 	  return function (dispatch, getState) {
 	    var appState = getState();
-	    var nodes = nodeSelectors.getPresentNodes(appState);
+	    var nodes = nodeSelectors.currentTreeState(appState);
 	    var nodeIdToUnfocus = nodeSelectors.getCurrentlyFocusedNodeId(nodes);
 	    var events = [];
 	
@@ -3440,7 +3440,7 @@
 	  return function (dispatch, getState) {
 	    var state = getState();
 	    var rootNodeId = nodeSelectors.getRootNodeId(state);
-	    var nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.getPresentNodes(state), state.visibleNodes.present, currentNodeId, true);
+	    var nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.currentTreeState(state), state.visibleNodes.present, currentNodeId, true);
 	
 	    if (nodeToFocus) {
 	      dispatch(nodeActions.nodeFocused(nodeToFocus.id));
@@ -3452,7 +3452,7 @@
 	  return function (dispatch, getState) {
 	    var appState = getState();
 	    var rootNodeId = nodeSelectors.getRootNodeId(appState);
-	    var nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.getPresentNodes(appState), appState.visibleNodes.present, currentNodeId, false);
+	    var nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.currentTreeState(appState), appState.visibleNodes.present, currentNodeId, false);
 	
 	    if (nodeToFocus) {
 	      dispatch(nodeActions.nodeFocused(nodeToFocus.id));
@@ -3464,7 +3464,7 @@
 	  return function (dispatch, getState) {
 	    var appState = getState();
 	    var rootNodeId = nodeSelectors.getRootNodeId(appState);
-	    var siblingAbove = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.getPresentNodes(appState), appState.visibleNodes.present, nodeId, true);
+	    var siblingAbove = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.currentTreeState(appState), appState.visibleNodes.present, nodeId, true);
 	    var addAfterLastChildOfSiblingAboveId = siblingAbove.childIds[siblingAbove.childIds.length - 1];
 	
 	    dispatch(nodeActions.nodeTransaction(generateEventsForReassignParentNode(dispatch, nodeId, parentId, siblingAbove.id, addAfterLastChildOfSiblingAboveId, appState)));
@@ -3475,7 +3475,7 @@
 	var promoteNode = exports.promoteNode = function promoteNode(nodeId, parentId) {
 	  return function (dispatch, getState) {
 	    var appState = getState();
-	    var nodes = nodeSelectors.getPresentNodes(appState);
+	    var nodes = nodeSelectors.currentTreeState(appState);
 	    var parentNode = nodes[parentId];
 	    var siblingIds = parentNode.childIds;
 	    var optimisticEvents = [];
@@ -3493,7 +3493,7 @@
 	
 	var deleteNode = exports.deleteNode = function deleteNode(nodeId) {
 	  return function (dispatch, getState) {
-	    var nodes = nodeSelectors.getPresentNodes(getState());
+	    var nodes = nodeSelectors.currentTreeState(getState());
 	    if (Object.keys(nodes).length > 2) {
 	      var appState = getState();
 	      var nodeToDelete = nodes[nodeId];
@@ -3512,7 +3512,7 @@
 	var deleteNodes = exports.deleteNodes = function deleteNodes(nodeIds) {
 	  return function (dispatch, getState) {
 	    var appState = getState();
-	    var nodes = nodeSelectors.getPresentNodes(appState);
+	    var nodes = nodeSelectors.currentTreeState(appState);
 	
 	    var reducerTransaction = [];
 	    var nodesToDeleteFromDatabase = [];
@@ -3543,7 +3543,7 @@
 	var toggleNodeExpansion = exports.toggleNodeExpansion = function toggleNodeExpansion(nodeId, forceToggleChildrenExpansion) {
 	  return function (dispatch, getState) {
 	    var appState = getState();
-	    var nodes = nodeSelectors.getPresentNodes(appState);
+	    var nodes = nodeSelectors.currentTreeState(appState);
 	    var allDescendentIds = forceToggleChildrenExpansion ? nodeSelectors.getAllDescendantIds(nodes, nodeId) : nodeSelectors.getAllUncollapsedDescedantIds(nodeId, nodes, nodeId);
 	    if (nodes[nodeId].collapsedBy[appState.auth.id]) {
 	      dispatch(nodeFirebaseActions.expandNode(nodeId, appState.auth.id));
@@ -3558,7 +3558,7 @@
 	var searchNodes = exports.searchNodes = function searchNodes(query) {
 	  return function (dispatch, getState) {
 	    var appState = getState();
-	    var nodes = nodeSelectors.dictionaryToArray(nodeSelectors.getPresentNodes(appState));
+	    var nodes = nodeSelectors.dictionaryToArray(nodeSelectors.currentTreeState(appState));
 	    var resultingNodeIds = nodes.filter(function (node) {
 	      if (node.id === nodeSelectors.getRootNodeId(appState)) {
 	        return true;
@@ -3581,8 +3581,8 @@
 	var undo = exports.undo = function undo() {
 	  return function (dispatch, getState) {
 	    // const appState = getState()
-	    // const currentTreeState = getPresentNodes(appState)
-	    // const undoneTreeState = getPresentNodes(appState)
+	    // const currentTreeState = currentTreeState(appState)
+	    // const undoneTreeState = currentTreeState(appState)
 	
 	    dispatch(_reduxUndo.ActionCreators.undo());
 	    // let differences = treeDiffer(currentTreeState, undoneTreeState)
@@ -3593,8 +3593,8 @@
 	var redo = exports.redo = function redo() {
 	  return function (dispatch) {
 	    // const appState = getState()
-	    // const currentTreeState = getPresentNodes(appState)
-	    // const redoneTreeState = getPresentNodes(appState)
+	    // const currentTreeState = currentTreeState(appState)
+	    // const redoneTreeState = currentTreeState(appState)
 	
 	    dispatch(_reduxUndo.ActionCreators.redo());
 	    // let differences = treeDiffer(currentTreeState, redoneTreeState)
@@ -3605,7 +3605,7 @@
 	  return function (dispatch, getState) {
 	    // TODO: let other collaborators know this user has selected this node
 	    var appState = getState();
-	    var allDescendentIds = nodeSelectors.getAllDescendantIds(nodeSelectors.getPresentNodes(appState), nodeId);
+	    var allDescendentIds = nodeSelectors.getAllDescendantIds(nodeSelectors.currentTreeState(appState), nodeId);
 	    var reducerTransaction = [];
 	
 	    reducerTransaction.push(nodeActions.nodeSelected(nodeId));
@@ -3621,7 +3621,7 @@
 	  return function (dispatch, getState) {
 	    // TODO: let other collaborators know this user has deselected this node
 	    var appState = getState();
-	    var allDescendentIds = nodeSelectors.getAllDescendantIds(nodeSelectors.getPresentNodes(appState), nodeId);
+	    var allDescendentIds = nodeSelectors.getAllDescendantIds(nodeSelectors.currentTreeState(appState), nodeId);
 	    var reducerTransaction = [];
 	
 	    reducerTransaction.push(nodeActions.nodeDeselected(nodeId));
@@ -3643,7 +3643,7 @@
 	var toggleNodeComplete = exports.toggleNodeComplete = function toggleNodeComplete(nodeId) {
 	  return function (dispatch, getState) {
 	    var appState = getState();
-	    var node = nodeSelectors.getPresentNodes(appState)[nodeId];
+	    var node = nodeSelectors.currentTreeState(appState)[nodeId];
 	
 	    dispatch(nodeActions.nodeCompleteToggled(nodeId));
 	    dispatch(nodeFirebaseActions.updateNodeComplete(nodeId, !node.completed, appState.auth.id));
@@ -5285,7 +5285,7 @@
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	exports.dictionaryToArray = dictionaryToArray;
-	exports.getPresentNodes = getPresentNodes;
+	exports.currentTreeState = currentTreeState;
 	exports.getRootNodeId = getRootNodeId;
 	exports.getAllNodeIdsOrdered = getAllNodeIdsOrdered;
 	exports.getAllDescendantIds = getAllDescendantIds;
@@ -5306,7 +5306,7 @@
 	}
 	
 	// retrieves the current state of nodes
-	function getPresentNodes(appState) {
+	function currentTreeState(appState) {
 	  var presentNodes = Object.assign({}, appState.tree.present);
 	
 	  Object.keys(presentNodes).forEach(function (nodeId) {
@@ -13869,7 +13869,7 @@
 	    nodeChildIdsRef.on('child_added', function (snapshot) {});
 	
 	    nodeChildIdsRef.on('child_removed', function (snapshot) {
-	      var nodeExistsInAppState = nodeSelectors.getPresentNodes(getState())[snapshot.key];
+	      var nodeExistsInAppState = nodeSelectors.currentTreeState(getState())[snapshot.key];
 	      if (initialized && nodeExistsInAppState) {
 	        dispatch(nodeActions.nodesDeleted([snapshot.key]));
 	      }
@@ -14099,7 +14099,7 @@
 	
 	    userPageUserNodesRef.on('child_added', function (snapshot) {
 	      var nodeId = snapshot.key;
-	      var nodeDoesNotExistsInAppState = !nodeSelectors.getPresentNodes(getState())[nodeId];
+	      var nodeDoesNotExistsInAppState = !nodeSelectors.currentTreeState(getState())[nodeId];
 	      if (initialized && nodeDoesNotExistsInAppState) {
 	        nodeFirebaseActions.getNodeSnapshot(nodeId).then(function (node) {
 	          dispatch(nodeFirebaseSubscriptions.subscribeToNode(nodeId));
@@ -14110,7 +14110,7 @@
 	
 	    userPageUserNodesRef.on('child_removed', function (snapshot) {
 	      var nodeId = snapshot.key;
-	      var nodeDoesNotExistsInAppState = !nodeSelectors.getPresentNodes(getState())[nodeId];
+	      var nodeDoesNotExistsInAppState = !nodeSelectors.currentTreeState(getState())[nodeId];
 	      if (initialized && nodeDoesNotExistsInAppState) {
 	        dispatch(nodeActions.nodesDeleted([nodeId]));
 	      }

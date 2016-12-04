@@ -58,7 +58,7 @@ function onNodeCreated (nodeSnapshot) {
   // TODO:
 
   // let nodeId = snapshot.key
-  // let nodeDoesNotExistsInAppState = !nodeSelectors.getPresentNodes(getState())[nodeId]
+  // let nodeDoesNotExistsInAppState = !nodeSelectors.currentTreeState(getState())[nodeId]
   // if (initialized && nodeDoesNotExistsInAppState) {
   //   nodeFirebaseActions.getNode(nodeId).then(node => {
   //     subscribeToNode(nodeId)
@@ -84,12 +84,12 @@ function onNodeUpdated (nodeSnapshot) {
 
 function onNodeDeleted (snapshot) {
   // let nodeId = snapshot.key
-  // let nodeDoesNotExistsInAppState = !nodeSelectors.getPresentNodes(getState())[nodeId]
+  // let nodeDoesNotExistsInAppState = !nodeSelectors.currentTreeState(getState())[nodeId]
   // if (initialized && nodeDoesNotExistsInAppState) {
   //   dispatch(nodeActions.nodesDeleted([nodeId]))
   // }
 
-  // let nodeExistsInAppState = nodeSelectors.getPresentNodes(getState())[snapshot.key]
+  // let nodeExistsInAppState = nodeSelectors.currentTreeState(getState())[snapshot.key]
   // if (initialized && nodeExistsInAppState) {
   // dispatch(nodeActions.nodeDeletionFromSubscription(snapshot.key))
   // }

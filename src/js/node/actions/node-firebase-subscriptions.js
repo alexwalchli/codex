@@ -73,7 +73,7 @@
 //     })
 
 //     nodeChildIdsRef.on('child_removed', snapshot => {
-//       let nodeExistsInAppState = nodeSelectors.getPresentNodes(getState())[snapshot.key]
+//       let nodeExistsInAppState = nodeSelectors.currentTreeState(getState())[snapshot.key]
 //       if (initialized && nodeExistsInAppState) {
 //         dispatch(nodeActions.nodesDeleted([snapshot.key]))
 //       }

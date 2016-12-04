@@ -1,163 +1,126 @@
 import * as nodeSelectors from '../selectors/node-selectors'
+import * as I from 'immutable'
+import { NodeRecord } from '../node-record'
+import { updateMany, setMany } from '../../utilities/immutable-helpers'
+
 
 export const create = (id, parentId, childIds, content, createdById) => {
-  return {
+  return new NodeRecord({
     id,
     parentId,
-    childIds: childIds || [],
-    content: content || '',
-    createdById,
-    collapsedBy: {},
-    taggedByIds: [],
-    focused: false,
-    notesFocused: false
-  }
+    childIds,
+    content,
+    createdById
+  })
 }
 
 export const addChild = (parentNode, childNodeId, originNodeId, originOffset, userId) => {
-  let updatedChildIds
+  const currentChildIds = I.List(parentNode.get('childIds'))
 
-  if (parentNode.childIds.includes(childNodeId)) {
-    // don't add the child ID if it's already been added
-    return Object.assign({}, parentNode)
+  if (currentChildIds.includes(childNodeId)) {
+    return parentNode
   }
 
   if (originNodeId) {
-    // if the child was created from a specific node, add it in front or behind the node it was created from based on the offset
-    updatedChildIds = [...parentNode.childIds]
-    updatedChildIds.splice(parentNode.childIds.indexOf(originNodeId) + originOffset, 0, childNodeId)
+    parentNode = parentNode.set('childIds', currentChildIds.splice(currentChildIds.indexOf(originNodeId) + originOffset, 0, childNodeId))
   } else {
-    // prepend the childId by default
-    updatedChildIds = [childNodeId, ...parentNode.childIds]
+    parentNode = parentNode.updateIn(['childIds'], (childIds) => [childNodeId, ...childIds])
   }
 
-  return Object.assign({}, parentNode, {
-    childIds: updatedChildIds,
+  return parentNode.merge({
     lastUpdatedById: userId
   })
 }
 
 export const removeChild = (parentNode, childNodeId, userId) => {
-  return Object.assign({}, parentNode, {
-    childIds: parentNode.childIds.filter(id => id !== childNodeId),
-    lastUpdatedById: userId
-  })
+  return parentNode.updateIn(['childIds'], childIds => childIds.filter((childId) => childId !== childNodeId))
+                   .merge({ lastUpdatedById: userId })
 }
 
 export const updateParent = (node, parentId, userId) => {
-  return Object.assign({}, node, {
+  return node.merge({
     parentId,
     lastUpdatedById: userId
   })
 }
 
 export const updateContent = (node, content, userId) => {
-  return Object.assign({}, node, {
+  return node.merge({
     content,
     lastUpdatedById: userId
   })
 }
 
 export const updateNotes = (node, notes, userId) => {
-  return Object.assign({}, node, {
+  return node.merge({
     notes,
     lastUpdatedById: userId
   })
 }
 
 export const deleteNode = (state, nodeId, parentId, userId) => {
-  let newState = Object.assign({}, state)
-  newState[parentId] = removeChild(newState[parentId], nodeId, userId)
-  newState[nodeId].deleted = true
-  newState[nodeId] = unfocus(newState[nodeId])
-  return newState
+  return state.merge({
+    [parentId]: removeChild(state.get(parentId), nodeId, userId),
+    [nodeId]: state.get(nodeId).update(node => {
+      node = node.set('deleted', true)
+      node = node.set('selected', false)
+      node = node.set('lastUpdatedById', userId)
+      node = unfocus(node)
+      return node
+    }) 
+  })
 }
 
 export const select = (state, nodeIds) => {
-  let newState = Object.assign({}, state)
-  nodeIds.forEach(nodeId => {
-    newState[nodeId] = Object.assign({}, newState[nodeId], {
-      selected: true
-    })
-  })
-
-  return newState
+  return setMany(state, nodeIds, { selected: true })
 }
 
 export const deselect = (state, nodeIds) => {
-  if (!nodeIds) {
-    return state
-  }
-
-  return nodeIds.reduce((acc, id) => {
-    acc[id].selected = false
-    return acc
-  }, Object.assign({}, state))
+  return setMany(state, nodeIds, { selected: false })
 }
 
 export const unfocus = (node) => {
-  return Object.assign({}, node, {
+  return node.merge({
     focused: false,
     notesFocused: false
   })
 }
 
 export const focus = (state, nodeId, focusNotes = false) => {
-  let newState = Object.assign(state)
   const currentlyFocusedNodeId = nodeSelectors.getCurrentlyFocusedNodeId(state)
-
   if (currentlyFocusedNodeId) {
-    newState[currentlyFocusedNodeId] = unfocus(newState[currentlyFocusedNodeId])
+    state = state.updateIn(currentlyFocusedNodeId, node => unfocus(node))
   }
 
-  nodeSelectors.getCurrentlySelectedNodeIds(state).forEach(id => {
-    newState = deselect(state, [ id ])
-  })
+  const currentlySelectedNodeIds = nodeSelectors.getCurrentlySelectedNodeIds(state)
+  state = deselect(state, currentlySelectedNodeIds)
 
-  newState[nodeId] = Object.assign({}, newState[nodeId], {
+  return state.updateIn(nodeId, (node) => node.merge({
     focused: !focusNotes,
     notesFocused: focusNotes
-  })
-
-  return newState
+  }))
 }
 
 export const expand = (state, nodeIds, userId) => {
-  nodeIds.forEach(nodeId => {
-    state[nodeId] = Object.assign({}, state[nodeId], {
-      collapsedBy: Object.assign({}, state[nodeId].collapsedBy, {
-        [userId]: false
-      })
-    })
-  })
-
-  return state
+  return nodeIds.reduce((acc, id) => {
+    return acc.setIn([id, 'collapsedBy', userId], false)
+  }, state)
 }
 
 export const collapse = (state, nodeIds, userId) => {
-  nodeIds.forEach(nodeId => {
-    state[nodeId] = Object.assign({}, state[nodeId], {
-      collapsedBy: Object.assign({}, state[nodeId].collapsedBy, {
-        [userId]: true
-      })
-    })
-  })
-
-  return state
+  return nodeIds.reduce((acc, id) => {
+    return acc.setIn([id, 'collapsedBy', userId], true)
+  }, state)
 }
 
-export const reassignParent = (state, nodeId, currentParentId, newParentd, addAfterSiblingId, userId) => {
-  let newState = Object.assign(state)
-
-  newState[currentParentId] = removeChild(newState[currentParentId], nodeId, userId)
-  newState[nodeId] = updateParent(newState[nodeId], newParentd, userId)
-  newState[newParentd] = addChild(newState[newParentd], nodeId, addAfterSiblingId, 1, userId)
-
-  return newState
+export const reassignParent = (state, nodeId, currentParentId, newParentd, addAfterSiblingId, userId) => {  
+  state = state.updateIn(currentParentId, currentParentNode => removeChild(currentParentNode, nodeId, userId))
+  state = state.updateIn(nodeId, node => updateParent(node, newParentd, userId))
+  return state.updateIn(newParentd, newParentNode => addChild(newParentNode, nodeId, addAfterSiblingId, 1, userId))
 }
 
 export const complete = (node, userId) => {
-  return Object.assign({}, node, {
+  return node.merge({
     completed: !node.completed,
     lastUpdatedById: userId
   })

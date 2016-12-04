@@ -52,7 +52,7 @@ export const shareUserPage = (userPageId, emails) =>
     const state = getState()
     const emailsArr = emails.split(',')
     const userPage = state.userPages[userPageId]
-    const allDescendantIds = nodeSelectors.getAllDescendantIds(nodeSelectors.getPresentNodes(state), userPage.rootNodeId)
+    const allDescendantIds = nodeSelectors.getAllDescendantIds(nodeSelectors.currentTreeState(state), userPage.rootNodeId)
 
     userPageRepository.shareUserPage(userPage, allDescendantIds, emailsArr, state.auth)
   }

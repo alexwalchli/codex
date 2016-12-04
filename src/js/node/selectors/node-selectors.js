@@ -5,23 +5,15 @@ export function dictionaryToArray (dictionary) {
   return Object.keys(dictionary).map(key => dictionary[key])
 }
 
-// retrieves the current state of nodes
-export function getPresentNodes (appState) {
-  let presentNodes = Object.assign({}, appState.tree.present)
-
-  Object.keys(presentNodes).forEach(nodeId => {
-    if (presentNodes[nodeId].deleted) {
-      delete presentNodes[nodeId]
-    }
-  })
-
-  return presentNodes
+export function currentTreeState (state) {
+  const currentTreeState = state.get('tree').get('present')
+  return currentTreeState.filter(node => !node.get('deleted'))
 }
 
 // retrieves the root node ID of the current page
-export function getRootNodeId (appState) {
-  let currentUserPageId = appState.app.currentUserPageId
-  return dictionaryToArray(appState.userPages).find(up => up.id === currentUserPageId).rootNodeId
+export function getRootNodeId (state) {
+  let currentUserPageId = state.get('app').get('currentUserPageId')
+  return state.get('userPages').find(up => up.get('id') === currentUserPageId).get('rootNodeId')
 }
 
 // retrieves a flattened ordered list of all node IDs starting under startNodeId
@@ -32,8 +24,8 @@ export function getAllNodeIdsOrdered (nodes, startNodeId) {
 
 // recursively retrieves, and flattens, all node IDs under the startNodeId
 export function getAllDescendantIds (nodes, startNodeId) {
-  return nodes[startNodeId].childIds.reduce((acc, childId) => {
-    if (!nodes[childId].deleted) {
+  return nodes.getIn([startNodeId, 'childIds']).reduce((acc, childId) => {
+    if (!nodes.getIn([childId, 'deleted'])) {
       return [ ...acc, childId, ...getAllDescendantIds(nodes, childId) ]
     }
     return acc
@@ -42,8 +34,8 @@ export function getAllDescendantIds (nodes, startNodeId) {
 
 // recursively retrieves, and flattens, all node Ids excluding children of collapsed nodes, except children of the start node
 export function getAllUncollapsedDescedantIds (rootNodeId, nodes, startNodeId, userId) {
-  return nodes[startNodeId].childIds.reduce((acc, childId) => {
-    if (rootNodeId !== startNodeId && !nodes[nodes[childId].parentId].collapsedBy[userId]) {
+  return nodes.getIn([startNodeId, 'childIds']).reduce((acc, childId) => {
+    if (rootNodeId !== startNodeId && !nodes.get(nodes.getIn([childId, 'parentId'])).getIn(['collapsedBy', userId])) {
       return acc
     }
     return [ ...acc, childId, ...getAllUncollapsedDescedantIds(rootNodeId, nodes, childId) ]
@@ -51,30 +43,29 @@ export function getAllUncollapsedDescedantIds (rootNodeId, nodes, startNodeId, u
 }
 
 export function getCurrentlySelectedNodeIds (nodes) {
-  return dictionaryToArray(nodes).filter(n => n.selected).map(n => n.id)
+  return nodes.filter(n => n.get('selected')).map(n => n.get('id')).toList()
 }
 
 export function getCurrentlyFocusedNodeId (nodes) {
-  let focusedNode = dictionaryToArray(nodes).find(n => n.focused || n.notesFocused)
-  return focusedNode ? focusedNode.id : null
+  let focusedNode = nodes.find(n => n.get('focused') || n.get('notesFocused'))
+  return focusedNode ? focusedNode.get('id') : null
 }
 
 // retrieves the next node above or below that is visible
 export function getNextNodeThatIsVisible (rootNodeId, nodes, visibleNodes, currentNodeId, searchAbove = true) {
   const allNodeIdsOrdered = getAllNodeIdsOrdered(nodes, rootNodeId)
   const currentNodeIndex = allNodeIdsOrdered.indexOf(currentNodeId)
-  console.log(allNodeIdsOrdered)
   if (searchAbove) {
     for (let j = currentNodeIndex - 1; j > 0; j--) {
-      let node = nodes[allNodeIdsOrdered[j]]
-      if (visibleNodes[node.id]) {
+      let node = nodes.get(allNodeIdsOrdered[j])
+      if (visibleNodes.get(node.get('id'))) {
         return node
       }
     }
   } else {
     for (let k = currentNodeIndex + 1; k < allNodeIdsOrdered.length; k++) {
-      let node = nodes[allNodeIdsOrdered[k]]
-      if (visibleNodes[node.id]) {
+      let node = nodes.get(allNodeIdsOrdered[k])
+      if (visibleNodes.get(node.get('id'))) {
         return node
       }
     }

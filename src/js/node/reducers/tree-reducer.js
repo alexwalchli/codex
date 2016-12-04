@@ -54,15 +54,15 @@ export const tree = reducerFactory({}, {
   },
 
   [NODE_DELETION_FROM_SUBSCRIPTION]: (state, action) => {
-
+    // TODO:
   },
 
   [NODE_UPSERT_FROM_SUBSCRIPTION]: (state, action) => {
-
+    // TODO:
   },
 
   [NODES_DELETION]: (state, action) => {
-
+    // TODO:
   },
 
   [NODE_DELETION]: (state, action) => {
