@@ -120,7 +120,7 @@ export const reassignParent = (state, nodeId, currentParentId, newParentd, addAf
 
 export const complete = (node, userId) => {
   return node.merge({
-    completed: !node.completed,
+    completed: !node.get('completed'),
     lastUpdatedById: userId
   })
 }

@@ -38,19 +38,17 @@ export const tree = reducerFactory(I.Map(), {
   [NODE_CREATION]: (state, action) => {
     const { nodeId, originNodeId, originOffset, content, parentId, nodeIdsToDeselect, nodeIdToUnfocus, userId } = action.payload
     const parentNode = state.get(parentId)
-
-    // TODO: left off here...
-
-    newState[nodeId] = nodeOperations.create(nodeId, parentNode.id, [], content, userId)
-    newState[parentNode.id] = nodeOperations.addChild(parentNode, nodeId, originNodeId, originOffset, userId)
+    
+    state = state.setIn([nodeId], nodeOperations.create(nodeId, parentId, [], content, userId))
+    state = state.updateIn([parentId], node => nodeOperations.addChild(parentNode, nodeId, originNodeId, originOffset, userId))
 
     if (originOffset > 0) {
-      newState[nodeIdToUnfocus] = nodeOperations.unfocus(newState[nodeIdToUnfocus])
-      newState = nodeOperations.deselect(newState, nodeIdsToDeselect)
-      newState = nodeOperations.focus(newState, nodeId, false)
+      state = state.updateIn([nodeIdToUnfocus], node => nodeOperations.unfocus(node))
+      state = nodeOperations.deselect(state, nodeIdsToDeselect)
+      state = nodeOperations.focus(state, nodeId, false)
     }
 
-    return newState
+    return state
   },
 
   [NODE_DELETION_FROM_SUBSCRIPTION]: (state, action) => {
@@ -74,9 +72,7 @@ export const tree = reducerFactory(I.Map(), {
 
   [NODE_CONTENT_UPDATE]: (state, action) => {
     const { nodeId, content, userId } = action.payload
-    return Object.assign({}, state, {
-      [nodeId]: nodeOperations.updateContent(state[nodeId], content, userId)
-    })
+    return state.updateIn(nodeId, node => nodeOperations.updateContent(node, content, userId))
   },
 
   [NODE_FOCUS]: (state, action) => {
@@ -84,51 +80,46 @@ export const tree = reducerFactory(I.Map(), {
   },
 
   [NODE_UNFOCUS]: (state, action) => {
-    return Object.assign({}, state, {
-      [action.payload.nodeId]: nodeOperations.unfocus(state[action.payload.nodeId])
-    })
+    const { nodeId } = action.payload
+    return state.updateIn(nodeId, node => nodeOperations.unfocus(state.get(nodeId)))
   },
 
   [NODE_DEMOTION]: (state, action) => {
     const { nodeId, currentParentId, newParentId,
             addNodeAfterNewSiblingId, userId } = action.payload
 
-    const newState = nodeOperations.reassignParent(state, nodeId, currentParentId, newParentId, addNodeAfterNewSiblingId, userId)
+    state = nodeOperations.reassignParent(state, nodeId, currentParentId, newParentId, addNodeAfterNewSiblingId, userId)
 
-    return nodeOperations.focus(newState, nodeId, false)
+    return nodeOperations.focus(state, nodeId, false)
   },
 
   [NODE_PROMOTION]: (state, action) => {
-    let newState = Object.assign({}, state)
     const { nodeId, userId, currentParentId, newParentId, siblingIds } = action.payload
 
     // reassign all siblings below to the promoted node
     for (let i = siblingIds.indexOf(nodeId) + 1; i < siblingIds.length; i++) {
-      let sibling = newState[siblingIds[i]]
-      newState = nodeOperations.reassignParent(newState, sibling.id, sibling.parentId, nodeId, userId)
+      let sibling = state.get(siblingIds[i])
+      state = nodeOperations.reassignParent(state, sibling.get('id'), sibling.get('parentId'), nodeId, userId)
     }
 
     // reassign the node to its parent's parent
-    nodeOperations.reassignParent(newState, nodeId, currentParentId, newParentId, currentParentId, userId)
+    state = nodeOperations.reassignParent(state, nodeId, currentParentId, newParentId, currentParentId, userId)
 
-    return nodeOperations.focus(newState, nodeId, false)
+    return nodeOperations.focus(state, nodeId, false)
   },
 
   [NODE_EXPANSION_TOGGLE]: (state, action) => {
-    let newState = Object.assign({}, state)
     const { nodeId, forceToggleChildrenExpansion, userId } = action.payload
     const allDescendantIds = forceToggleChildrenExpansion
                               ? nodeSelectors.getAllDescendantIds(state, nodeId)
                               : nodeSelectors.getAllUncollapsedDescedantIds(nodeId, state, nodeId)
-    if (state[nodeId].collapsedBy[userId]) {
-      // TODO: dispatch(nodeFirebaseActions.expandNode(nodeId, state.auth.id)))
-      newState = nodeOperations.expand(newState, [ nodeId, ...allDescendantIds ], userId)
+    if (state.getIn([nodeId, 'collapsedBy', userId])) {
+      state = nodeOperations.expand(state, [ nodeId, ...allDescendantIds ], userId)
     } else {
-      // TODO: dispatch(nodeFirebaseActions.collapseNode(nodeId, state.auth.id))
-      newState = nodeOperations.collapse(newState, [ nodeId, ...allDescendantIds ], userId)
+      state = nodeOperations.collapse(state, [ nodeId, ...allDescendantIds ], userId)
     }
 
-    return newState
+    return state
   },
 
   [NODE_COLLAPSE]: (state, action) => {
@@ -163,9 +154,7 @@ export const tree = reducerFactory(I.Map(), {
 
   [NODE_COMPLETION_TOGGLE]: (state, action) => {
     const { nodeId, userId } = action.payload
-    return Object.assign({}, state, {
-      [nodeId]: nodeOperations.complete(state[nodeId], userId)
-    })
+    return state.updateIn([nodeId], node => nodeOperations.complete(node, userId))
   },
 
   [NODES_COMPLETION]: (state, action) => {
@@ -174,9 +163,7 @@ export const tree = reducerFactory(I.Map(), {
 
   [NODE_NOTES_UPDATE]: (state, action) => {
     const { nodeId, notes, userId } = action.payload
-    return Object.assign({}, state, {
-      [nodeId]: nodeOperations.updateNotes(state[nodeId], notes, userId)
-    })
+    return state.updateIn([nodeId], node => nodeOperations.updateNotes(node, notes, userId))
   },
 
   [NODE_DISPLAY_MODE_UPDATE]: (state, action) => {
