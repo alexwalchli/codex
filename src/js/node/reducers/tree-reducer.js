@@ -1,7 +1,7 @@
-// the new tree reducer in progress
 import { reducerFactory } from '../../redux/reducer-factory'
 import * as nodeOperations from '../operations/node-operations'
 import * as nodeSelectors from '../selectors/node-selectors'
+import * as I from 'immutable'
 import {
   INITIAL_TREE_STATE_LOAD,
   NODE_CREATION,
@@ -27,19 +27,19 @@ import {
   NODE_DELETION_FROM_SUBSCRIPTION
 } from '../actions/node-action-types'
 
-export const tree = reducerFactory({}, {
+export const tree = reducerFactory(I.Map(), {
 
   [INITIAL_TREE_STATE_LOAD]: (state, action) => {
     const { initialTreeState, rootNodeId } = action.payload
-    const rootNode = initialTreeState[rootNodeId]
-
-    return nodeOperations.focus(action.payload.initialTreeState, rootNode.childIds[0], false)
+    const rootNode = initialTreeState.get(rootNodeId)
+    return nodeOperations.focus(action.payload.initialTreeState, rootNode.get('childIds').get(0), false)
   },
 
   [NODE_CREATION]: (state, action) => {
-    let newState = Object.assign({}, state)
     const { nodeId, originNodeId, originOffset, content, parentId, nodeIdsToDeselect, nodeIdToUnfocus, userId } = action.payload
-    const parentNode = state[parentId]
+    const parentNode = state.get(parentId)
+
+    // TODO: left off here...
 
     newState[nodeId] = nodeOperations.create(nodeId, parentNode.id, [], content, userId)
     newState[parentNode.id] = nodeOperations.addChild(parentNode, nodeId, originNodeId, originOffset, userId)

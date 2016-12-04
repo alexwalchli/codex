@@ -92,10 +92,9 @@ export const focus = (state, nodeId, focusNotes = false) => {
     state = state.updateIn(currentlyFocusedNodeId, node => unfocus(node))
   }
 
-  const currentlySelectedNodeIds = nodeSelectors.getCurrentlySelectedNodeIds(state)
-  state = deselect(state, currentlySelectedNodeIds)
-
-  return state.updateIn(nodeId, (node) => node.merge({
+  state = deselect(state, nodeSelectors.getCurrentlySelectedNodeIds(state))
+  
+  return state.updateIn([nodeId], (node) => node.merge({
     focused: !focusNotes,
     notesFocused: focusNotes
   }))
