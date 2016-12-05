@@ -27,7 +27,8 @@ import {
   NODE_DELETION_FROM_SUBSCRIPTION
 } from '../actions/node-action-types'
 
-export const tree = reducerFactory(I.Map(), {
+const initialTreeState = I.Map({})
+export const tree = reducerFactory(initialTreeState, {
 
   [INITIAL_TREE_STATE_LOAD]: (state, action) => {
     const { initialTreeState, rootNodeId } = action.payload
@@ -38,7 +39,7 @@ export const tree = reducerFactory(I.Map(), {
   [NODE_CREATION]: (state, action) => {
     const { nodeId, originNodeId, originOffset, content, parentId, nodeIdsToDeselect, nodeIdToUnfocus, userId } = action.payload
     const parentNode = state.get(parentId)
-    
+
     state = state.setIn([nodeId], nodeOperations.create(nodeId, parentId, [], content, userId))
     state = state.updateIn([parentId], node => nodeOperations.addChild(parentNode, nodeId, originNodeId, originOffset, userId))
 

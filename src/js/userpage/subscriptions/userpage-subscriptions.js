@@ -7,18 +7,19 @@ import { firebaseDb } from '../../firebase'
 export function subscribeToUserPages () {
   return (dispatch, getState) => {
     const state = getState()
-    userPageRepository.getUserPages(state.auth.id).then(userPages => {
-      if (!userPages || userPages.length === 0) {
+    const userId = state.getIn(['auth', 'id'])
+    userPageRepository.getUserPages(userId).then(userPages => {
+      if (!userPages || userPages.count() === 0) {
         dispatch(userPageActionCreators.createUserPage('Home', true))
       } else {
         userPages.forEach(userPage => {
           dispatch(userPageActions.userPageCreation(userPage))
         })
 
-        dispatch(appActionCreators.navigateToUserPage(userPages.find(u => u.isHome).id))
+        dispatch(appActionCreators.navigateToUserPage(userPages.find(u => u.get('isHome')).get('id')))
       }
 
-      firebaseDb.ref('userPages/' + state.auth.id).on('child_added', snapshot => onUserPageCreated(snapshot, dispatch))
+      firebaseDb.ref('userPages/' + userId).on('child_added', snapshot => onUserPageCreated(snapshot, dispatch))
     })
   }
 }

@@ -41,6 +41,7 @@
     "react-tag-input": "^4.3.3",
     "react-textarea-autosize": "^4.0.5",
     "redux": "^3.5.2",
+    "redux-immutablejs": "0.0.8",
     "redux-logger": "^2.6.1",
     "redux-thunk": "^2.1.0",
     "redux-undo": "^0.6.1"

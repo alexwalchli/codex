@@ -1,3 +1,4 @@
+import * as I from 'immutable'
 import { firebaseDb } from '../../firebase'
 // import * as nodeActions from '../actions/node-actions'
 import * as nodeRepository from '../repositories/node-repository'
@@ -34,7 +35,7 @@ export const initializeNodeSubscriptions = (userPageId, userId) => {
       })
 
       Promise.all(initialNodePromises).then(() => {
-        resolve(initialTreeState)
+        resolve(I.Map(initialTreeState))
         // initialized = true
       }).catch(error => {
         console.error('Error while initializing node subscriptions: ' + error.message)

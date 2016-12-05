@@ -11,7 +11,7 @@ describe('nodeSelectors', () => {
             abc: { id: 1 },
             def: { id: 2, deleted: true }
           },
-          past:{
+          past: {
             abc: { id: 1 },
             def: { id: 2 }
           }

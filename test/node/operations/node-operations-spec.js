@@ -12,7 +12,7 @@ describe('nodeOperations', () => {
     '5': new NodeRecord({ id: '5', parentId: '1', childIds: I.List([]) })
   })
 
-  const dummyNode = new NodeRecord({ id: '2', parentId: '1', childIds: I.List.of('3', '4')})
+  const dummyNode = new NodeRecord({ id: '2', parentId: '1', childIds: I.List.of('3', '4') })
 
   describe('create', () => {
     it('should return a node with initialized values', () => {
@@ -51,14 +51,14 @@ describe('nodeOperations', () => {
   describe('removeChild', () => {
     it('should remove the child ID from childIds', () => {
       expect(nodeOperations.removeChild(dummyNode, '4', 'user123')).to.equal(
-        new NodeRecord({ id: '2', parentId: '1', childIds: I.List([ '3' ]), lastUpdatedById: 'user123'})
+        new NodeRecord({ id: '2', parentId: '1', childIds: I.List([ '3' ]), lastUpdatedById: 'user123' })
       )
     })
   })
   describe('updateParent', () => {
     it('should set to the new parent ID', () => {
       expect(nodeOperations.updateParent(dummyNode, '1111', 'user123')).to.equal(
-        new NodeRecord({ id: '2', parentId: '1111', childIds: I.List([ '3', '4' ]), lastUpdatedById: 'user123'})
+        new NodeRecord({ id: '2', parentId: '1111', childIds: I.List([ '3', '4' ]), lastUpdatedById: 'user123' })
       )
     })
   })
@@ -162,7 +162,7 @@ describe('nodeOperations', () => {
       expect(newState.getIn(['4', 'collapsedBy'])).to.deep.equal(I.Map({ 'user123': true, 'user456': true }))
     })
   })
-  
+
   describe('reassignParent', () => {
     it('should remove the node from its current parent, update its parent ID to the new parent, and add the node to its new parent', () => {
       const state = I.Map({

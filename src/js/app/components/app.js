@@ -8,6 +8,8 @@ import { isAuthenticated } from '../../auth/helpers/index'
 import * as appActionCreators from '../actions/app-action-creators'
 import * as nodeActionCreators from '../../node/actions/node-action-creators'
 import * as nodeActions from '../../node/actions/node-actions'
+import * as userPageSelectors from '../../userpage/selectors/userpage-selectors'
+import * as nodeSelectors from '../../node/selectors/node-selectors'
 
 export class App extends Component {
 
@@ -17,10 +19,10 @@ export class App extends Component {
   }
 
   render () {
-    let currentUserPage = userPagesList(this.props.userPages).filter(u => u.id === this.props.app.currentUserPageId)[0]
-    let appIsInitialized = isAuthenticated(this.props) && currentUserPage && this.props.tree.present[currentUserPage.rootNodeId]
-    let userIsAuthenticated = isAuthenticated(this.props)
-    let showSignIn = !userIsAuthenticated && this.props.auth.initialCheck
+    const { currentUserPage, tree, isAuthenticated, initialAuthChecked } = this.props
+    let appIsInitialized = isAuthenticated && currentUserPage && tree[currentUserPage.rootNodeId]
+    let userIsAuthenticated = isAuthenticated
+    let showSignIn = !userIsAuthenticated && initialAuthChecked
     let showLoading = userIsAuthenticated && !appIsInitialized
 
     return (
@@ -49,11 +51,13 @@ export class App extends Component {
 }
 
 function mapStateToProps (state, ownProps) {
-  return Object.assign({}, { ...state, ...ownProps })
-}
-
-function userPagesList (userPages) {
-  return Object.keys(userPages).map(userPageId => userPages[userPageId])
+  return {
+    currentUserPage: userPageSelectors.currentPage(state),
+    isAuthenticated: isAuthenticated(state),
+    initialAuthChecked: state.getIn(['auth', 'initialCheck']),
+    tree: nodeSelectors.currentTreeState(state).toJS(),
+    ...ownProps
+  }
 }
 
 const ConnectedApp = connect(mapStateToProps, {...appActionCreators, ...nodeActionCreators, ...nodeActions})(App)

@@ -1,16 +1,16 @@
 import * as nodeActions from '../../../src/js/node/actions/node-actions'
 import * as nodeActionCreators from '../../../src/js/node/actions/node-action-creators'
-// import * as nodeSelectors from '../../../src/js/node/selectors/node-selectors'
 import * as nodeRepository from '../../../src/js/node/repositories/node-repository'
 import sinon from 'sinon'
 import { expect } from 'chai'
+import * as I from 'immutable'
 
 describe('nodeActionCreators', () => {
   const newNodeId = '1111'
   const userId = 111
   const currentUserPageId = 54321
   const dispatch = sinon.spy()
-  const nodes = {
+  const nodes = I.fromJS({
     '1': { id: '1', childIds: ['123', '321', '456'] },
     '123': {
       id: '123',
@@ -46,16 +46,16 @@ describe('nodeActionCreators', () => {
       completed: true,
       taggedByIds: []
     }
-  }
-  const visibleNodes = {
+  })
+  const visibleNodes = I.fromJS({
     '1': true,
     '123': true,
     '321': true,
     '456': true,
     '789': true
-  }
+  })
   const getState = () => {
-    return {
+    return I.fromJS({
       auth: {
         id: userId
       },
@@ -67,13 +67,14 @@ describe('nodeActionCreators', () => {
       },
       userPages: [{ id: currentUserPageId, rootNodeId: '1' }],
       visibleNodes: { present: visibleNodes }
-    }
+    })
   }
 
   beforeEach(() => {
     dispatch.reset()
     sinon.stub(nodeRepository, 'getNewNodeId', () => (newNodeId))
     sinon.stub(nodeRepository, 'updateNodes', () => {})
+    sinon.stub(nodeRepository, 'updateNode', () => {})
     sinon.stub(nodeRepository, 'createNode', () => {})
     sinon.stub(nodeRepository, 'reassignParentNode', () => {})
     sinon.spy(nodeActions, 'nodeCreation')
@@ -89,6 +90,7 @@ describe('nodeActionCreators', () => {
     nodeRepository.getNewNodeId.restore()
     nodeRepository.createNode.restore()
     nodeRepository.updateNodes.restore()
+    nodeRepository.updateNode.restore()
     nodeRepository.reassignParentNode.restore()
     nodeActions.nodeCreation.restore()
     nodeActions.nodeFocus.restore()
@@ -112,7 +114,7 @@ describe('nodeActionCreators', () => {
         newNodeId,
         originNodeId,
         '1',
-        [],
+        I.List([]),
         '123',
         originOffset,
         content,
@@ -178,15 +180,7 @@ describe('nodeActionCreators', () => {
   //   })
   // })
   describe('demoteNode', () => {
-    it('should not dispatch a nodeDemotion and not update persistence if there is not a node above to attach to', () => {
-      const nodeId = '123'
-
-      nodeActionCreators.demoteNode(nodeId)(dispatch, getState)
-
-      expect(dispatch).to.not.have.been.called
-      expect(nodeRepository.reassignParentNode).to.not.have.been.called
-    })
-    it('should dispatch a nodeDemotion action and update persistence', () => {
+    it('should dispatch a nodeDemotion action', () => {
       const nodeId = '321'
 
       nodeActionCreators.demoteNode(nodeId)(dispatch, getState)
@@ -200,24 +194,16 @@ describe('nodeActionCreators', () => {
         undefined,
         visibleNodes,
         userId)
-      expect(nodeRepository.reassignParentNode).to.have.been.calledWith(
-        nodeId,
-        '1',
-        '123',
-        [ '123', '321', '456' ],
-        [ '321' ],
-        userId
-      )
     })
   })
   describe('promoteNode', () => {
     it('should not dispatch or update persistence if the node has the root node as a parent', () => {
       const nodeId = '123'
-      const node = nodes[nodeId]
-      const parentNode = nodes[node.parentId]
-      const currentParentId = parentNode.id
-      const newParentId = parentNode.parentId
-      const siblingIds = parentNode.childIds
+      const node = nodes.get(nodeId)
+      const parentNode = nodes.get(node.get('parentId'))
+      const currentParentId = parentNode.get('id')
+      const newParentId = parentNode.get('parentId')
+      const siblingIds = parentNode.get('childIds')
 
       nodeActionCreators.promoteNode(nodeId, siblingIds, currentParentId, newParentId, visibleNodes, userId)(dispatch, getState)
 

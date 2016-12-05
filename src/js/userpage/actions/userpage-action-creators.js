@@ -1,21 +1,30 @@
 import * as appActionCreators from '../../app/actions/app-action-creators'
-import { nodeFactory } from '../../node/helpers/node-factory'
 import * as nodeRepository from '../../node/repositories/node-repository'
 import * as nodeSelectors from '../../node/selectors/node-selectors'
-import { userPageFactory } from '../helpers/userpage-factory'
 import * as userPageActions from './userpage-actions'
 import * as userPageRepository from '../repositories/userpage-repository'
+import * as nodeOperations from '../../node/operations/node-operations'
+import UserPageRecord from '../userpage-record'
 
 export const createUserPage = (title, isHomePage) =>
   (dispatch, getState) => {
     const state = getState()
+    const userId = state.getIn(['auth', 'id'])
     const rootNodeId = nodeRepository.getNewNodeId()
     const firstNodeId = nodeRepository.getNewNodeId()
     const newUserPageId = userPageRepository.getNewUserPageId()
+    // const newRootNode = nodeFactory(rootNodeId, null, [firstNodeId], '', state.auth.id)
+    const newRootNode = nodeOperations.create(rootNodeId, null, [ firstNodeId ], '', userId)
+    // const newFirstNode = nodeFactory(firstNodeId, rootNodeId, [], '', state.auth.id)
+    const newFirstNode = nodeOperations.create(firstNodeId, rootNodeId, [], '', userId)
 
-    const newRootNode = nodeFactory(rootNodeId, null, [firstNodeId], '', state.auth.id)
-    const newFirstNode = nodeFactory(firstNodeId, rootNodeId, [], '', state.auth.id)
-    const newUserPage = userPageFactory(newUserPageId, rootNodeId, state.auth.id, title, isHomePage)
+    const newUserPage = new UserPageRecord({
+      id: newUserPageId,
+      rootNodeId,
+      createdById: userId,
+      title,
+      isHomePage
+    })
 
     userPageRepository.createUserPage(newUserPage, newRootNode, newFirstNode)
       .then(snapshot => {

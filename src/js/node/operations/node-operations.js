@@ -1,8 +1,7 @@
 import * as nodeSelectors from '../selectors/node-selectors'
 import * as I from 'immutable'
 import { NodeRecord } from '../node-record'
-import { updateMany, setMany } from '../../utilities/immutable-helpers'
-
+import { setMany } from '../../utilities/immutable-helpers'
 
 export const create = (id, parentId, childIds, content, createdById) => {
   return new NodeRecord({
@@ -67,7 +66,7 @@ export const deleteNode = (state, nodeId, parentId, userId) => {
       node = node.set('lastUpdatedById', userId)
       node = unfocus(node)
       return node
-    }) 
+    })
   })
 }
 
@@ -93,7 +92,7 @@ export const focus = (state, nodeId, focusNotes = false) => {
   }
 
   state = deselect(state, nodeSelectors.getCurrentlySelectedNodeIds(state))
-  
+
   return state.updateIn([nodeId], (node) => node.merge({
     focused: !focusNotes,
     notesFocused: focusNotes
@@ -112,7 +111,7 @@ export const collapse = (state, nodeIds, userId) => {
   }, state)
 }
 
-export const reassignParent = (state, nodeId, currentParentId, newParentd, addAfterSiblingId, userId) => {  
+export const reassignParent = (state, nodeId, currentParentId, newParentd, addAfterSiblingId, userId) => {
   state = state.updateIn(currentParentId, currentParentNode => removeChild(currentParentNode, nodeId, userId))
   state = state.updateIn(nodeId, node => updateParent(node, newParentd, userId))
   return state.updateIn(newParentd, newParentNode => addChild(newParentNode, nodeId, addAfterSiblingId, 1, userId))

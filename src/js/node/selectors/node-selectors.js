@@ -6,7 +6,8 @@ export function dictionaryToArray (dictionary) {
 }
 
 export function currentTreeState (state) {
-  const currentTreeState = state.get('tree').get('present')
+  // const currentTreeState = state.get('tree').get('present') When I reimplment undo functionality we'll need this
+  const currentTreeState = state.get('tree')
   return currentTreeState.filter(node => !node.get('deleted'))
 }
 

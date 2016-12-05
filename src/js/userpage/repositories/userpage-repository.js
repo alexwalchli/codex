@@ -1,11 +1,11 @@
 import { firebaseDb } from '../../firebase'
 import userPageFactory from '../helpers/userpage-factory'
-import { dictionaryToArray } from '../../node/selectors/node-selectors'
 import { queuedRequest } from '../../requestqueue/queued-request'
+import * as I from 'immutable'
 
 export const getUserPages = (userId) => {
   return firebaseDb.ref('userPages/' + userId).once('value').then(snapshot => {
-    return dictionaryToArray(snapshot.val())
+    return I.fromJS(snapshot.val())
   })
 }
 
@@ -14,20 +14,24 @@ export const getNewUserPageId = () => {
 }
 
 export const createUserPage = queuedRequest((userPage, rootNode, firstNode) => {
+  const userPageId = userPage.get('id')
+  const createdById = userPage.get('createdById')
+  const rootNodeId = rootNode.get('id')
+  const firstNodeId = firstNode.get('id')
   let createUserPagesAndInitialNodesUpdates = {}
-  createUserPagesAndInitialNodesUpdates[`nodes/${rootNode.id}`] = rootNode
-  createUserPagesAndInitialNodesUpdates[`nodes/${firstNode.id}`] = firstNode
-  createUserPagesAndInitialNodesUpdates[`userPages/${userPage.createdById}/${userPage.id}`] = userPage
+  createUserPagesAndInitialNodesUpdates[`nodes/${rootNodeId}`] = rootNode.toJS()
+  createUserPagesAndInitialNodesUpdates[`nodes/${firstNodeId}`] = firstNode.toJS()
+  createUserPagesAndInitialNodesUpdates[`userPages/${createdById}/${userPageId}`] = userPage.toJS()
 
   return firebaseDb.ref().update(createUserPagesAndInitialNodesUpdates)
     .then(snapshot => {
       let manyToManyConnectionDbUpdates = {}
-      manyToManyConnectionDbUpdates[`userPage_users_nodes/${userPage.id}/${userPage.createdById}/${rootNode.id}`] = true
-      manyToManyConnectionDbUpdates[`userPage_users_nodes/${userPage.id}/${userPage.createdById}/${firstNode.id}`] = true
-      manyToManyConnectionDbUpdates[`node_userPages_users/${rootNode.id}/${userPage.id}/${userPage.createdById}`] = true
-      manyToManyConnectionDbUpdates[`node_userPages_users/${firstNode.id}/${userPage.id}/${userPage.createdById}`] = true
-      manyToManyConnectionDbUpdates[`node_users/${rootNode.id}/${userPage.createdById}`] = true
-      manyToManyConnectionDbUpdates[`node_users/${firstNode.id}/${userPage.createdById}`] = true
+      manyToManyConnectionDbUpdates[`userPage_users_nodes/${userPageId}/${userPage.createdById}/${rootNodeId}`] = true
+      manyToManyConnectionDbUpdates[`userPage_users_nodes/${userPageId}/${userPage.createdById}/${firstNodeId}`] = true
+      manyToManyConnectionDbUpdates[`node_userPages_users/${rootNodeId}/${userPageId}/${createdById}`] = true
+      manyToManyConnectionDbUpdates[`node_userPages_users/${firstNodeId}/${userPageId}/${createdById}`] = true
+      manyToManyConnectionDbUpdates[`node_users/${rootNodeId}/${createdById}`] = true
+      manyToManyConnectionDbUpdates[`node_users/${firstNodeId}/${createdById}`] = true
 
       return firebaseDb.ref().update(manyToManyConnectionDbUpdates)
     })

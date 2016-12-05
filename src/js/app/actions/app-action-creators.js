@@ -6,10 +6,11 @@ import * as appActions from './app-actions'
 export const navigateToUserPage = (userPageId) =>
   (dispatch, getState) => {
     const state = getState()
+    const userId = state.getIn(['auth', 'id'])
     dispatch(appActions.userPageNavigation(userPageId))
-    nodeSubscriptions.initializeNodeSubscriptions(userPageId, state.auth.id)
+    nodeSubscriptions.initializeNodeSubscriptions(userPageId, userId)
       .then(initialTreeState => {
-        dispatch(nodeActions.initialTreeStateLoad(nodeSelectors.getRootNodeId(getState()), initialTreeState, state.auth.id))
+        dispatch(nodeActions.initialTreeStateLoad(nodeSelectors.getRootNodeId(getState()), initialTreeState, userId))
       })
   }
 
