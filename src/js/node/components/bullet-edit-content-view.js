@@ -2,13 +2,17 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actionCreators from '../actions/node-action-creators'
 import IntellisenseInput from '../../intellisense/components/intellisense-input'
+import {Editor, EditorState} from 'draft-js';
 
 export class BulletEditContentView extends Component {
   constructor (props) {
     super(props)
 
+    this.state = {};
+    this.onChange = (editorState) => this.setState({editorState});
     this.state = {
-      content: props.content
+      content: props.content,
+      editorState: EditorState.createEmpty()
     }
   }
 
@@ -90,17 +94,18 @@ export class BulletEditContentView extends Component {
 
   render () {
     const { focused, nodeId } = this.props
-    const { content } = this.state
+    const { content, editorState } = this.state
 
     return (
-      <IntellisenseInput
-        nodeId={nodeId}
-        value={content}
-        focused={focused}
-        onBlur={(e) => this.onBlur(e)}
-        onKeyDown={(e) => this.onKeyDown(e)}
-        onChange={(e, value) => this.onChange(e, value)}
-        onCommandSelected={(e, value) => this.onCommandSelected(e, value)} />
+      <Editor editorState={editorState} onChange={this.onChange} />
+      // <IntellisenseInput
+      //   nodeId={nodeId}
+      //   value={content}
+      //   focused={focused}
+      //   onBlur={(e) => this.onBlur(e)}
+      //   onKeyDown={(e) => this.onKeyDown(e)}
+      //   onChange={(e, value) => this.onChange(e, value)}
+      //   onCommandSelected={(e, value) => this.onCommandSelected(e, value)} />
     )
   }
 }
