@@ -1,4 +1,4 @@
-import * as nodeActionCreators from '../../node/actions/node-action-creators'
+import * as nodeActionCreators from '../../node/node-action-creators'
 import * as tagActions from '../../tag/actions/tag-actions'
 import * as tagFirebaseActions from './tag-firebase-actions'
 

@@ -1,7 +1,7 @@
-import * as nodeSelectors from '../selectors/node-selectors'
+import * as nodeSelectors from './node-selectors'
 import * as I from 'immutable'
-import { NodeRecord } from '../node-record'
-import { setMany } from '../../utilities/immutable-helpers'
+import { NodeRecord } from './node-record'
+import { setMany } from '../utilities/immutable-helpers'
 
 export const makeNode = (id, parentId, childIds, content, createdById) => {
   return new NodeRecord({

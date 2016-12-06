@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import * as actionCreators from '../actions/node-action-creators'
-import * as nodeSelectors from '../selectors/node-selectors'
+import * as actionCreators from '../node-action-creators'
+import * as nodeSelectors from '../node-selectors'
 
 export class BulletIcon extends Component {
 

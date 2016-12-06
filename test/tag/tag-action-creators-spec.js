@@ -1,7 +1,7 @@
 // import * as tagActionCreators from '../../src/js/tag/actions/tag-action-creators'
 // import * as tagFirebaseActions from '../../src/js/tag/actions/tag-firebase-actions'
 // import * as tagActions from '../../src/js/tag/actions/tag-actions'
-// import * as nodeActionCreators from '../../src/js/node/actions/node-action-creators'
+// import * as nodeActionCreators from '../../src/js/node/node-action-creators'
 // import sinon from 'sinon'
 // import { expect } from 'chai'
 

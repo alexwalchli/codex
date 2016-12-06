@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import * as actions from '../../node/actions/node-actions'
-import * as nodeSelectors from '../../node/selectors/node-selectors'
+import * as actions from '../../node/node-actions'
+import * as nodeSelectors from '../../node/node-selectors'
 
 export class AppContextMenu extends Component {
 

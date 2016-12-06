@@ -1,10 +1,10 @@
-import reducerFactory from '../../redux/reducer-factory'
+import reducerFactory from '../redux/reducer-factory'
 import * as I from 'immutable'
 import {
   UPDATE_AUTH_STATE,
   SIGN_IN_SUCCESS,
   SIGN_IN_ERROR
-} from '../actions/auth-action-types'
+} from './auth-action-types'
 
 const initialAuthState = I.Map({
   authenticated: false,

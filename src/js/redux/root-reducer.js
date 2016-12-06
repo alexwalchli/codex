@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux'
 import { app } from '../app/reducers/app-reducer'
 import { tree } from '../node/reducers/tree-reducer'
-import { visibleNodes } from '../node/reducers/visible-nodes-reducer'
+import { visibleNodes } from '../node/visible-nodes-reducer'
 import { auth } from '../auth/reducers/auth-reducer'
 import { userPages } from '../userpage/reducers/userpage-reducer'
 import { tags } from '../tag/reducers/tag-reducer'

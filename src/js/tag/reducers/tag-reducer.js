@@ -1,5 +1,5 @@
 import { TAG_CREATED } from '../actions/tag-action-types'
-import { INITIAL_NODE_STATE_LOADED } from '../../node/actions/node-action-types'
+import { INITIAL_NODE_STATE_LOADED } from '../../node/node-action-types'
 
 export function tags (state = [], action) {
   switch (action.type) {

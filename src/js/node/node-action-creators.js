@@ -1,7 +1,7 @@
 // import { ActionCreators } from 'redux-undo'
 import * as nodeActions from './node-actions'
-import * as nodeSelectors from '../selectors/node-selectors'
-import * as nodeRepository from '../repositories/node-repository'
+import * as nodeSelectors from './node-selectors'
+import * as nodeRepository from './node-repository'
 
 export const createNode = (originNodeId, originOffset, content) =>
   (dispatch, getState) => {

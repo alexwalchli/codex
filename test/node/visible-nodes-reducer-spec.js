@@ -1,5 +1,5 @@
-import { visibleNodes } from '../../../src/js/node/reducers/visible-nodes-reducer'
-import * as nodeActions from '../../../src/js/node/actions/node-actions'
+import { visibleNodes } from '../../src/js/node/visible-nodes-reducer'
+import * as nodeActions from '../../src/js/node/node-actions'
 import { expect } from 'chai'
 import * as I from 'immutable'
 

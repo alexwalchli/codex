@@ -1,5 +1,5 @@
 import * as I from 'immutable'
-import { NodeRecord } from '../node-record'
+import { NodeRecord } from './node-record'
 
 const nodeSnapshotUnwrapper = (nodeSnapshot) => {
   // firebase does not store empty arrays or objects, so initialize as empty if they are undefined

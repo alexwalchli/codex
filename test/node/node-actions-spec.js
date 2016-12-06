@@ -1,5 +1,5 @@
-import * as nodeActions from '../../../src/js/node/actions/node-actions'
-import * as nodeActionTypes from '../../../src/js/node/actions/node-action-types'
+import * as nodeActions from '../../src/js/node/node-actions'
+import * as nodeActionTypes from '../../src/js/node/node-action-types'
 import { expect } from 'chai'
 
 describe('node actions', () => {

@@ -1,5 +1,5 @@
-import * as appActions from '../../../src/js/app/app-actions'
-import * as appActionTypes from '../../../src/js/app/app-action-types'
+import * as appActions from '../../src/js/app/app-actions'
+import * as appActionTypes from '../../src/js/app/app-action-types'
 import { expect } from 'chai'
 
 describe('app actions', () => {

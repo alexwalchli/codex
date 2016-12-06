@@ -1,6 +1,6 @@
-import * as nodeSubscriptions from '../node/subscriptions/node-subscriptions'
-import * as nodeActions from '../node/actions/node-actions'
-import * as nodeSelectors from '../node/selectors/node-selectors'
+import * as nodeSubscriptions from '../node/node-subscriptions'
+import * as nodeActions from '../node/node-actions'
+import * as nodeSelectors from '../node/node-selectors'
 import * as appActions from './app-actions'
 
 export const navigateToUserPage = (userPageId) =>

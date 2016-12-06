@@ -1,9 +1,9 @@
 import * as I from 'immutable'
-import { firebaseDb } from '../../firebase'
+import { firebaseDb } from '../firebase'
 // import * as nodeActions from '../actions/node-actions'
-import * as nodeRepository from '../repositories/node-repository'
-import * as userPageUsersNodesRepository from '../../userpage/repositories/userpage-users-nodes-repository'
-// import nodeSnapshotUnwrapper from '../helpers/node-snapshot-unwrapper'
+import * as nodeRepository from './node-repository'
+import * as userPageUsersNodesRepository from '../userpage/repositories/userpage-users-nodes-repository'
+// import nodeSnapshotUnwrapper from './node-snapshot-unwrapper'
 // import { dispatch } from 'redux'
 
 // let initialized = false

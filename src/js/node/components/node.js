@@ -6,7 +6,7 @@ import BulletEditContentView from './bullet-edit-content-view'
 import BulletNotes from './bullet-notes'
 import BulletMenu from './bullet-menu'
 import BulletIcon from './bullet-icon'
-import * as nodeSelectors from '../selectors/node-selectors'
+import * as nodeSelectors from '../node-selectors'
 
 export class Node extends Component {
   constructor (props) {

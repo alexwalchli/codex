@@ -1,6 +1,6 @@
-// import * as nodeActions from '../../src/js/node/actions/node-actions'
-// import { INITIAL_NODE_STATE_LOADED } from '../../src/js/node/actions/node-action-types'
-// import * as visibleNodesReducer from '../../src/js/node/reducers/visible-nodes-reducer'
+// import * as nodeActions from '../../src/js/node/node-actions'
+// import { INITIAL_NODE_STATE_LOADED } from '../../src/js/node/node-action-types'
+// import * as visibleNodesReducer from '../../src/js/node/visible-nodes-reducer'
 // import { expect } from 'chai'
 
 // describe('node visibility reducer', () => {

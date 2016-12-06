@@ -1,7 +1,7 @@
-import * as nodeOperations from '../../../src/js/node/operations/node-operations'
+import * as nodeOperations from '../../src/js/node/node-operations'
 import { expect } from 'chai'
 import * as I from 'immutable'
-import { NodeRecord } from '../../../src/js/node/node-record'
+import { NodeRecord } from '../../src/js/node/node-record'
 
 describe('nodeOperations', () => {
   const dummyState = I.Map({

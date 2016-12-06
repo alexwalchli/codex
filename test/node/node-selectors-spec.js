@@ -1,4 +1,4 @@
-import * as nodeSelectors from '../../../src/js/node/selectors/node-selectors'
+import * as nodeSelectors from '../../src/js/node/node-selectors'
 import { expect } from 'chai'
 import * as I from 'immutable'
 

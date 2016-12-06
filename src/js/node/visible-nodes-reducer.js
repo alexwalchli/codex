@@ -1,12 +1,12 @@
-import * as nodeSelectors from '../selectors/node-selectors'
-import reducerFactory from '../../redux/reducer-factory'
+import * as nodeSelectors from './node-selectors'
+import reducerFactory from '../redux/reducer-factory'
 import * as I from 'immutable'
 import {
   NODE_CREATION,
   NODE_COLLAPSE,
   NODE_EXPANSION,
   NODE_DELETION,
-  INITIAL_TREE_STATE_LOAD } from '../actions/node-action-types'
+  INITIAL_TREE_STATE_LOAD } from './node-action-types'
 
 export const visibleNodes = reducerFactory({}, {
   [INITIAL_TREE_STATE_LOAD]: (state, action) => {

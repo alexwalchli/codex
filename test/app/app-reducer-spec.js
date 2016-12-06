@@ -1,5 +1,5 @@
-import { app } from '../../../src/js/app/app-reducer'
-import * as appActions from '../../../src/js/app/app-actions'
+import { app } from '../../src/js/app/app-reducer'
+import * as appActions from '../../src/js/app/app-actions'
 import { expect } from 'chai'
 import * as I from 'immutable'
 

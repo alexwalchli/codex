@@ -1,6 +1,6 @@
-import nodeSnapshotUnwrapper from '../helpers/node-snapshot-unwrapper'
-import { firebaseDb } from '../../firebase'
-import { queuedRequest } from '../../requestqueue/queued-request'
+import nodeSnapshotUnwrapper from './node-snapshot-unwrapper'
+import { firebaseDb } from '../firebase'
+import { queuedRequest } from '../requestqueue/queued-request'
 
 export const getNode = (nodeId) => {
   return firebaseDb.ref(`nodes/${nodeId}`).once('value').then(nodeSnapshotUnwrapper)

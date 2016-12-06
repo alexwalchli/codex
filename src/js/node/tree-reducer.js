@@ -1,6 +1,6 @@
-import { reducerFactory } from '../../redux/reducer-factory'
-import * as nodeOperations from '../operations/node-operations'
-import * as nodeSelectors from '../selectors/node-selectors'
+import { reducerFactory } from '../redux/reducer-factory'
+import * as nodeOperations from './node-operations'
+import * as nodeSelectors from './node-selectors'
 import * as I from 'immutable'
 import {
   INITIAL_TREE_STATE_LOAD,
@@ -25,7 +25,7 @@ import {
   NODE_TAG_REMOVAL,
   NODE_UPSERT_FROM_SUBSCRIPTION,
   NODE_DELETION_FROM_SUBSCRIPTION
-} from '../actions/node-action-types'
+} from './node-action-types'
 
 const initialTreeState = I.Map({})
 export const tree = reducerFactory(initialTreeState, {

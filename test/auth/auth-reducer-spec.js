@@ -1,5 +1,5 @@
-import { auth } from '../../../src/js/auth/reducers/auth-reducer'
-import * as authActions from '../../../src/js/auth/actions/auth-actions'
+import { auth } from '../../src/js/auth/auth-reducer'
+import * as authActions from '../../src/js/auth/auth-actions'
 import { expect } from 'chai'
 import * as I from 'immutable'
 
