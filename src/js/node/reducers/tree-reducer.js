@@ -40,7 +40,7 @@ export const tree = reducerFactory(initialTreeState, {
     const { nodeId, originNodeId, originOffset, content, parentId, nodeIdsToDeselect, nodeIdToUnfocus, userId } = action.payload
     const parentNode = state.get(parentId)
 
-    state = state.setIn([nodeId], nodeOperations.create(nodeId, parentId, [], content, userId))
+    state = state.setIn([nodeId], nodeOperations.makeNode(nodeId, parentId, [], content, userId))
     state = state.updateIn([parentId], node => nodeOperations.addChild(parentNode, nodeId, originNodeId, originOffset, userId))
 
     if (originOffset > 0) {

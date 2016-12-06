@@ -1,8 +1,9 @@
 import * as userPageActionCreators from '../../../src/js/userpage/actions/userpage-action-creators'
 import * as userPageRepository from '../../../src/js/userpage/repositories/userpage-repository'
 import * as userPageActions from '../../../src/js/userpage/actions/userpage-actions'
+import * as userPageOperations from '../../../src/js/userpage/userpage-operations'
 import * as nodeRepository from '../../../src/js/node/repositories/node-repository'
-import * as nodeFactory from '../../../src/js/node/helpers/node-factory'
+import * as nodeOperations from '../../../src/js/node/operations/node-operations'
 import * as appActionCreators from '../../../src/js/app/actions/app-action-creators'
 import sinon from 'sinon'
 import { expect } from 'chai'
@@ -36,8 +37,8 @@ describe('userPageActionCreators', () => {
   const userPageNameUpdateActionStub = { userPageNameUpdate: true }
   beforeEach(() => {
     sinon.stub(nodeRepository, 'getNewNodeId', () => (newNodeId))
-    sinon.stub(nodeFactory, 'nodeFactory', () => (newNode))
-    sinon.stub(userPageFactory, 'userPageFactory', () => (newUserPage))
+    sinon.stub(nodeOperations, 'makeNode', () => (newNode))
+    sinon.stub(userPageOperations, 'makeUserPage', () => (newUserPage))
     sinon.stub(userPageRepository, 'getNewUserPageId', () => (newUserPageId))
     sinon.stub(userPageRepository, 'createUserPage', (newUserPage, newRootNode, newFirstNode) => (Promise.resolve(newUserPage)))
     sinon.stub(userPageRepository, 'deleteUserPage', (userPageId) => (Promise.resolve()))
@@ -49,8 +50,8 @@ describe('userPageActionCreators', () => {
 
   afterEach(() => {
     nodeRepository.getNewNodeId.restore()
-    nodeFactory.nodeFactory.restore()
-    userPageFactory.userPageFactory.restore()
+    nodeOperations.makeNode.restore()
+    userPageOperations.makeUserPage.restore()
     userPageRepository.getNewUserPageId.restore()
     userPageRepository.createUserPage.restore()
     appActionCreators.navigateToUserPage.restore()
@@ -64,9 +65,9 @@ describe('userPageActionCreators', () => {
     it('should create a userPage then navigate to the new userPage', (done) => {
       userPageActionCreators.createUserPage('Home', true)(dispatch, getState)
 
-      expect(nodeFactory.nodeFactory).to.have.been.calledWith(newNodeId, null, [newNodeId], '', userId)
-      expect(nodeFactory.nodeFactory).to.have.been.calledWith(newNodeId, newNodeId, [], '', userId)
-      expect(userPageFactory.userPageFactory).to.have.been.calledWith(newUserPageId, newNodeId, userId, 'Home', true)
+      expect(nodeOperations.makeNode).to.have.been.calledWith(newNodeId, null, [newNodeId], '', userId)
+      expect(nodeOperations.makeNode).to.have.been.calledWith(newNodeId, newNodeId, [], '', userId)
+      expect(userPageOperations.makeUserPage).to.have.been.calledWith(newUserPageId, newNodeId, userId, 'Home', true)
       expect(userPageRepository.createUserPage).to.have.been.calledWith(newUserPage, newNode, newNode)
 
       setTimeout(() => {

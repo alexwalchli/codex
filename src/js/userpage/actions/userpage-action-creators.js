@@ -2,9 +2,9 @@ import * as appActionCreators from '../../app/actions/app-action-creators'
 import * as nodeRepository from '../../node/repositories/node-repository'
 import * as nodeSelectors from '../../node/selectors/node-selectors'
 import * as userPageActions from './userpage-actions'
+import * as userPageOperations from '../userpage-operations'
 import * as userPageRepository from '../repositories/userpage-repository'
 import * as nodeOperations from '../../node/operations/node-operations'
-import UserPageRecord from '../userpage-record'
 
 export const createUserPage = (title, isHomePage) =>
   (dispatch, getState) => {
@@ -13,16 +13,9 @@ export const createUserPage = (title, isHomePage) =>
     const rootNodeId = nodeRepository.getNewNodeId()
     const firstNodeId = nodeRepository.getNewNodeId()
     const newUserPageId = userPageRepository.getNewUserPageId()
-    const newRootNode = nodeOperations.create(rootNodeId, null, [ firstNodeId ], '', userId)
-    const newFirstNode = nodeOperations.create(firstNodeId, rootNodeId, [], '', userId)
-
-    const newUserPage = new UserPageRecord({
-      id: newUserPageId,
-      rootNodeId,
-      createdById: userId,
-      title,
-      isHomePage
-    })
+    const newRootNode = nodeOperations.makeNode(rootNodeId, null, [ firstNodeId ], '', userId)
+    const newFirstNode = nodeOperations.makeNode(firstNodeId, rootNodeId, [], '', userId)
+    const newUserPage = userPageOperations.makeUserPage(newUserPageId, rootNodeId, userId, title, isHomePage)
 
     userPageRepository.createUserPage(newUserPage, newRootNode, newFirstNode)
       .then(snapshot => {

@@ -26,7 +26,7 @@ describe('treeReducer', () => {
     sinon.spy(nodeOperations, 'focus')
     sinon.spy(nodeOperations, 'unfocus')
     sinon.spy(nodeOperations, 'addChild')
-    sinon.spy(nodeOperations, 'create')
+    sinon.spy(nodeOperations, 'makeNode')
     sinon.spy(nodeSelectors, 'getNextNodeThatIsVisible')
     sinon.spy(nodeSelectors, 'getCurrentlySelectedNodeIds')
     sinon.spy(nodeSelectors, 'getCurrentlyFocusedNodeId')
@@ -36,7 +36,7 @@ describe('treeReducer', () => {
     nodeOperations.focus.restore()
     nodeOperations.unfocus.restore()
     nodeOperations.addChild.restore()
-    nodeOperations.create.restore()
+    nodeOperations.makeNode.restore()
     nodeSelectors.getNextNodeThatIsVisible.restore()
     nodeSelectors.getCurrentlySelectedNodeIds.restore()
     nodeSelectors.getCurrentlyFocusedNodeId.restore()
@@ -90,7 +90,7 @@ describe('treeReducer', () => {
       const newState = tree(state, nodeCreationAction)
 
       expect(newState.get(nodeId)).to.be.defined
-      expect(nodeOperations.create).to.have.been.calledWith(
+      expect(nodeOperations.makeNode).to.have.been.calledWith(
         nodeCreationAction.payload.nodeId, '2', [], nodeCreationAction.payload.content, nodeCreationAction.payload.userId
       )
     })
@@ -106,7 +106,7 @@ describe('treeReducer', () => {
 
       tree(state, nodeCreationAction)
 
-      expect(nodeOperations.create).to.have.been.calledWith(
+      expect(nodeOperations.makeNode).to.have.been.calledWith(
         nodeCreationAction.payload.nodeId, '1', [], nodeCreationAction.payload.content, nodeCreationAction.payload.userId
       )
     })

@@ -21,7 +21,7 @@ describe('nodeOperations', () => {
       const childIds = I.List(['4', '5'])
       const content = 'some content'
       const createdById = 'abc123'
-      expect(nodeOperations.create(nodeId, parentId, childIds, content, createdById))
+      expect(nodeOperations.makeNode(nodeId, parentId, childIds, content, createdById))
         .to.deep.equal(new NodeRecord({
           id: nodeId, parentId, childIds, content, createdById
         }))
