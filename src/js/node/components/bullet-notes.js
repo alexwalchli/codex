@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actionCreators from '../actions/node-action-creators'
 import Textarea from 'react-textarea-autosize'
-import renderContent from '../helpers/render-content'
 import * as nodeSelectors from '../selectors/node-selectors'
 
 export class BulletNotes extends Component {
@@ -24,14 +23,14 @@ export class BulletNotes extends Component {
   componentWillMount () {
     const { notes } = this.props
     this.setState({
-      renderedNotes: renderContent(notes).payload
+      renderedNotes: notes
     })
   }
 
   componentWillReceiveProps (newProps) {
     if (newProps.notes !== this.props.notes) {
       this.setState({
-        renderedNotes: renderContent(newProps.notes).payload
+        renderedNotes: newProps.notes
       })
     }
   }

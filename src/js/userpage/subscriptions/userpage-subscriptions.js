@@ -2,7 +2,6 @@ import * as userPageActions from '../../userpage/actions/userpage-actions'
 import * as userPageActionCreators from '../../userpage/actions/userpage-action-creators'
 import * as appActionCreators from '../../app/actions/app-action-creators'
 import * as userPageRepository from '../repositories/userpage-repository'
-import { firebaseDb } from '../../firebase'
 
 export function subscribeToUserPages () {
   return (dispatch, getState) => {

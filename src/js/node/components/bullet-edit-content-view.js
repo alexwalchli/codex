@@ -1,15 +1,14 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actionCreators from '../actions/node-action-creators'
-import IntellisenseInput from '../../intellisense/components/intellisense-input'
-import {Editor, EditorState} from 'draft-js';
+import {Editor, EditorState} from 'draft-js'
 
 export class BulletEditContentView extends Component {
   constructor (props) {
     super(props)
 
-    this.state = {};
-    this.onChange = (editorState) => this.setState({editorState});
+    this.state = {}
+    this.onChange = (editorState) => this.setState({editorState})
     this.state = {
       content: props.content,
       editorState: EditorState.createEmpty()
@@ -93,8 +92,8 @@ export class BulletEditContentView extends Component {
   // rendering
 
   render () {
-    const { focused, nodeId } = this.props
-    const { content, editorState } = this.state
+    // const { focused, nodeId } = this.props
+    const { editorState } = this.state
 
     return (
       <Editor editorState={editorState} onChange={this.onChange} />

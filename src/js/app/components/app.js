@@ -4,10 +4,6 @@ import Node from '../../node/components/node'
 import AppContextMenu from './app-context-menu'
 import SignIn from '../../auth/components/sign-in'
 import AppLoader from './app-loader'
-import * as appActionCreators from '../actions/app-action-creators'
-import * as nodeActionCreators from '../../node/actions/node-action-creators'
-import * as nodeActions from '../../node/actions/node-actions'
-import * as nodeSelectors from '../../node/selectors/node-selectors'
 import * as appSelectors from '../app-selectors'
 
 export class App extends Component {

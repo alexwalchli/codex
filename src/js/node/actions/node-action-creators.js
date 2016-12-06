@@ -7,7 +7,7 @@ export const createNode = (originNodeId, originOffset, content) =>
   (dispatch, getState) => {
     const state = getState()
     const treeState = nodeSelectors.currentTreeState(state)
-    const userId = state.getIn(['auth', 'id'])
+    const userId = state.auth.get('id')
     const newNodeId = nodeRepository.getNewNodeId()
     const originNode = treeState.get(originNodeId)
     const parentId = originNode.get('childIds').count() === 0 || originNode.getIn(['collapsed', userId])
@@ -29,20 +29,21 @@ export const createNode = (originNodeId, originOffset, content) =>
       nodeIdToUnfocus,
       originOffset,
       content,
-      state.getIn(['app', 'currentUserPageId']),
+      state.app.get('currentUserPageId'),
       userId))
 
     const newState = getState()
     const newTreeState = nodeSelectors.currentTreeState(newState)
-    nodeRepository.createNode(newTreeState.get(newNodeId), state.getIn('app', 'currentUserPageId'), newTreeState.getIn(parentId, 'childIds'))
+    nodeRepository.createNode(newTreeState.get(newNodeId), state.app.get('currentUserPageId'), newTreeState.getIn(parentId, 'childIds'))
   }
 
 export const deleteNode = (nodeId) =>
   (dispatch, getState) => {
     const state = getState()
     const treeState = nodeSelectors.currentTreeState(state)
+    const userId = state.auth.get('id')
 
-    if (Object.keys(treeState).length === 2) {
+    if (nodeSelectors.getNodeCount(state) === 2) {
       // this is the last node before the root
       return
     }
@@ -50,19 +51,19 @@ export const deleteNode = (nodeId) =>
     const allDescendantIds = nodeSelectors.getAllDescendantIds(treeState, nodeId)
     const parentId = treeState[nodeId].parentId
 
-    dispatch(nodeActions.nodeDeletion(nodeId, parentId, allDescendantIds, state.auth.id))
+    dispatch(nodeActions.nodeDeletion(nodeId, parentId, allDescendantIds, userId))
 
     const newState = getState()
     const newTreeState = nodeSelectors.currentTreeState(newState)
-    nodeRepository.deleteNode(nodeId, parentId, newTreeState[parentId].childIds, allDescendantIds, state.auth.id)
+    nodeRepository.deleteNode(nodeId, parentId, newTreeState[parentId].childIds, allDescendantIds, userId)
   }
 
 export const deleteNodes = (nodeIds) =>
   (dispatch, getState) => {
     const state = getState()
-    const treeState = nodeSelectors.currentTreeState(state)
-    if (nodeIds.length - 2 > Object.keys(treeState).length) {
-      // need to add back an initial node if they delete everything
+
+    if (nodeIds.length - 2 > nodeSelectors.getNodeCount(state)) {
+      // TODO: warn/confirm and then need to add back an initial node if they delete everything
     }
 
     dispatch(nodeActions.nodesDeleted(nodeIds))
@@ -73,8 +74,9 @@ export const deleteNodes = (nodeIds) =>
 export const updateNodeContent = (nodeId, content) =>
   (dispatch, getState) => {
     const state = getState()
+    const userId = state.auth.get('id')
 
-    dispatch(nodeActions.nodeContentUpdate(nodeId, content, state.getIn(['auth', 'id'])))
+    dispatch(nodeActions.nodeContentUpdate(nodeId, content, userId))
 
     nodeRepository.updateNode(nodeSelectors.currentTreeState(getState())[nodeId])
   }
@@ -88,7 +90,7 @@ export const focusNodeAbove = (currentNodeId) =>
   (dispatch, getState) => {
     const state = getState()
     const rootNodeId = nodeSelectors.getRootNodeId(state)
-    const nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.currentTreeState(state), state.getIn(['visibleNodes', 'present']), currentNodeId, true)
+    const nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.currentTreeState(state), state.visibleNodes, currentNodeId, true)
 
     if (nodeToFocus) {
       dispatch(nodeActions.nodeFocus(nodeToFocus.get('id')))
@@ -99,7 +101,7 @@ export const focusNodeBelow = (currentNodeId) =>
   (dispatch, getState) => {
     const state = getState()
     const rootNodeId = nodeSelectors.getRootNodeId(state)
-    const nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.currentTreeState(state), state.getIn(['visibleNodes', 'present']), currentNodeId, false)
+    const nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.currentTreeState(state), state.visibleNodes, currentNodeId, false)
 
     if (nodeToFocus) {
       dispatch(nodeActions.nodeFocus(nodeToFocus.get('id')))
@@ -112,14 +114,14 @@ export const demoteNode = (nodeId) =>
     const treeState = nodeSelectors.currentTreeState(state)
     const rootNodeId = nodeSelectors.getRootNodeId(state)
     const currentParentId = treeState.getIn([nodeId, 'parentId'])
-    const visibleNodes = state.getIn(['visibleNodes', 'present'])
     const userId = state.getIn(['auth', 'id'])
-    const addAfterSibling = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, treeState, visibleNodes, nodeId, true)
-    console.log(addAfterSibling)
-    if (!addAfterSibling || addAfterSibling.id === currentParentId) {
+    const addAfterSibling = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, treeState, state.visibleNodes, nodeId, true)
+
+    if (!addAfterSibling || addAfterSibling.get('id') === currentParentId) {
       // can't demote the node when there isn't a sibling above to attach it too
       return
     }
+
     const newParentId = addAfterSibling.get('id')
     const addAfterLastChildOfSiblingAboveId = addAfterSibling.get('childIds')[addAfterSibling.get('childIds').count() - 1]
 
@@ -129,7 +131,7 @@ export const demoteNode = (nodeId) =>
       currentParentId,
       newParentId,
       addAfterLastChildOfSiblingAboveId,
-      visibleNodes,
+      state.visibleNodes,
       userId))
 
     const newTreeState = nodeSelectors.currentTreeState(getState())
@@ -151,15 +153,14 @@ export const promoteNode = (nodeId) =>
     const currentParentId = parentNode.get('id')
     const newParentId = parentNode.get('parentId')
     const siblingIds = parentNode.get('childIds')
-    const userId = state.getIn(['auth', 'id'])
-    const visibleNodes = state.getIn(['visibleNodes', 'present'])
+    const userId = state.auth.get('id')
+
     if (currentParentId === nodeSelectors.getRootNodeId(state)) {
       return
     }
 
-    dispatch(nodeActions.nodePromotion(nodeId, siblingIds, currentParentId, newParentId, visibleNodes, userId))
+    dispatch(nodeActions.nodePromotion(nodeId, siblingIds, currentParentId, newParentId, state.visibleNodes, userId))
 
-    // side effect, syncAction, syncNodes,
     const newTreeState = nodeSelectors.currentTreeState(getState())
     const oldParentForSiblings = newTreeState.get(currentParentId)
     const promotedNode = newTreeState.get(nodeId)
@@ -173,15 +174,16 @@ export const promoteNode = (nodeId) =>
 export const toggleNodeExpansion = (nodeId) =>
   (dispatch, getState) => {
     const state = getState()
-    const nodes = nodeSelectors.currentTreeState(state)
-    const allDescendentIds = nodeSelectors.getAllDescendantIds(nodes, nodeId)
+    const userId = state.auth.get('id')
+    const treeState = nodeSelectors.currentTreeState(state)
+    const allDescendentIds = nodeSelectors.getAllDescendantIds(treeState, nodeId)
     const rootNodeId = nodeSelectors.getRootNodeId(state)
-    const allUncollapsedDescendantIds = nodeSelectors.getAllUncollapsedDescedantIds(rootNodeId, nodes, nodeId, state.auth.id)
+    const allUncollapsedDescendantIds = nodeSelectors.getAllUncollapsedDescedantIds(rootNodeId, treeState, nodeId, userId)
 
-    if (nodeSelectors.currentTreeState(state)[nodeId].collapsedBy[state.auth.id]) {
-      dispatch(nodeActions.nodeExpansion(nodeId, allDescendentIds, allUncollapsedDescendantIds, state.auth.id))
+    if (treeState.getIn([nodeId, 'collapsedBy', userId])) {
+      dispatch(nodeActions.nodeExpansion(nodeId, allDescendentIds, allUncollapsedDescendantIds, userId))
     } else {
-      dispatch(nodeActions.nodeCollapse(nodeId, allDescendentIds, state.auth.id))
+      dispatch(nodeActions.nodeCollapse(nodeId, allDescendentIds, userId))
     }
 
     const newTreeState = nodeSelectors.currentTreeState(getState())
@@ -198,8 +200,9 @@ export const deselectNode = (nodeId) => (dispatch, getState) => {
 
 export const toggleNodeComplete = (nodeId) => (dispatch, getState) => {
   const state = getState()
+  const userId = state.auth.get('id')
 
-  dispatch(nodeActions.nodeCompletionToggle(nodeId, state.auth.id))
+  dispatch(nodeActions.nodeCompletionToggle(nodeId, userId))
 }
 
 export const toggleNodeMenu = (nodeId) => (dispatch, getState) => {

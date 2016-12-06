@@ -1,7 +1,6 @@
 import * as userPageActionCreators from '../../../src/js/userpage/actions/userpage-action-creators'
 import * as userPageRepository from '../../../src/js/userpage/repositories/userpage-repository'
 import * as userPageActions from '../../../src/js/userpage/actions/userpage-actions'
-import * as userPageFactory from '../../../src/js/userpage/helpers/userpage-factory'
 import * as nodeRepository from '../../../src/js/node/repositories/node-repository'
 import * as nodeFactory from '../../../src/js/node/helpers/node-factory'
 import * as appActionCreators from '../../../src/js/app/actions/app-action-creators'

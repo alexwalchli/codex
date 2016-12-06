@@ -202,9 +202,9 @@ export class Node extends Component {
 // react redux
 
 const mapStateToProps = (state, ownProps) => {
-  return { 
-    ...ownProps, 
-    ...nodeSelectors.getNodeProps(state, ownProps.id) 
+  return {
+    ...ownProps,
+    ...nodeSelectors.getNodeProps(state, ownProps.id)
   }
 }
 
