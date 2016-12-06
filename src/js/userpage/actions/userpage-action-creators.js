@@ -1,4 +1,4 @@
-import * as appActionCreators from '../../app/actions/app-action-creators'
+import * as appActionCreators from '../../app/app-action-creators'
 import * as nodeRepository from '../../node/repositories/node-repository'
 import * as nodeSelectors from '../../node/selectors/node-selectors'
 import * as userPageActions from './userpage-actions'
@@ -9,7 +9,7 @@ import * as nodeOperations from '../../node/operations/node-operations'
 export const createUserPage = (title, isHomePage) =>
   (dispatch, getState) => {
     const state = getState()
-    const userId = state.getIn(['auth', 'id'])
+    const userId = state.auth.get('id')
     const rootNodeId = nodeRepository.getNewNodeId()
     const firstNodeId = nodeRepository.getNewNodeId()
     const newUserPageId = userPageRepository.getNewUserPageId()
@@ -26,11 +26,11 @@ export const createUserPage = (title, isHomePage) =>
 export const deleteUserPage = (userPageId) =>
   (dispatch, getState) => {
     const state = getState()
-    const userPage = state.userPages[userPageId]
-    const rootNode = state.tree.present[userPage.rootNodeId]
+    const userPage = state.userPages.get(userPageId)
+    const rootNode = state.tree.get(userPage.get('rootNodeId'))
     const auth = state.auth
 
-    dispatch(appActionCreators.navigateToUserPage(nodeSelectors.dictionaryToArray(state.userPages).find(u => u.isHome).id))
+    dispatch(appActionCreators.navigateToUserPage(state.userPages.find(u => u.get('isHome')).get('id')))
     dispatch(userPageActions.userPageDeletion(userPageId))
 
     userPageRepository.deleteUserPage(userPage, rootNode, auth)
@@ -39,7 +39,7 @@ export const deleteUserPage = (userPageId) =>
 export const updateUserPageName = (userPageId, newUserPageName) =>
   (dispatch, getState) => {
     const state = getState()
-    userPageRepository.updateUserPageName(state.userPages[userPageId], newUserPageName)
+    userPageRepository.updateUserPageName(state.userPages.get(userPageId), newUserPageName)
     dispatch(userPageActions.userPageNameUpdate(userPageId, newUserPageName))
   }
 

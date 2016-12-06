@@ -122,7 +122,7 @@ describe('treeReducer', () => {
 
       tree(state, nodeCreationAction)
 
-      expect(nodeOperations.create).to.have.been.calledWith(
+      expect(nodeOperations.makeNode).to.have.been.calledWith(
         nodeCreationAction.payload.nodeId, '1', [], nodeCreationAction.payload.content, nodeCreationAction.payload.userId
       )
     })

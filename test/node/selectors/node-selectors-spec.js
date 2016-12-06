@@ -5,18 +5,12 @@ import * as I from 'immutable'
 describe('nodeSelectors', () => {
   describe('currentTreeState', () => {
     it('should return the present nodes', () => {
-      const state = I.fromJS({
-        tree: {
-          present: {
-            abc: { id: 1 },
-            def: { id: 2, deleted: true }
-          },
-          past: {
-            abc: { id: 1 },
-            def: { id: 2 }
-          }
-        }
-      })
+      const state = {
+        tree: I.fromJS({
+          abc: { id: 1 },
+          def: { id: 2, deleted: true }
+        })
+      }
 
       var presentNodes = nodeSelectors.currentTreeState(state)
 
@@ -26,14 +20,14 @@ describe('nodeSelectors', () => {
 
   describe('getRootNodeId', () => {
     it('should return the current page root node Id', () => {
-      const state = I.fromJS({
-        app: { currentUserPageId: 'def' },
-        userPages: {
+      const state = {
+        app: I.fromJS({ currentUserPageId: 'def' }),
+        userPages: I.fromJS({
           abc: { id: 'abc', rootNodeId: '123' },
           def: { id: 'def', rootNodeId: '456' },
           ghi: { id: 'ghi', rootNodeId: '789' }
-        }
-      })
+        })
+      }
 
       expect(nodeSelectors.getRootNodeId(state)).to.equal('456')
     })
@@ -184,8 +178,8 @@ describe('nodeSelectors', () => {
       // ------ggg
       // --hhh(deleted)
       // --iii
-      state = I.fromJS({
-        nodes: {
+      state = {
+        tree: I.fromJS({
           aaa: { id: 'aaa', childIds: ['bbb', 'hhh', 'iii'], parentId: null },
           bbb: { id: 'bbb', childIds: ['ccc', 'ddd', 'fff'], parentId: 'aaa', visible: true },
           ccc: { id: 'ccc', childIds: [], parentId: 'bbb', visible: true },
@@ -195,8 +189,8 @@ describe('nodeSelectors', () => {
           ggg: { id: 'ggg', childIds: [], parentId: 'fff', visible: true },
           hhh: { id: 'hhh', childIds: [], parentId: 'aaa', visible: true, deleted: true },
           iii: { id: 'iii', childIds: [], parentId: 'aaa', visible: true }
-        },
-        visibleNodes: {
+        }),
+        visibleNodes: I.fromJS({
           'aaa': true,
           'bbb': true,
           'ccc': true,
@@ -206,14 +200,14 @@ describe('nodeSelectors', () => {
           'ggg': true,
           'hhh': false,
           'iii': true
-        }
-      })
+        })
+      }
     })
 
     it('should return the sibling nodeId above, if searching above and it is visible', () => {
-      const nodeAboveiii = nodeSelectors.getNextNodeThatIsVisible('aaa', state.get('nodes'), state.get('visibleNodes'), 'iii', true)
-      const nodeAbovefff = nodeSelectors.getNextNodeThatIsVisible('aaa', state.get('nodes'), state.get('visibleNodes'), 'fff', true)
-      const nodeAbovebbb = nodeSelectors.getNextNodeThatIsVisible('aaa', state.get('nodes'), state.get('visibleNodes'), 'bbb', true)
+      const nodeAboveiii = nodeSelectors.getNextNodeThatIsVisible('aaa', state.tree, state.visibleNodes, 'iii', true)
+      const nodeAbovefff = nodeSelectors.getNextNodeThatIsVisible('aaa', state.tree, state.visibleNodes, 'fff', true)
+      const nodeAbovebbb = nodeSelectors.getNextNodeThatIsVisible('aaa', state.tree, state.visibleNodes, 'bbb', true)
 
       expect(nodeAboveiii.get('id')).to.equal('ggg')
       expect(nodeAbovefff.get('id')).to.equal('ddd')
@@ -221,11 +215,11 @@ describe('nodeSelectors', () => {
     })
 
     it('should return the sibling nodeId below, if searching below and it is visible', () => {
-      const nodeBelowiii = nodeSelectors.getNextNodeThatIsVisible('aaa', state.get('nodes'), state.get('visibleNodes'), 'iii', false)
-      const nodeBelowbbb = nodeSelectors.getNextNodeThatIsVisible('aaa', state.get('nodes'), state.get('visibleNodes'), 'bbb', false)
-      const nodeBelowccc = nodeSelectors.getNextNodeThatIsVisible('aaa', state.get('nodes'), state.get('visibleNodes'), 'ccc', false)
-      const nodeBelowddd = nodeSelectors.getNextNodeThatIsVisible('aaa', state.get('nodes'), state.get('visibleNodes'), 'ddd', false)
-      const nodeBelowggg = nodeSelectors.getNextNodeThatIsVisible('aaa', state.get('nodes'), state.get('visibleNodes'), 'ggg', false)
+      const nodeBelowiii = nodeSelectors.getNextNodeThatIsVisible('aaa', state.tree, state.visibleNodes, 'iii', false)
+      const nodeBelowbbb = nodeSelectors.getNextNodeThatIsVisible('aaa', state.tree, state.visibleNodes, 'bbb', false)
+      const nodeBelowccc = nodeSelectors.getNextNodeThatIsVisible('aaa', state.tree, state.visibleNodes, 'ccc', false)
+      const nodeBelowddd = nodeSelectors.getNextNodeThatIsVisible('aaa', state.tree, state.visibleNodes, 'ddd', false)
+      const nodeBelowggg = nodeSelectors.getNextNodeThatIsVisible('aaa', state.tree, state.visibleNodes, 'ggg', false)
 
       expect(nodeBelowiii).to.equal(null)
       expect(nodeBelowbbb.get('id')).to.equal('ccc')

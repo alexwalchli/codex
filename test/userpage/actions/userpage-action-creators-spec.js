@@ -4,27 +4,26 @@ import * as userPageActions from '../../../src/js/userpage/actions/userpage-acti
 import * as userPageOperations from '../../../src/js/userpage/userpage-operations'
 import * as nodeRepository from '../../../src/js/node/repositories/node-repository'
 import * as nodeOperations from '../../../src/js/node/operations/node-operations'
-import * as appActionCreators from '../../../src/js/app/actions/app-action-creators'
+import * as appActionCreators from '../../../src/js/app/app-action-creators'
+import * as I from 'immutable'
 import sinon from 'sinon'
 import { expect } from 'chai'
 
 describe('userPageActionCreators', () => {
   const userId = 'user123'
   const dispatch = sinon.spy()
-  const auth = {
+  const auth = I.fromJS({
     id: userId
-  }
-  const userPage = { id: '1', rootNodeId: '1', isHome: true }
-  const rootNode = { id: '1' }
+  })
+  const userPage = I.fromJS({ id: '1', rootNodeId: '1', isHome: true })
+  const rootNode = I.fromJS({ id: '1' })
   const state = {
-    tree: {
-      present: {
-        '1': rootNode
-      }
-    },
-    userPages: {
+    tree: I.fromJS({
+      '1': rootNode
+    }),
+    userPages: I.fromJS({
       '1': userPage
-    },
+    }),
     auth
   }
   const getState = () => (state)

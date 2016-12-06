@@ -14,7 +14,7 @@ describe('nodeOperations', () => {
 
   const dummyNode = new NodeRecord({ id: '2', parentId: '1', childIds: I.List.of('3', '4') })
 
-  describe('create', () => {
+  describe('makeNode', () => {
     it('should return a node with initialized values', () => {
       const nodeId = '123'
       const parentId = '1'

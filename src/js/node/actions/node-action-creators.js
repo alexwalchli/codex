@@ -114,7 +114,7 @@ export const demoteNode = (nodeId) =>
     const treeState = nodeSelectors.currentTreeState(state)
     const rootNodeId = nodeSelectors.getRootNodeId(state)
     const currentParentId = treeState.getIn([nodeId, 'parentId'])
-    const userId = state.getIn(['auth', 'id'])
+    const userId = state.auth.get('id')
     const addAfterSibling = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, treeState, state.visibleNodes, nodeId, true)
 
     if (!addAfterSibling || addAfterSibling.get('id') === currentParentId) {

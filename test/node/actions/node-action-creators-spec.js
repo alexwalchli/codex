@@ -55,19 +55,17 @@ describe('nodeActionCreators', () => {
     '789': true
   })
   const getState = () => {
-    return I.fromJS({
-      auth: {
+    return {
+      auth: I.fromJS({
         id: userId
-      },
-      app: {
+      }),
+      app: I.fromJS({
         currentUserPageId: currentUserPageId
-      },
-      tree: {
-        present: nodes
-      },
-      userPages: [{ id: currentUserPageId, rootNodeId: '1' }],
-      visibleNodes: { present: visibleNodes }
-    })
+      }),
+      tree: nodes,
+      userPages: I.fromJS([{ id: currentUserPageId, rootNodeId: '1' }]),
+      visibleNodes: visibleNodes
+    }
   }
 
   beforeEach(() => {

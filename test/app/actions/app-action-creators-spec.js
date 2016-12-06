@@ -1,18 +1,19 @@
-import * as appActionCreators from '../../../src/js/app/actions/app-action-creators'
-import * as appActions from '../../../src/js/app/actions/app-actions'
+import * as appActionCreators from '../../../src/js/app/app-action-creators'
+import * as appActions from '../../../src/js/app/app-actions'
 import * as nodeActions from '../../../src/js/node/actions/node-actions'
 import * as nodeSelectors from '../../../src/js/node/selectors/node-selectors'
 import * as nodeSubscriptions from '../../../src/js/node/subscriptions/node-subscriptions'
 import sinon from 'sinon'
 import { expect } from 'chai'
+import * as I from 'immutable'
 
 describe('app action creators', () => {
   const initialTreeState = {}
   const dispatch = sinon.spy()
   const getState = () => ({
-    auth: {
+    auth: I.Map({
       id: 'user123'
-    }
+    })
   })
   const userPageNavigationActionStub = { userPageNavigation: true }
   const initialTreeStateLoadActionStub = { initialTreeStateLoad: true }
