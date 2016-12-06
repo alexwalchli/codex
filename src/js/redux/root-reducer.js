@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux-immutablejs'
+import { combineReducers } from 'redux'
 import { app } from '../app/reducers/app-reducer'
 import { tree } from '../node/reducers/tree-reducer'
 import { visibleNodes } from '../node/reducers/visible-nodes-reducer'

@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import _ from 'lodash'
 import * as actionCreators from '../actions/node-action-creators'
 import BulletEditContentView from './bullet-edit-content-view'
-import BulletReadContentView from './bullet-read-content-view'
 import BulletNotes from './bullet-notes'
 import BulletMenu from './bullet-menu'
 import BulletIcon from './bullet-icon'
@@ -170,16 +169,11 @@ export class Node extends Component {
               onMouseLeave={(e) => this.onContentMouseLeave(e)}
               onPaste={(e) => this.onContentPaste(e)}
               onClick={(e) => this.onContentClick(e)}>
-              { focused
-                ? <BulletEditContentView
-                  nodeId={id}
-                  content={content}
-                  focused={focused}
-                  />
-                : <BulletReadContentView
-                  nodeId={id}
-                  content={content}
-                  /> }
+              <BulletEditContentView
+                nodeId={id}
+                content={content}
+                focused={focused}
+              />
             </div>
 
             <BulletNotes
@@ -208,7 +202,10 @@ export class Node extends Component {
 // react redux
 
 const mapStateToProps = (state, ownProps) => {
-  return { ...ownProps, ...nodeSelectors.getNodeDataForComponent(state, ownProps.id, ownProps.parentId) }
+  return { 
+    ...ownProps, 
+    ...nodeSelectors.getNodeProps(state, ownProps.id) 
+  }
 }
 
 const ConnectedNode = connect(mapStateToProps, actionCreators)(Node)

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actionCreators from '../actions/node-action-creators'
+import * as nodeSelectors from '../selectors/node-selectors'
 
 export class BulletIcon extends Component {
 
@@ -11,19 +12,14 @@ export class BulletIcon extends Component {
   }
 
   render () {
-    const { positionInOrderedList, nodeCount } = this.props
+    const { nodeCount } = this.props
 
     return (
       <div className='bullet-container' onClick={(e) => this.onBulletClick(e)}>
         { nodeCount === 2
           ? <div className='pulse' />
           : null }
-        { positionInOrderedList
-          ? <div className='ordered-bullet'>
-            <div className='outer-circle' />
-            <div className='number'>{positionInOrderedList}.</div>
-          </div>
-          : <div className='unordered-bullet'><div className='outer-circle' /><div className='inner-circle' /></div> }
+        <div className='unordered-bullet'><div className='outer-circle' /><div className='inner-circle' /></div> }
       </div>
     )
   }
@@ -32,7 +28,10 @@ export class BulletIcon extends Component {
 // react redux
 
 const mapStateToProps = (state, ownProps) => {
-  return { nodeCount: Object.keys(state.tree.present).length, ...state.tree.present[ownProps.nodeId] }
+  return {
+    nodeCount: nodeSelectors.getNodeCount(state),
+    ...ownProps
+  }
 }
 
 const ConnectedBulletIcon = connect(mapStateToProps, actionCreators)(BulletIcon)

@@ -4,7 +4,6 @@ import Textarea from 'react-textarea-autosize'
 import * as nodeActionCreators from '../../node/actions/node-action-creators'
 import * as tagActionCreators from '../../tag/actions/tag-action-creators'
 import { connect } from 'react-redux'
-import Highlighter from './Highlighter'
 import { autoCompleteQueryWithSelectedSuggestion } from '../helpers/intellisense-helpers'
 import * as intellisenseSelectors from '../selectors/intellisense-selectors'
 import * as nodeSelectors from '../../node/selectors/node-selectors'
@@ -134,8 +133,7 @@ export class IntellisenseInput extends Component {
   }
 
   render () {
-    const { nodeId } = this.props
-    const { currentInputValue, selectionStart, selectionEnd } = this.state
+    const { currentInputValue } = this.state
 
     return (
       <div className='intellisense-container'>
@@ -148,15 +146,6 @@ export class IntellisenseInput extends Component {
           onSelect={(e) => this.onTextInputSelect(e)}
         />
         {this.renderSuggestionBox()}
-        <Highlighter
-          nodeId={nodeId}
-          value={currentInputValue}
-          onCaretPositionChange={(e, position) => this.onCaretPositionChange(e, position)}
-          selection={{
-            start: selectionStart,
-            end: selectionEnd
-          }}
-        />
       </div>
     )
   }
@@ -259,7 +248,7 @@ export class IntellisenseInput extends Component {
 function mapStateToProps (state, ownProps) {
   return {
     suggestions: intellisenseSelectors.allSuggestions(state),
-    node: nodeSelectors.getNodeDataForComponent(state),
+    node: nodeSelectors.getNodeProps(state, ownProps.nodeId, ownProps.parentId),
     ...ownProps
   }
 }

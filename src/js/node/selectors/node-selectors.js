@@ -5,16 +5,19 @@ export function dictionaryToArray (dictionary) {
   return Object.keys(dictionary).map(key => dictionary[key])
 }
 
+export function getNode (state, nodeId) {
+  return state.tree.get(nodeId)
+}
+
 export function currentTreeState (state) {
   // const currentTreeState = state.get('tree').get('present') When I reimplment undo functionality we'll need this
-  const currentTreeState = state.get('tree')
-  return currentTreeState.filter(node => !node.get('deleted'))
+  return state.tree.filter(node => !node.get('deleted'))
 }
 
 // retrieves the root node ID of the current page
 export function getRootNodeId (state) {
-  let currentUserPageId = state.get('app').get('currentUserPageId')
-  return state.get('userPages').find(up => up.get('id') === currentUserPageId).get('rootNodeId')
+  let currentUserPageId = state.app.get('currentUserPageId')
+  return state.userPages.find(up => up.get('id') === currentUserPageId).get('rootNodeId')
 }
 
 // retrieves a flattened ordered list of all node IDs starting under startNodeId
@@ -52,6 +55,10 @@ export function getCurrentlyFocusedNodeId (nodes) {
   return focusedNode ? focusedNode.get('id') : null
 }
 
+export function getNodeCount (state) {
+  return state.tree.count()
+}
+
 // retrieves the next node above or below that is visible
 export function getNextNodeThatIsVisible (rootNodeId, nodes, visibleNodes, currentNodeId, searchAbove = true) {
   const allNodeIdsOrdered = getAllNodeIdsOrdered(nodes, rootNodeId)
@@ -75,14 +82,17 @@ export function getNextNodeThatIsVisible (rootNodeId, nodes, visibleNodes, curre
   return null
 }
 
-export const getNodeDataForComponent = (state, id, parentId) => {
-  const nodeFromState = state.tree.present[id]
-  const parentNode = state.tree.present[parentId]
+export const getNodeProps = (state, id) => {
+  const tree = currentTreeState(state)
+  const nodeFromState = tree.get(id)
+  const parentId = nodeFromState.get('parentId')
+  const parentNode = parentId ? tree.get(parentId) : undefined
+  const parentNodeChildIds = parentId ? parentNode.get('childIds') : []
   const rootNodeId = getRootNodeId(state)
 
   let positionInOrderedList
   if (parentNode && parentNode.displayMode === 'ordered') {
-    positionInOrderedList = parentNode.childIds.indexOf(id) + 1
+    positionInOrderedList = parentNodeChildIds.indexOf(id) + 1
   }
 
   return {
@@ -90,8 +100,8 @@ export const getNodeDataForComponent = (state, id, parentId) => {
     nodeInitialized: !!nodeFromState,
     auth: state.auth,
     positionInOrderedList,
-    lastChild: parentNode && parentNode.childIds.indexOf(id) === parentNode.childIds.length - 1,
-    visible: state.visibleNodes.present[id],
-    ...nodeFromState
+    lastChild: parentNode && parentNodeChildIds.indexOf(id) === parentNodeChildIds.length - 1,
+    visible: state.visibleNodes.get(id),
+    ...nodeFromState.toJS()
   }
 }

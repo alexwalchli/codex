@@ -11,7 +11,7 @@ require('../less/app.less')
 startApplication()
 
 function startApplication () {
-  const store = configureStore(I.Map({}))
+  const store = configureStore()
 
   render(
     <Provider store={store}>

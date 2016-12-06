@@ -9,8 +9,7 @@ import {
 export const userPages = reducerFactory(I.Map({}), {
 
   [USER_PAGE_CREATION]: (state, action) => {
-    const { id } = action.payload
-    return state.setIn([id], action.payload)
+    return state.set(action.payload.get('id'), action.payload)
   },
 
   [USER_PAGE_NAME_UPDATE]: (state, action) => {

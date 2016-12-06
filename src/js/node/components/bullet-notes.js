@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import * as actionCreators from '../actions/node-action-creators'
 import Textarea from 'react-textarea-autosize'
 import renderContent from '../helpers/render-content'
+import * as nodeSelectors from '../selectors/node-selectors'
 
 export class BulletNotes extends Component {
   constructor (props) {
@@ -100,7 +101,10 @@ export class BulletNotes extends Component {
 // react redux
 
 function mapStateToProps (state, ownProps) {
-  return state.tree.present[ownProps.nodeId]
+  return {
+    ...nodeSelectors.getNode(state, ownProps.nodeId).toJS(),
+    ...ownProps
+  }
 }
 
 const ConnectedBulletNotes = connect(mapStateToProps, actionCreators)(BulletNotes)

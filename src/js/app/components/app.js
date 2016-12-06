@@ -4,12 +4,11 @@ import Node from '../../node/components/node'
 import AppContextMenu from './app-context-menu'
 import SignIn from '../../auth/components/sign-in'
 import AppLoader from './app-loader'
-import { isAuthenticated } from '../../auth/helpers/index'
 import * as appActionCreators from '../actions/app-action-creators'
 import * as nodeActionCreators from '../../node/actions/node-action-creators'
 import * as nodeActions from '../../node/actions/node-actions'
-import * as userPageSelectors from '../../userpage/selectors/userpage-selectors'
 import * as nodeSelectors from '../../node/selectors/node-selectors'
+import * as appSelectors from '../app-selectors'
 
 export class App extends Component {
 
@@ -19,8 +18,8 @@ export class App extends Component {
   }
 
   render () {
-    const { currentUserPage, tree, isAuthenticated, initialAuthChecked } = this.props
-    let appIsInitialized = isAuthenticated && currentUserPage && tree[currentUserPage.rootNodeId]
+    const { appState, currentUserPage, isAuthenticated, initialAuthChecked } = this.props
+    let appIsInitialized = isAuthenticated && currentUserPage && appState.tree.get(currentUserPage.get('rootNodeId'))
     let userIsAuthenticated = isAuthenticated
     let showSignIn = !userIsAuthenticated && initialAuthChecked
     let showLoading = userIsAuthenticated && !appIsInitialized
@@ -40,7 +39,7 @@ export class App extends Component {
             <AppContextMenu />
 
             <div id='tree-container'>
-              <Node id={currentUserPage.rootNodeId} />
+              <Node id={currentUserPage.get('rootNodeId')} />
             </div>
 
           </div>
@@ -50,17 +49,7 @@ export class App extends Component {
   }
 }
 
-function mapStateToProps (state, ownProps) {
-  return {
-    currentUserPage: userPageSelectors.currentPage(state),
-    isAuthenticated: isAuthenticated(state),
-    initialAuthChecked: state.getIn(['auth', 'initialCheck']),
-    tree: nodeSelectors.currentTreeState(state).toJS(),
-    ...ownProps
-  }
-}
-
-const ConnectedApp = connect(mapStateToProps, {...appActionCreators, ...nodeActionCreators, ...nodeActions})(App)
+const ConnectedApp = connect((state, ownProps) => appSelectors.getAppProps(state, ownProps))(App)
 export default ConnectedApp
 
 // TODO: Reimplement

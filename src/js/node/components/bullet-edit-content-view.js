@@ -108,7 +108,7 @@ export class BulletEditContentView extends Component {
 // react redux
 
 function mapStateToProps (state, ownProps) {
-  return state.tree.present[ownProps.nodeId]
+  return { ...ownProps }
 }
 
 const ConnectedBulletEditContentView = connect(mapStateToProps, actionCreators)(BulletEditContentView)
