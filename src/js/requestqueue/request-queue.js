@@ -20,7 +20,7 @@ export const enqueue = (func, args) => {
   return queuedRequestPromise
 }
 
-const execute = () => {
+function execute {
   const queuedRequest = requestQueue.shift()
   queuedRequest.func.apply(null, queuedRequest.args)
     .then((response) => {
