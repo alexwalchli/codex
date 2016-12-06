@@ -1,5 +1,4 @@
 import { firebaseDb } from '../../firebase'
-import userPageFactory from '../helpers/userpage-factory'
 import { queuedRequest } from '../../requestqueue/queued-request'
 import * as I from 'immutable'
 
@@ -61,52 +60,53 @@ export const deleteUserPage = queuedRequest((userPage, rootNode, auth) => {
   }
 })
 
-export const shareUserPage = queuedRequest((userPage, allDescendantIds, emails, auth) => {
-  let newUserPageUpdates = {}
-  let manyToManyConnectionDbUpdates = {}
-  let shareUserPagePromises = []
+// TODO: take a look back at this when it's time to work on collaboration/sharing
+// export const shareUserPage = queuedRequest((userPage, allDescendantIds, emails, auth) => {
+//   let newUserPageUpdates = {}
+//   let manyToManyConnectionDbUpdates = {}
+//   let shareUserPagePromises = []
 
-  if (!emails) {
-    return
-  }
+//   if (!emails) {
+//     return
+//   }
 
-  emails.forEach(email => {
-    // for each user that matches with an entered email, create a userPage and records to connect to all descendants
-    let shareUserPagePromise = new Promise((resolve, reject) => {
-      firebaseDb.ref(`email_users/${escapeEmail(email)}`).once(`value`).then(snapshot => {
-        let userId = snapshot.val()
+//   emails.forEach(email => {
+//     // for each user that matches with an entered email, create a userPage and records to connect to all descendants
+//     let shareUserPagePromise = new Promise((resolve, reject) => {
+//       firebaseDb.ref(`email_users/${escapeEmail(email)}`).once(`value`).then(snapshot => {
+//         let userId = snapshot.val()
 
-        if (!userId || email === auth.email) {
-          return
-        }
+//         if (!userId || email === auth.email) {
+//           return
+//         }
 
-        // TODO: ROOTNODEID and CREATEDBYID UNDEFINED
+//         // TODO: ROOTNODEID and CREATEDBYID UNDEFINED
 
-        let newUserPageId = firebaseDb.ref(`userPages/`).push().key
-        let newUserPage = userPageFactory(newUserPageId, userPage.rootNodeId, userPage.createdById, userPage.title, false)
-        newUserPageUpdates[`userPages/${userId}/${newUserPageId}`] = newUserPage
-        manyToManyConnectionDbUpdates[`userPage_users_nodes/${newUserPageId}/${userId}/${userPage.rootNodeId}`] = true
-        manyToManyConnectionDbUpdates[`node_userPages_users/${userPage.rootNodeId}/${newUserPageId}/${userId}`] = true
-        manyToManyConnectionDbUpdates[`node_users/${userPage.rootNodeId}/${userId}`] = true
-        allDescendantIds.forEach(descedantId => {
-          manyToManyConnectionDbUpdates['userPage_users_nodes/' + newUserPageId + '/' + userId + '/' + descedantId] = true
-          manyToManyConnectionDbUpdates['node_userPages_users/' + descedantId + '/' + newUserPageId + '/' + userId] = true
-          manyToManyConnectionDbUpdates['node_users/' + descedantId + '/' + userId] = true
-        })
+//         let newUserPageId = firebaseDb.ref(`userPages/`).push().key
+//         let newUserPage = userPageFactory(newUserPageId, userPage.rootNodeId, userPage.createdById, userPage.title, false)
+//         newUserPageUpdates[`userPages/${userId}/${newUserPageId}`] = newUserPage
+//         manyToManyConnectionDbUpdates[`userPage_users_nodes/${newUserPageId}/${userId}/${userPage.rootNodeId}`] = true
+//         manyToManyConnectionDbUpdates[`node_userPages_users/${userPage.rootNodeId}/${newUserPageId}/${userId}`] = true
+//         manyToManyConnectionDbUpdates[`node_users/${userPage.rootNodeId}/${userId}`] = true
+//         allDescendantIds.forEach(descedantId => {
+//           manyToManyConnectionDbUpdates['userPage_users_nodes/' + newUserPageId + '/' + userId + '/' + descedantId] = true
+//           manyToManyConnectionDbUpdates['node_userPages_users/' + descedantId + '/' + newUserPageId + '/' + userId] = true
+//           manyToManyConnectionDbUpdates['node_users/' + descedantId + '/' + userId] = true
+//         })
 
-        resolve()
-      })
-    })
+//         resolve()
+//       })
+//     })
 
-    shareUserPagePromises.push(shareUserPagePromise)
-  })
+//     shareUserPagePromises.push(shareUserPagePromise)
+//   })
 
-  return Promise.all(shareUserPagePromises).then(() => {
-    firebaseDb.ref().update(newUserPageUpdates).then(() => {
-      firebaseDb.ref().update(manyToManyConnectionDbUpdates)
-    })
-  })
-})
+//   return Promise.all(shareUserPagePromises).then(() => {
+//     firebaseDb.ref().update(newUserPageUpdates).then(() => {
+//       firebaseDb.ref().update(manyToManyConnectionDbUpdates)
+//     })
+//   })
+// })
 
 export function createEmailUser (email, userId) {
   email = email.replace(/\./g, ',')
