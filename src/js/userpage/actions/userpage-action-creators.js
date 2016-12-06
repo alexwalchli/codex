@@ -13,9 +13,7 @@ export const createUserPage = (title, isHomePage) =>
     const rootNodeId = nodeRepository.getNewNodeId()
     const firstNodeId = nodeRepository.getNewNodeId()
     const newUserPageId = userPageRepository.getNewUserPageId()
-    // const newRootNode = nodeFactory(rootNodeId, null, [firstNodeId], '', state.auth.id)
     const newRootNode = nodeOperations.create(rootNodeId, null, [ firstNodeId ], '', userId)
-    // const newFirstNode = nodeFactory(firstNodeId, rootNodeId, [], '', state.auth.id)
     const newFirstNode = nodeOperations.create(firstNodeId, rootNodeId, [], '', userId)
 
     const newUserPage = new UserPageRecord({
