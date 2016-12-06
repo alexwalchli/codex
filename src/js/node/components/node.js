@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import _ from 'lodash'
-import * as actionCreators from '../actions/node-action-creators'
+import * as actionCreators from '../node-action-creators'
 import BulletEditContentView from './bullet-edit-content-view'
 import BulletNotes from './bullet-notes'
 import BulletMenu from './bullet-menu'

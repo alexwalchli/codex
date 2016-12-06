@@ -1,10 +1,10 @@
 import { combineReducers } from 'redux'
-import { app } from '../app/reducers/app-reducer'
-import { tree } from '../node/reducers/tree-reducer'
+import { app } from '../app/app-reducer'
+import { tree } from '../node/tree-reducer'
 import { visibleNodes } from '../node/visible-nodes-reducer'
-import { auth } from '../auth/reducers/auth-reducer'
-import { userPages } from '../userpage/reducers/userpage-reducer'
-import { tags } from '../tag/reducers/tag-reducer'
+import { auth } from '../auth/auth-reducer'
+import { userPages } from '../userpage/userpage-reducer'
+import { tags } from '../tag/tag-reducer'
 // import undoable from 'redux-undo'
 
 // const undoableActionFilter = action => action.undoable !== false

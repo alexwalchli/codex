@@ -1,5 +1,5 @@
-import * as nodeActionCreators from '../../node/node-action-creators'
-import * as tagActions from '../../tag/actions/tag-actions'
+import * as nodeActionCreators from '../node/node-action-creators'
+import * as tagActions from './tag-actions'
 import * as tagFirebaseActions from './tag-firebase-actions'
 
 export const createTag = (type, label, nodeId) =>

@@ -1,5 +1,5 @@
-import * as tagActions from '../../src/js/tag/actions/tag-actions'
-import * as tagActionTypes from '../../src/js/tag/actions/tag-action-types'
+import * as tagActions from '../../src/js/tag/tag-actions'
+import * as tagActionTypes from '../../src/js/tag/tag-action-types'
 import { expect } from 'chai'
 
 describe('tags action', () => {

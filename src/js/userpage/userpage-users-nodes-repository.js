@@ -1,4 +1,4 @@
-import { firebaseDb } from '../../firebase'
+import { firebaseDb } from '../firebase'
 
 export const getNodeIds = (userPageId, userId) => {
   const userPageUsersNodesRef = firebaseDb.ref(`userPage_users_nodes/${userPageId}/${userId}`)

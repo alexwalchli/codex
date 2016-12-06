@@ -1,4 +1,4 @@
-// import * as tagFirebaseActions from '../../src/js/tag/actions/tag-firebase-actions'
+// import * as tagFirebaseActions from '../../src/js/tag/tag-firebase-actions'
 // import * as firebaseRequestQueueActionCreators from '../../src/js/requestqueue/actions/firebase-request-queue-action-creators'
 // import { firebaseDb } from '../../src/js/firebase'
 // import sinon from 'sinon'

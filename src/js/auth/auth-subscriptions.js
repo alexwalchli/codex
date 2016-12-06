@@ -1,6 +1,6 @@
 import { firebaseAuth } from '../firebase'
-import * as userPageRepository from '../userpage/repositories/userpage-repository'
-import * as userPageSubscriptions from '../userpage/subscriptions/userpage-subscriptions'
+import * as userPageRepository from '../userpage/userpage-repository'
+import * as userPageSubscriptions from '../userpage/userpage-subscriptions'
 import * as authActions from './auth-actions'
 
 export function subscribeToAuthStateChanged (dispatch) {

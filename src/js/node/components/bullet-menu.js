@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import * as actionCreators from '../actions/node-action-creators'
+import * as actionCreators from '../node-action-creators'
 
 export class BulletMenu extends Component {
 

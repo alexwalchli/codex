@@ -1,6 +1,6 @@
-import * as tagActions from '../../src/js/tag/actions/tag-actions'
+import * as tagActions from '../../src/js/tag/tag-actions'
 import { INITIAL_NODE_STATE_LOADED } from '../../src/js/node/node-action-types'
-import * as tagsReducer from '../../src/js/tag/reducers/tag-reducer'
+import * as tagsReducer from '../../src/js/tag/tag-reducer'
 import { expect } from 'chai'
 
 describe('tags reducer', () => {

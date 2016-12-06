@@ -1,5 +1,5 @@
-import * as userPageActions from '../../../src/js/userpage/actions/userpage-actions'
-import * as userPageActionTypes from '../../../src/js/userpage/actions/userpage-action-types'
+import * as userPageActions from '../../src/js/userpage/userpage-actions'
+import * as userPageActionTypes from '../../src/js/userpage/userpage-action-types'
 import { expect } from 'chai'
 
 describe('userpageActions', () => {

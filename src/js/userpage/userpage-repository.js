@@ -1,5 +1,5 @@
-import { firebaseDb } from '../../firebase'
-import { queuedRequest } from '../../requestqueue/queued-request'
+import { firebaseDb } from '../firebase'
+import { queuedRequest } from '../requestqueue/queued-request'
 import * as I from 'immutable'
 
 export const getUserPages = (userId) => {

@@ -1,10 +1,10 @@
-import * as appActionCreators from '../../app/app-action-creators'
-import * as nodeRepository from '../../node/node-repository'
-import * as nodeSelectors from '../../node/node-selectors'
+import * as appActionCreators from '../app/app-action-creators'
+import * as nodeRepository from '../node/node-repository'
+import * as nodeSelectors from '../node/node-selectors'
+import * as nodeOperations from '../node/node-operations'
 import * as userPageActions from './userpage-actions'
-import * as userPageOperations from '../userpage-operations'
-import * as userPageRepository from '../repositories/userpage-repository'
-import * as nodeOperations from '../../node/node-operations'
+import * as userPageOperations from './userpage-operations'
+import * as userPageRepository from './userpage-repository'
 
 export const createUserPage = (title, isHomePage) =>
   (dispatch, getState) => {

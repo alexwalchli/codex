@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import * as actionCreators from '../actions/node-action-creators'
+import * as actionCreators from '../node-action-creators'
 import Textarea from 'react-textarea-autosize'
 import * as nodeSelectors from '../node-selectors'
 

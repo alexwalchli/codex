@@ -1,10 +1,10 @@
-import reducerFactory from '../../redux/reducer-factory'
+import reducerFactory from '../redux/reducer-factory'
 import * as I from 'immutable'
 import {
   USER_PAGE_CREATION,
   USER_PAGE_NAME_UPDATE,
   USER_PAGE_DELETION
-} from '../actions/userpage-action-types.js'
+} from './userpage-action-types.js'
 
 export const userPages = reducerFactory(I.Map({}), {
 

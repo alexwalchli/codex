@@ -1,8 +1,8 @@
 import * as I from 'immutable'
 import { firebaseDb } from '../firebase'
-// import * as nodeActions from '../actions/node-actions'
+// import * as nodeActions from '../node-actions'
 import * as nodeRepository from './node-repository'
-import * as userPageUsersNodesRepository from '../userpage/repositories/userpage-users-nodes-repository'
+import * as userPageUsersNodesRepository from '../userpage/userpage-users-nodes-repository'
 // import nodeSnapshotUnwrapper from './node-snapshot-unwrapper'
 // import { dispatch } from 'redux'
 
