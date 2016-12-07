@@ -19,7 +19,7 @@ export class BulletIcon extends Component {
         { nodeCount === 2
           ? <div className='pulse' />
           : null }
-        <div className='unordered-bullet'><div className='outer-circle' /><div className='inner-circle' /></div> }
+        <div className='unordered-bullet'><div className='outer-circle' /><div className='inner-circle' /></div>
       </div>
     )
   }

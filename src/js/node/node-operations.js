@@ -58,16 +58,12 @@ export const updateNotes = (node, notes, userId) => {
 }
 
 export const deleteNode = (state, nodeId, parentId, userId) => {
-  return state.merge({
-    [parentId]: removeChild(state.get(parentId), nodeId, userId),
-    [nodeId]: state.get(nodeId).update(node => {
-      node = node.set('deleted', true)
-      node = node.set('selected', false)
-      node = node.set('lastUpdatedById', userId)
-      node = unfocus(node)
-      return node
-    })
-  })
+  state = state.update(parentId, parent => removeChild(parent, nodeId, userId))
+  return state.update(nodeId, node => node.merge({
+    deleted: true,
+    selected: false,
+    lastUpdatedById: userId
+  }))
 }
 
 export const select = (state, nodeIds) => {
@@ -87,8 +83,8 @@ export const unfocus = (node) => {
 
 export const focus = (state, nodeId, focusNotes = false) => {
   const currentlyFocusedNodeId = nodeSelectors.getCurrentlyFocusedNodeId(state)
-  if (currentlyFocusedNodeId) {
-    state = state.updateIn(currentlyFocusedNodeId, node => unfocus(node))
+  if (currentlyFocusedNodeId && currentlyFocusedNodeId !== nodeId) {
+    state = state.set(currentlyFocusedNodeId, unfocus(state.get(currentlyFocusedNodeId)))
   }
 
   state = deselect(state, nodeSelectors.getCurrentlySelectedNodeIds(state))
@@ -112,9 +108,9 @@ export const collapse = (state, nodeIds, userId) => {
 }
 
 export const reassignParent = (state, nodeId, currentParentId, newParentd, addAfterSiblingId, userId) => {
-  state = state.updateIn(currentParentId, currentParentNode => removeChild(currentParentNode, nodeId, userId))
-  state = state.updateIn(nodeId, node => updateParent(node, newParentd, userId))
-  return state.updateIn(newParentd, newParentNode => addChild(newParentNode, nodeId, addAfterSiblingId, 1, userId))
+  state = state.updateIn([currentParentId], currentParentNode => removeChild(currentParentNode, nodeId, userId))
+  state = state.updateIn([nodeId], node => updateParent(node, newParentd, userId))
+  return state.updateIn([newParentd], newParentNode => addChild(newParentNode, nodeId, addAfterSiblingId, 1, userId))
 }
 
 export const complete = (node, userId) => {

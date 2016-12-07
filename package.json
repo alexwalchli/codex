@@ -31,6 +31,7 @@
     "draft-js": "^0.9.1",
     "firebase": "^3.3.0",
     "immutable": "^3.8.1",
+    "immutablediff": "^0.4.4",
     "lodash": "^4.14.1",
     "markdown-it": "^8.0.1",
     "pretty-immutable": "^1.0.1",

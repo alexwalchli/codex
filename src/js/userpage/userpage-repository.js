@@ -108,10 +108,10 @@ export const deleteUserPage = queuedRequest((userPage, rootNode, auth) => {
 //   })
 // })
 
-// export function createEmailUser (email, userId) {
-//   email = email.replace(/\./g, ',')
-//   return firebaseDb.ref('email_users/' + email).set(userId)
-// }
+export function createEmailUser (email, userId) {
+  email = email.replace(/\./g, ',')
+  return firebaseDb.ref('email_users/' + email).set(userId)
+}
 
 // function escapeEmail (email) {
 //   return (email || '').replace('.', ',')

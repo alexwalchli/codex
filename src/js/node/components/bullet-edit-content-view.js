@@ -15,6 +15,14 @@ export class BulletEditContentView extends Component {
     }
   }
 
+  componentDidMount () {
+    this.maybeFocus()
+  }
+
+  componentDidUpdate () {
+    this.maybeFocus()
+  }
+
   // event handling
 
   onChange (e, value) {
@@ -27,33 +35,23 @@ export class BulletEditContentView extends Component {
     this.submitContent()
   }
 
-  onKeyDown (e) {
+  onEditorKeyDown (e) {
     const { nodeId, createNode, deleteNode, focusNodeAbove, undo, redo,
-            focusNodeBelow, parentId, demoteNode, promoteNode } = this.props
+            focusNodeBelow, parentId } = this.props
     e.stopPropagation()
 
-    if (e.key === 'Tab' && e.shiftKey) {
-      e.preventDefault()
-      this.submitContent()
-      promoteNode(nodeId, parentId)
-    } else if (e.key === 'Tab') {
-      e.preventDefault()
-      this.submitContent()
-      demoteNode(nodeId, parentId)
-    } else if (e.key === 'Enter') {
+    if (e.key === 'Enter') {
       e.preventDefault()
       this.submitContent()
       // if cursor is add the beginning of the input, add new node at current position, else below
       const offset = e.target.selectionEnd === 0 && e.target.value ? 0 : 1
       createNode(nodeId, offset, '')
-    } else if (e.key === 'Backspace' && !this.state.content) {
+    } else if (e.key === 'Backspace' && !this.currentContent()) {
       e.preventDefault()
       focusNodeAbove(nodeId)
       deleteNode(nodeId)
     } else if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      this.submitContent()
-      focusNodeBelow(nodeId)
+      
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
       this.submitContent()
@@ -70,33 +68,71 @@ export class BulletEditContentView extends Component {
     }
   }
 
-  submitContent () {
-    const { id, content, updateNodeContent } = this.props
-    if (this.state.content !== content) {
-      updateNodeContent(id, this.state.content.trim())
+  onEditorTabDown (e) {
+    e.preventDefault()
+    const { nodeId, parentId, demoteNode, promoteNode } = this.props
+
+    this.submitContent()
+    if (e.shiftKey) {
+      promoteNode(nodeId, parentId)
+    } else {
+      demoteNode(nodeId, parentId)
     }
   }
 
-  onCommandSelected (e, suggestion) {
-    const { nodeId, toggleNodeComplete, deleteNode } = this.props
+  onEditorArrowUp (e) {
+    e.preventDefault()
+    const { nodeId, focusNodeAbove } = this.props
 
-    switch (suggestion.action) {
-      case 'COMPLETE_NODE':
-        toggleNodeComplete(nodeId)
-        break
-      case 'DELETE_NODE':
-        deleteNode(nodeId)
+    this.submitContent()
+    focusNodeAbove(nodeId)
+  }
+
+  onEditorArrowDown (e) {
+    e.preventDefault()
+    const { nodeId, focusNodeBelow } = this.props
+
+    this.submitContent()
+    focusNodeBelow(nodeId)
+  }
+
+  submitContent () {
+    const { nodeId, content, updateNodeContent } = this.props
+    const currentContent = this.currentContent()
+    if (currentContent !== content) {
+      updateNodeContent(nodeId, currentContent.trim())
+    }
+  }
+
+  currentContent () {
+    return this.state.editorState.getCurrentContent().getPlainText()
+  }
+
+  maybeFocus () {
+    if(this.props.focused) {
+      this.refs['editor'].focus()
     }
   }
 
   // rendering
 
   render () {
-    // const { focused, nodeId } = this.props
+    const { focused } = this.props
     const { editorState } = this.state
 
     return (
-      <Editor editorState={editorState} onChange={this.onChange} />
+      <Editor
+        ref='editor'
+        editorState={editorState}
+        onChange={this.onChange}
+        focused={focused}
+        onKeyDown={(e) => this.onKeyDown(e)}
+        onUpArrow={(e) => this.onEditorArrowUp(e)}
+        onDownArrow={(e) => this.onEditorArrowDown(e)}
+        onTab ={(e) => this.onEditorTabDown(e)}
+        onBlur={(e) => this.onBlur(e)}
+        keyBindingFn={(e) => this.onEditorKeyDown(e)}
+      />
       // <IntellisenseInput
       //   nodeId={nodeId}
       //   value={content}

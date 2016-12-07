@@ -34,7 +34,7 @@ export const createNode = (originNodeId, originOffset, content) =>
 
     const newState = getState()
     const newTreeState = nodeSelectors.currentTreeState(newState)
-    nodeRepository.createNode(newTreeState.get(newNodeId), state.app.get('currentUserPageId'), newTreeState.getIn(parentId, 'childIds'))
+    nodeRepository.createNode(newTreeState.get(newNodeId), state.app.get('currentUserPageId'), newTreeState.getIn([parentId, 'childIds']))
   }
 
 export const deleteNode = (nodeId) =>
@@ -49,13 +49,13 @@ export const deleteNode = (nodeId) =>
     }
 
     const allDescendantIds = nodeSelectors.getAllDescendantIds(treeState, nodeId)
-    const parentId = treeState[nodeId].parentId
+    const parentId = treeState.getIn([nodeId, 'parentId'])
 
     dispatch(nodeActions.nodeDeletion(nodeId, parentId, allDescendantIds, userId))
 
     const newState = getState()
     const newTreeState = nodeSelectors.currentTreeState(newState)
-    nodeRepository.deleteNode(nodeId, parentId, newTreeState[parentId].childIds, allDescendantIds, userId)
+    nodeRepository.deleteNode(nodeId, parentId, newTreeState.getIn([parentId, 'childIds']), allDescendantIds, userId)
   }
 
 export const deleteNodes = (nodeIds) =>
@@ -78,7 +78,7 @@ export const updateNodeContent = (nodeId, content) =>
 
     dispatch(nodeActions.nodeContentUpdate(nodeId, content, userId))
 
-    nodeRepository.updateNode(nodeSelectors.currentTreeState(getState())[nodeId])
+    nodeRepository.updateNode(nodeSelectors.currentTreeState(getState()).get(nodeId))
   }
 
 export const focusNode = (nodeId, focusNotes) =>
@@ -127,7 +127,6 @@ export const demoteNode = (nodeId) =>
 
     dispatch(nodeActions.nodeDemotion(
       nodeId,
-      rootNodeId,
       currentParentId,
       newParentId,
       addAfterLastChildOfSiblingAboveId,
