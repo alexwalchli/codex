@@ -2,12 +2,12 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import _ from 'lodash'
 import * as actionCreators from '../node-action-creators'
-import BulletEditContentView from './bullet-edit-content-view'
+import BulletContent from './bullet-content'
 import BulletNotes from './bullet-notes'
 import BulletMenu from './bullet-menu'
 import BulletIcon from './bullet-icon'
 import * as nodeSelectors from '../node-selectors'
-
+import CoolEditor from './editor'
 export class Node extends Component {
   constructor (props) {
     super(props)
@@ -169,7 +169,8 @@ export class Node extends Component {
               onMouseLeave={(e) => this.onContentMouseLeave(e)}
               onPaste={(e) => this.onContentPaste(e)}
               onClick={(e) => this.onContentClick(e)}>
-              <BulletEditContentView
+              
+              <BulletContent
                 nodeId={id}
                 content={content}
                 focused={focused}

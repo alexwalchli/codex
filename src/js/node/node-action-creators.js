@@ -32,9 +32,9 @@ export const createNode = (originNodeId, originOffset, content) =>
       state.app.get('currentUserPageId'),
       userId))
 
-    const newState = getState()
-    const newTreeState = nodeSelectors.currentTreeState(newState)
-    nodeRepository.createNode(newTreeState.get(newNodeId), state.app.get('currentUserPageId'), newTreeState.getIn([parentId, 'childIds']))
+    // const newState = getState()
+    // const newTreeState = nodeSelectors.currentTreeState(newState)
+    // nodeRepository.createNode(newTreeState.get(newNodeId), state.app.get('currentUserPageId'), newTreeState.getIn([parentId, 'childIds']))
   }
 
 export const deleteNode = (nodeId) =>
@@ -53,9 +53,9 @@ export const deleteNode = (nodeId) =>
 
     dispatch(nodeActions.nodeDeletion(nodeId, parentId, allDescendantIds, userId))
 
-    const newState = getState()
-    const newTreeState = nodeSelectors.currentTreeState(newState)
-    nodeRepository.deleteNode(nodeId, parentId, newTreeState.getIn([parentId, 'childIds']), allDescendantIds, userId)
+    // const newState = getState()
+    // const newTreeState = nodeSelectors.currentTreeState(newState)
+    // nodeRepository.deleteNode(nodeId, parentId, newTreeState.getIn([parentId, 'childIds']), allDescendantIds, userId)
   }
 
 export const deleteNodes = (nodeIds) =>
@@ -68,7 +68,7 @@ export const deleteNodes = (nodeIds) =>
 
     dispatch(nodeActions.nodesDeleted(nodeIds))
 
-    nodeRepository.deleteNodes(nodeIds)
+    // nodeRepository.deleteNodes(nodeIds)
   }
 
 export const updateNodeContent = (nodeId, content) =>
@@ -78,7 +78,7 @@ export const updateNodeContent = (nodeId, content) =>
 
     dispatch(nodeActions.nodeContentUpdate(nodeId, content, userId))
 
-    nodeRepository.updateNode(nodeSelectors.currentTreeState(getState()).get(nodeId))
+    // nodeRepository.updateNode(nodeSelectors.currentTreeState(getState()).get(nodeId))
   }
 
 export const focusNode = (nodeId, focusNotes) =>

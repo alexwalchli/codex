@@ -1,17 +1,30 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actionCreators from '../node-action-creators'
-import {Editor, EditorState} from 'draft-js'
+import Editor, { createEditorStateWithText } from 'draft-js-plugins-editor'
+import createHashtagPlugin from 'draft-js-hashtag-plugin'
+import createLinkifyPlugin from 'draft-js-linkify-plugin'
+import editorStyles from '../../../less/editor.less'
+import * as I from 'immutable'
 
-export class BulletEditContentView extends Component {
+const hashTagConfig = I.Map({
+  theme: {
+    hashtag: 'color: Red'
+  }
+});
+const hashtagPlugin = createHashtagPlugin(hashTagConfig);
+const linkifyPlugin = createLinkifyPlugin();
+const plugins = [
+  hashtagPlugin,
+  linkifyPlugin,
+];
+
+export class BulletContent extends Component {
   constructor (props) {
     super(props)
 
-    this.state = {}
-    this.onChange = (editorState) => this.setState({editorState})
     this.state = {
-      content: props.content,
-      editorState: EditorState.createEmpty()
+      editorState: createEditorStateWithText(this.props.content)
     }
   }
 
@@ -25,10 +38,10 @@ export class BulletEditContentView extends Component {
 
   // event handling
 
-  onChange (e, value) {
+  onChange (editorState) {
     this.setState({
-      content: value
-    })
+      editorState
+    });
   }
 
   onBlur (e) {
@@ -38,24 +51,12 @@ export class BulletEditContentView extends Component {
   onEditorKeyDown (e) {
     const { nodeId, createNode, deleteNode, focusNodeAbove, undo, redo,
             focusNodeBelow, parentId } = this.props
-    e.stopPropagation()
+    // e.stopPropagation()
 
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      this.submitContent()
-      // if cursor is add the beginning of the input, add new node at current position, else below
-      const offset = e.target.selectionEnd === 0 && e.target.value ? 0 : 1
-      createNode(nodeId, offset, '')
-    } else if (e.key === 'Backspace' && !this.currentContent()) {
+    if (e.key === 'Backspace' && !this.currentContent()) {
       e.preventDefault()
       focusNodeAbove(nodeId)
       deleteNode(nodeId)
-    } else if (e.key === 'ArrowDown') {
-      
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      this.submitContent()
-      focusNodeAbove(nodeId)
     } else if (e.key === 'v' && (e.metaKey || e.cntrlKey)) {
       // if there are bullets from within the app copied, then paste those and prevent further actions
       // else do nothing
@@ -69,6 +70,7 @@ export class BulletEditContentView extends Component {
   }
 
   onEditorTabDown (e) {
+    e.stopPropagation()
     e.preventDefault()
     const { nodeId, parentId, demoteNode, promoteNode } = this.props
 
@@ -81,6 +83,7 @@ export class BulletEditContentView extends Component {
   }
 
   onEditorArrowUp (e) {
+    e.stopPropagation()
     e.preventDefault()
     const { nodeId, focusNodeAbove } = this.props
 
@@ -89,11 +92,23 @@ export class BulletEditContentView extends Component {
   }
 
   onEditorArrowDown (e) {
+    e.stopPropagation()
     e.preventDefault()
     const { nodeId, focusNodeBelow } = this.props
 
     this.submitContent()
     focusNodeBelow(nodeId)
+  }
+
+  onEditorEnter (e) {
+    e.stopPropagation()
+    e.preventDefault()
+    const { nodeId, createNode } = this.props
+    this.submitContent()
+
+    // if cursor is add the beginning of the input, add new node at current position, else below
+    const offset = e.target.selectionEnd === 0 && e.target.value ? 0 : 1
+    createNode(nodeId, offset, '')
   }
 
   submitContent () {
@@ -110,7 +125,7 @@ export class BulletEditContentView extends Component {
 
   maybeFocus () {
     if(this.props.focused) {
-      this.refs['editor'].focus()
+      setTimeout(() => this.refs.editor.focus, 0)
     }
   }
 
@@ -118,29 +133,20 @@ export class BulletEditContentView extends Component {
 
   render () {
     const { focused } = this.props
-    const { editorState } = this.state
 
     return (
       <Editor
         ref='editor'
-        editorState={editorState}
-        onChange={this.onChange}
-        focused={focused}
-        onKeyDown={(e) => this.onKeyDown(e)}
+        plugins={plugins}
+        editorState={this.state.editorState}
+        onChange={(editorState) => this.onChange(editorState)}
         onUpArrow={(e) => this.onEditorArrowUp(e)}
         onDownArrow={(e) => this.onEditorArrowDown(e)}
+        handleReturn={(e) => this.onEditorEnter(e)}
         onTab ={(e) => this.onEditorTabDown(e)}
         onBlur={(e) => this.onBlur(e)}
         keyBindingFn={(e) => this.onEditorKeyDown(e)}
       />
-      // <IntellisenseInput
-      //   nodeId={nodeId}
-      //   value={content}
-      //   focused={focused}
-      //   onBlur={(e) => this.onBlur(e)}
-      //   onKeyDown={(e) => this.onKeyDown(e)}
-      //   onChange={(e, value) => this.onChange(e, value)}
-      //   onCommandSelected={(e, value) => this.onCommandSelected(e, value)} />
     )
   }
 }
@@ -151,5 +157,5 @@ function mapStateToProps (state, ownProps) {
   return { ...ownProps }
 }
 
-const ConnectedBulletEditContentView = connect(mapStateToProps, actionCreators)(BulletEditContentView)
-export default ConnectedBulletEditContentView
+const ConnectedBulletContent = connect(mapStateToProps, actionCreators)(BulletContent)
+export default ConnectedBulletContent
