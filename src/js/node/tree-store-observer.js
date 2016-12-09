@@ -41,7 +41,7 @@ const onNodeAdd = (state, updates, diffPath) => {
 const onChildIdsUpdate = (state, updates, diffPath) => {
   const nodeId = diffPath.split('/')[1]
   const childIdsPath = diffPath.substring(0, diffPath.lastIndexOf('/'))
-  const updatedChildIds = state.get([nodeId, 'childIds'])
-  updates[`childIdsPath`] = updatedChildIds
+  const updatedChildIds = state.tree.getIn([nodeId, 'childIds']).toJS()
+  updates[childIdsPath] = updatedChildIds
   return updates
 }

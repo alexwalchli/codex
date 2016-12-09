@@ -92,6 +92,11 @@ export class Node extends Component {
     }
   }
 
+  onNodeClick (e) {
+    const { id, focusNode } = this.props
+    focusNode(id)
+  }
+
   // /////////////
   // rendering //
   // /////////////
@@ -153,7 +158,7 @@ export class Node extends Component {
             : null }
 
         { typeof parentId !== 'undefined'
-          ? <div className={`depth ${currentlySelectedCss}`}>
+          ? <div onClick={(e) => this.onNodeClick(e)} className={`depth ${currentlySelectedCss}`}>
             <div className='add-btn inline-btn' onClick={(e) => this.onAddBulletButtonClick(e)}><i className='icon dripicons-plus' /></div>
             <div className='menu-btn inline-btn' onClick={(e) => this.onToggleBulletMenuClick(e)}><i className='icon dripicons-menu' /></div>
             { menuVisible
