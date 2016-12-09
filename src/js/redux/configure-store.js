@@ -18,8 +18,6 @@ export default function configureStore (preloadedState) {
   )
 
   observeTreeStore(store)
-
-  window.dev = {}
-  window.dev.store = store
+  
   return store
 }

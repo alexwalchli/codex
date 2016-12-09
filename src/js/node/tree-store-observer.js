@@ -19,7 +19,10 @@ function treeStateChanged (state, currentTreeState, nextTreeState) {
   const firebaseUpdates = diffsToFirebaseUpdate(
     'nodes',
     treeDiff,
-    { add: onNodeAdd.bind(null, state) }
+    { add: onNodeAdd.bind(null, state) },
+    I.Map({
+      childIds: onChildIdsUpdate.bind(null, state)
+    })
   )
 
   if (Object.keys(firebaseUpdates).length > 0) {
@@ -32,5 +35,13 @@ const onNodeAdd = (state, updates, diffPath) => {
   const userPageId = userPageSelectors.currentPage(state).get('id')
   const userId = state.auth.get('id')
   updates[`userPage_users_nodes/${userPageId}/${userId}/${nodeId}`] = true
+  return updates
+}
+
+const onChildIdsUpdate = (state, updates, diffPath) => {
+  const nodeId = diffPath.split('/')[1]
+  const childIdsPath = diffPath.substring(0, diffPath.lastIndexOf('/'))
+  const updatedChildIds = state.get([nodeId, 'childIds'])
+  updates[`childIdsPath`] = updatedChildIds
   return updates
 }
