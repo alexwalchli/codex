@@ -74,6 +74,8 @@ export class BulletContent extends Component {
     } else {
       demoteNode(nodeId, parentId)
     }
+
+    return 'handled'
   }
 
   onEditorArrowUp (e) {
@@ -92,6 +94,8 @@ export class BulletContent extends Component {
 
     this.submitContent()
     focusNodeBelow(nodeId)
+
+    return 'handled'
   }
 
   onEditorEnter (e) {
@@ -103,6 +107,8 @@ export class BulletContent extends Component {
     // if cursor is add the beginning of the input, add new node at current position, else below
     const offset = e.target.selectionEnd === 0 && e.target.value ? 0 : 1
     createNode(nodeId, offset, '')
+
+    return 'handled'
   }
 
   submitContent () {
@@ -120,7 +126,13 @@ export class BulletContent extends Component {
 
   maybeFocus () {
     if (this.props.focused) {
-      setTimeout(() => this.refs.editor.focus, 0)
+      setTimeout(() => {
+        this.refs.editor.focus() 
+      }, 0)
+    } else {
+      setTimeout(() => {
+        this.refs.editor.blur() 
+      }, 0)
     }
   }
 

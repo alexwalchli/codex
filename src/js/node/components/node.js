@@ -132,7 +132,7 @@ export class Node extends Component {
     } else {
       bulletClasses += ' no-children'
     }
-    if (collapsedBy[auth.id]) {
+    if (collapsedBy[auth.get('id')]) {
       bulletClasses += ' collapsed'
     }
     if (completed) {
