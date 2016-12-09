@@ -23,7 +23,7 @@ export const addChild = (parentNode, childNodeId, originNodeId, originOffset, us
   if (originNodeId) {
     parentNode = parentNode.set('childIds', currentChildIds.splice(currentChildIds.indexOf(originNodeId) + originOffset, 0, childNodeId))
   } else {
-    parentNode = parentNode.updateIn(['childIds'], (childIds) => [childNodeId, ...childIds])
+    parentNode = parentNode.updateIn(['childIds'], (childIds) => I.List([childNodeId, ...childIds]))
   }
 
   return parentNode.merge({
@@ -107,10 +107,10 @@ export const collapse = (state, nodeIds, userId) => {
   }, state)
 }
 
-export const reassignParent = (state, nodeId, currentParentId, newParentd, addAfterSiblingId, userId) => {
+export const reassignParent = (state, nodeId, currentParentId, newParentId, addAfterSiblingId, userId) => {
   state = state.updateIn([currentParentId], currentParentNode => removeChild(currentParentNode, nodeId, userId))
-  state = state.updateIn([nodeId], node => updateParent(node, newParentd, userId))
-  return state.updateIn([newParentd], newParentNode => addChild(newParentNode, nodeId, addAfterSiblingId, 1, userId))
+  state = state.updateIn([nodeId], node => updateParent(node, newParentId, userId))
+  return state.updateIn([newParentId], newParentNode => addChild(newParentNode, nodeId, addAfterSiblingId, 1, userId))
 }
 
 export const complete = (node, userId) => {

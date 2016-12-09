@@ -16,8 +16,7 @@ module.exports = {
   },
   plugins: [
     new webpack.optimize.OccurrenceOrderPlugin(),
-    new webpack.HotModuleReplacementPlugin(),
-    new ExtractTextPlugin('styles.css')
+    new webpack.HotModuleReplacementPlugin()
   ],
   module: {
     loaders: [

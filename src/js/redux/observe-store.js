@@ -1,11 +1,14 @@
 export const observeStore = (store, select, onChange) => {
-  let currentState
+  let currentSelectedState
 
   function handleChange () {
-    let nextState = select(store.getState())
-    if (nextState !== currentState) {
-      onChange(currentState, nextState)
-      currentState = nextState
+    const state = store.getState()
+    const appInitialized = state.app.get('appInitialized')
+    let nextSelectedState = select(state)
+
+    if (appInitialized && nextSelectedState !== currentSelectedState) {
+      onChange(state, currentSelectedState, nextSelectedState)
+      currentSelectedState = nextSelectedState
     }
   }
 

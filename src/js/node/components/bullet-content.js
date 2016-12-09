@@ -4,20 +4,15 @@ import * as actionCreators from '../node-action-creators'
 import Editor, { createEditorStateWithText } from 'draft-js-plugins-editor'
 import createHashtagPlugin from 'draft-js-hashtag-plugin'
 import createLinkifyPlugin from 'draft-js-linkify-plugin'
-import editorStyles from '../../../less/editor.less'
-import * as I from 'immutable'
 
-const hashTagConfig = I.Map({
-  theme: {
-    hashtag: 'color: Red'
-  }
-});
-const hashtagPlugin = createHashtagPlugin(hashTagConfig);
-const linkifyPlugin = createLinkifyPlugin();
+const hashTagConfig = { theme: { hashtag: 'hashtag' } }
+const linkifyConfig = { theme: { linkify: 'link' } }
+const hashtagPlugin = createHashtagPlugin(hashTagConfig)
+const linkifyPlugin = createLinkifyPlugin(linkifyConfig)
 const plugins = [
   hashtagPlugin,
-  linkifyPlugin,
-];
+  linkifyPlugin
+]
 
 export class BulletContent extends Component {
   constructor (props) {
@@ -41,7 +36,7 @@ export class BulletContent extends Component {
   onChange (editorState) {
     this.setState({
       editorState
-    });
+    })
   }
 
   onBlur (e) {
@@ -49,8 +44,7 @@ export class BulletContent extends Component {
   }
 
   onEditorKeyDown (e) {
-    const { nodeId, createNode, deleteNode, focusNodeAbove, undo, redo,
-            focusNodeBelow, parentId } = this.props
+    const { nodeId, focusNodeAbove, deleteNode, undo, redo } = this.props
     // e.stopPropagation()
 
     if (e.key === 'Backspace' && !this.currentContent()) {
@@ -114,6 +108,7 @@ export class BulletContent extends Component {
   submitContent () {
     const { nodeId, content, updateNodeContent } = this.props
     const currentContent = this.currentContent()
+
     if (currentContent !== content) {
       updateNodeContent(nodeId, currentContent.trim())
     }
@@ -124,7 +119,7 @@ export class BulletContent extends Component {
   }
 
   maybeFocus () {
-    if(this.props.focused) {
+    if (this.props.focused) {
       setTimeout(() => this.refs.editor.focus, 0)
     }
   }
@@ -132,8 +127,6 @@ export class BulletContent extends Component {
   // rendering
 
   render () {
-    const { focused } = this.props
-
     return (
       <Editor
         ref='editor'
@@ -143,7 +136,7 @@ export class BulletContent extends Component {
         onUpArrow={(e) => this.onEditorArrowUp(e)}
         onDownArrow={(e) => this.onEditorArrowDown(e)}
         handleReturn={(e) => this.onEditorEnter(e)}
-        onTab ={(e) => this.onEditorTabDown(e)}
+        onTab={(e) => this.onEditorTabDown(e)}
         onBlur={(e) => this.onBlur(e)}
         keyBindingFn={(e) => this.onEditorKeyDown(e)}
       />

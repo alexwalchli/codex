@@ -7,7 +7,7 @@ export const NodeRecord = new I.Record({
   content: '',
   notes: '',
   createdById: undefined,
-  lastUpdatedById: undefined,
+  lastUpdatedById: null,
   collapsedBy: I.Map(),
   taggedByIds: I.List(),
   focused: false,

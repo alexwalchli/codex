@@ -10,6 +10,10 @@ export const getNewNodeId = () => {
   return firebaseDb.ref('nodes').push().key
 }
 
+export const sync = queuedRequest((diffs) => {
+  return firebaseDb.ref().update(diffs)
+})
+
 export const createNode = queuedRequest((node, userPageId, updatedParentChildIds) => {
   return firebaseDb.ref('node_userPages_users/' + node.parentId).once('value').then(parentNodeUserPagesUsersSnapshot => {
     const parentNodeUserPagesUsers = parentNodeUserPagesUsersSnapshot.val()

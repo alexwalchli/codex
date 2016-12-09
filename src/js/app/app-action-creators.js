@@ -11,6 +11,7 @@ export const navigateToUserPage = (userPageId) =>
     nodeSubscriptions.initializeNodeSubscriptions(userPageId, userId)
       .then(initialTreeState => {
         dispatch(nodeActions.initialTreeStateLoad(nodeSelectors.getRootNodeId(getState()), initialTreeState, userId))
+        dispatch(appActions.appInitializationSuccess())
       })
   }
 

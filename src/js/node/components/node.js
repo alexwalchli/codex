@@ -7,7 +7,7 @@ import BulletNotes from './bullet-notes'
 import BulletMenu from './bullet-menu'
 import BulletIcon from './bullet-icon'
 import * as nodeSelectors from '../node-selectors'
-import CoolEditor from './editor'
+
 export class Node extends Component {
   constructor (props) {
     super(props)
@@ -169,7 +169,7 @@ export class Node extends Component {
               onMouseLeave={(e) => this.onContentMouseLeave(e)}
               onPaste={(e) => this.onContentPaste(e)}
               onClick={(e) => this.onContentClick(e)}>
-              
+
               <BulletContent
                 nodeId={id}
                 content={content}

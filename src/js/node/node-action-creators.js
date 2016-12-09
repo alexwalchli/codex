@@ -31,10 +31,6 @@ export const createNode = (originNodeId, originOffset, content) =>
       content,
       state.app.get('currentUserPageId'),
       userId))
-
-    // const newState = getState()
-    // const newTreeState = nodeSelectors.currentTreeState(newState)
-    // nodeRepository.createNode(newTreeState.get(newNodeId), state.app.get('currentUserPageId'), newTreeState.getIn([parentId, 'childIds']))
   }
 
 export const deleteNode = (nodeId) =>
@@ -52,10 +48,6 @@ export const deleteNode = (nodeId) =>
     const parentId = treeState.getIn([nodeId, 'parentId'])
 
     dispatch(nodeActions.nodeDeletion(nodeId, parentId, allDescendantIds, userId))
-
-    // const newState = getState()
-    // const newTreeState = nodeSelectors.currentTreeState(newState)
-    // nodeRepository.deleteNode(nodeId, parentId, newTreeState.getIn([parentId, 'childIds']), allDescendantIds, userId)
   }
 
 export const deleteNodes = (nodeIds) =>
@@ -67,8 +59,6 @@ export const deleteNodes = (nodeIds) =>
     }
 
     dispatch(nodeActions.nodesDeleted(nodeIds))
-
-    // nodeRepository.deleteNodes(nodeIds)
   }
 
 export const updateNodeContent = (nodeId, content) =>
@@ -77,8 +67,6 @@ export const updateNodeContent = (nodeId, content) =>
     const userId = state.auth.get('id')
 
     dispatch(nodeActions.nodeContentUpdate(nodeId, content, userId))
-
-    // nodeRepository.updateNode(nodeSelectors.currentTreeState(getState()).get(nodeId))
   }
 
 export const focusNode = (nodeId, focusNotes) =>
@@ -132,15 +120,6 @@ export const demoteNode = (nodeId) =>
       addAfterLastChildOfSiblingAboveId,
       state.visibleNodes,
       userId))
-
-    const newTreeState = nodeSelectors.currentTreeState(getState())
-    nodeRepository.reassignParentNode(
-      nodeId,
-      currentParentId,
-      newParentId,
-      newTreeState.getIn([currentParentId, 'childIds']),
-      newTreeState.getIn([newParentId, 'childIds']),
-      userId)
   }
 
 export const promoteNode = (nodeId) =>
@@ -159,15 +138,6 @@ export const promoteNode = (nodeId) =>
     }
 
     dispatch(nodeActions.nodePromotion(nodeId, siblingIds, currentParentId, newParentId, state.visibleNodes, userId))
-
-    const newTreeState = nodeSelectors.currentTreeState(getState())
-    const oldParentForSiblings = newTreeState.get(currentParentId)
-    const promotedNode = newTreeState.get(nodeId)
-    siblingIds.forEach(siblingId => {
-      nodeRepository.reassignParentNode(siblingId, currentParentId, nodeId, oldParentForSiblings.get('childIds'), promotedNode.get('childIds'), userId)
-    })
-    const newParentForPromotedNode = newTreeState.get(newParentId)
-    nodeRepository.reassignParentNode(nodeId, currentParentId, newParentId, oldParentForSiblings.get('childIds'), newParentForPromotedNode.get('childIds'), userId)
   }
 
 export const toggleNodeExpansion = (nodeId) =>
@@ -184,9 +154,6 @@ export const toggleNodeExpansion = (nodeId) =>
     } else {
       dispatch(nodeActions.nodeCollapse(nodeId, allDescendentIds, userId))
     }
-
-    const newTreeState = nodeSelectors.currentTreeState(getState())
-    nodeRepository.updateNode(newTreeState[nodeId])
   }
 
 export const selectNode = (nodeId) => (dispatch, getState) => {

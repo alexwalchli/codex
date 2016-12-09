@@ -19,6 +19,7 @@ export const createUserPage = (title, isHomePage) =>
 
     userPageRepository.createUserPage(newUserPage, newRootNode, newFirstNode)
       .then(snapshot => {
+        dispatch(userPageActions.userPageCreation(newUserPage))
         dispatch(appActionCreators.navigateToUserPage(newUserPageId))
       })
   }
