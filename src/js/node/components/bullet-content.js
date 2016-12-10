@@ -127,11 +127,11 @@ export class BulletContent extends Component {
   maybeFocus () {
     if (this.props.focused) {
       setTimeout(() => {
-        this.refs.editor.focus() 
+        this.refs.editor.focus()
       }, 0)
     } else {
       setTimeout(() => {
-        this.refs.editor.blur() 
+        this.refs.editor.blur()
       }, 0)
     }
   }

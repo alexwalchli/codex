@@ -34,7 +34,7 @@ export const createUserPage = queuedRequest((userPage, rootNode, firstNode) => {
 
       return firebaseDb.ref().update(manyToManyConnectionDbUpdates)
     })
-  })
+})
 
 export const updateUserPageName = queuedRequest((userPage, newUserPageName) => {
   return firebaseDb.ref(`userPages/${userPage.createdById}/${userPage.id}`).update({ title: newUserPageName })

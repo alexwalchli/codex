@@ -10,7 +10,7 @@ export const observeTreeStore = (store) => {
 }
 
 function treeStateChanged (state, currentTreeState, nextTreeState) {
-  if(currentTreeState === undefined) {
+  if (currentTreeState === undefined) {
     // a bit of a hack right now to get around posting updates to FB when the tree is getting initialized
     return
   }

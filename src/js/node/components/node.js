@@ -43,16 +43,6 @@ export class Node extends Component {
     this.selectNodeIfHoldingMouseDown(e)
   }
 
-  onContentClick (e) {
-    const { id, focusNode, selectNode } = this.props
-
-    if (e.ctrlKey || e.metaKey) {
-      selectNode(id)
-    } else {
-      focusNode(id)
-    }
-  }
-
   onContentPaste (e) {
     const { parentId, id, createNode, addChild, focusNode } = this.props
 
@@ -93,8 +83,15 @@ export class Node extends Component {
   }
 
   onNodeClick (e) {
-    const { id, focusNode } = this.props
-    focusNode(id)
+    const { id, focusNode, selectNode } = this.props
+    e.stopPropagation()
+    e.preventDefault()
+
+    if (e.ctrlKey || e.metaKey) {
+      selectNode(id)
+    } else {
+      focusNode(id)
+    }
   }
 
   // /////////////

@@ -28,20 +28,20 @@ function startApplication () {
   window.dev.validateTree = validateTree
 }
 
-function validateTree() {
+function validateTree () {
   const state = window.dev.store.getState()
   const rootNodeId = nodeSelectors.getRootNodeId(state)
   let allNodeIds = []
   try {
     allNodeIds = nodeSelectors.getAllNodeIdsOrdered(state.tree, rootNodeId)
   } catch (error) {
-     console.error(`Error getting all nodeIds. This can happen if there's a gap in the childIds: ${error}`)
-     return
+    console.error(`Error getting all nodeIds. This can happen if there's a gap in the childIds: ${error}`)
+    return
   }
 
   let visitedNodeIds = {}
   allNodeIds.forEach(nodeId => {
-    if(visitedNodeIds[nodeId]) {
+    if (visitedNodeIds[nodeId]) {
       throw new Error(`Node found twice: ${nodeId}`)
     }
 

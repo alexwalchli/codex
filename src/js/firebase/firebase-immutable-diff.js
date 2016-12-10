@@ -13,7 +13,7 @@ export const diffsToFirebaseUpdate = (collectionName, diff, callbacks = {}, spec
     const value = extractValue(d.get('value'))
 
     var handleSpecial = specialPropHandling.find((v, k) => diffPath.includes(k))
-    if(handleSpecial){
+    if (handleSpecial) {
       updates = handleSpecial(updates, diffPath, value)
     } else {
       if (op === 'remove') {
