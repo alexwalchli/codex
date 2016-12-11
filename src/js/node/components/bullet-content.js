@@ -81,19 +81,29 @@ export class BulletContent extends Component {
   onEditorArrowUp (e) {
     e.stopPropagation()
     e.preventDefault()
-    const { nodeId, focusNodeAbove } = this.props
+    const { nodeId, focusNodeAbove, shiftNodeUp } = this.props
 
     this.submitContent()
-    focusNodeAbove(nodeId)
+    if (e.altKey) {
+      shiftNodeUp(nodeId)
+    } else {
+      focusNodeAbove(nodeId)
+    }
+
+    return 'handled'
   }
 
   onEditorArrowDown (e) {
     e.stopPropagation()
     e.preventDefault()
-    const { nodeId, focusNodeBelow } = this.props
+    const { nodeId, focusNodeBelow, shiftNodeDown } = this.props
 
     this.submitContent()
-    focusNodeBelow(nodeId)
+    if (e.altKey) {
+      shiftNodeDown(nodeId)
+    } else {
+      focusNodeBelow(nodeId)
+    }
 
     return 'handled'
   }

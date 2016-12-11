@@ -154,3 +154,19 @@ export const nodeDeletionFromSubscription = (nodeId) => ({
     nodeId
   }
 })
+
+export const nodeShiftUp = (nodeId, parentId) => ({
+  type: nodeActionTypes.NODE_SHIFT_UP,
+  payload: {
+    nodeId,
+    parentId
+  }
+})
+
+export const nodeShiftDown = (nodeId, parentId) => ({
+  type: nodeActionTypes.NODE_SHIFT_DOWN,
+  payload: {
+    nodeId,
+    parentId
+  }
+})

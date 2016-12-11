@@ -184,4 +184,34 @@ describe('nodeOperations', () => {
       }))
     })
   })
+
+  describe('repositionChild', () => {
+    const state = I.Map({
+      '1': new NodeRecord({ id: '1', parentId: undefined, childIds: I.List([ '2', '3', '4', '5' ]) }),
+      '2': new NodeRecord({ id: '2', parentId: '1', childIds: I.List([]) }),
+      '3': new NodeRecord({ id: '3', parentId: '1', childIds: I.List([ '4' ]) }),
+      '4': new NodeRecord({ id: '4', parentId: '3', childIds: I.List([]) }),
+      '5': new NodeRecord({ id: '5', parentId: '1', childIds: I.List([]) })
+    })
+    it('should do nothing if node would go out of bounds upwards', () => {
+      const newState = nodeOperations.repositionChild(state.get('1'), '2', -1)
+
+      expect(newState.childIds).to.deep.equal(I.List([ '2', '3', '4', '5' ]))
+    })
+    it('should do nothing if node would go out of bounds downwards', () => {
+      const newState = nodeOperations.repositionChild(state.get('1'), '4', 2)
+
+      expect(newState.childIds).to.deep.equal(I.List([ '2', '3', '4', '5' ]))
+    })
+    it('should move the node id up', () => {
+      const newState = nodeOperations.repositionChild(state.get('1'), '5', -1)
+
+      expect(newState.childIds).to.deep.equal(I.List([ '2', '3', '5', '4' ]))
+    })
+    it('should move the node id down', () => {
+      const newState = nodeOperations.repositionChild(state.get('1'), '2', 2)
+
+      expect(newState.childIds).to.deep.equal(I.List([ '3', '4', '2', '5' ]))
+    })
+  })
 })

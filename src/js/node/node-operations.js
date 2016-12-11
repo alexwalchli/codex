@@ -119,3 +119,17 @@ export const complete = (node, userId) => {
     lastUpdatedById: userId
   })
 }
+
+export const repositionChild = (parentNode, nodeId, offset) => {
+  let childIds = parentNode.childIds
+  const currentNodeIndex = childIds.indexOf(nodeId)
+  const newNodeIndex = currentNodeIndex + offset
+
+  if (newNodeIndex < 0 || newNodeIndex > childIds.count() - 1) {
+    return parentNode
+  }
+
+  return parentNode.updateIn(['childIds'],
+          (childIds) => childIds.delete(currentNodeIndex)
+                                .insert(newNodeIndex, nodeId))
+}

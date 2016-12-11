@@ -14,11 +14,11 @@ export const sync = queuedRequest((diffs) => {
   return firebaseDb.ref().update(diffs)
 })
 
-function filterOutUserSpecificAttributes (node) {
-  delete node.focused
-  delete node.notesFocused
-  return node
-}
+// function filterOutUserSpecificAttributes (node) {
+//   delete node.focused
+//   delete node.notesFocused
+//   return node
+// }
 
 // TODO: In order to support undo functionality there's a delete flag on nodes
 // but we'll need to clean up eventually

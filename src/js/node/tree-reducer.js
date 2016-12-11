@@ -24,7 +24,9 @@ import {
   NODE_TAG_ADDITION,
   NODE_TAG_REMOVAL,
   NODE_UPSERT_FROM_SUBSCRIPTION,
-  NODE_DELETION_FROM_SUBSCRIPTION
+  NODE_DELETION_FROM_SUBSCRIPTION,
+  NODE_SHIFT_UP,
+  NODE_SHIFT_DOWN
 } from './node-action-types'
 
 const initialTreeState = I.Map({})
@@ -165,6 +167,17 @@ export const tree = reducerFactory(initialTreeState, {
   [NODE_NOTES_UPDATE]: (state, action) => {
     const { nodeId, notes, userId } = action.payload
     return state.updateIn([nodeId], node => nodeOperations.updateNotes(node, notes, userId))
+  },
+
+  [NODE_SHIFT_UP]: (state, action) => {
+    const { nodeId, parentId } = action.payload
+    return state.updateIn([parentId], parentNode => nodeOperations.repositionChild(parentNode, nodeId, -1))
+  },
+
+  [NODE_SHIFT_DOWN]: (state, action) => {
+    const { nodeId, parentId } = action.payload
+
+    return state.updateIn([parentId], parentNode => nodeOperations.repositionChild(parentNode, nodeId, 1))
   },
 
   [NODE_DISPLAY_MODE_UPDATE]: (state, action) => {
