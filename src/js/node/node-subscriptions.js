@@ -36,7 +36,6 @@ export const initializeNodeSubscriptions = (userPageId, userId) => {
 
       Promise.all(initialNodePromises).then(() => {
         resolve(I.Map(initialTreeState))
-        // initialized = true
       }).catch(error => {
         console.error('Error while initializing node subscriptions: ' + error.message)
       })

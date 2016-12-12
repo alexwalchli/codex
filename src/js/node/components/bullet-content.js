@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { findDOMNode } from 'react-dom'
 import { connect } from 'react-redux'
 import * as actionCreators from '../node-action-creators'
 import Editor, { createEditorStateWithText } from 'draft-js-plugins-editor'
@@ -24,14 +25,16 @@ export class BulletContent extends Component {
   }
 
   componentDidMount () {
-    this.maybeFocus()
+    setTimeout(() => {
+      this.maybeFocus()
+    }, 0)
   }
 
   componentDidUpdate () {
-    this.maybeFocus()
+    setTimeout(() => {
+      this.maybeFocus()
+    }, 0)
   }
-
-  // event handling
 
   onChange (editorState) {
     this.setState({
@@ -81,10 +84,12 @@ export class BulletContent extends Component {
   onEditorArrowUp (e) {
     e.stopPropagation()
     e.preventDefault()
-    const { nodeId, focusNodeAbove, shiftNodeUp } = this.props
+    const { nodeId, focusNodeAbove, shiftNodeUp, copyNodeUp } = this.props
 
     this.submitContent()
-    if (e.altKey) {
+    if (e.altKey && e.shiftKey) {
+      copyNodeUp(nodeId)
+    } else if (e.altKey) {
       shiftNodeUp(nodeId)
     } else {
       focusNodeAbove(nodeId)
@@ -96,10 +101,13 @@ export class BulletContent extends Component {
   onEditorArrowDown (e) {
     e.stopPropagation()
     e.preventDefault()
-    const { nodeId, focusNodeBelow, shiftNodeDown } = this.props
+    const { nodeId, focusNodeBelow, shiftNodeDown, copyNodeDown } = this.props
 
     this.submitContent()
-    if (e.altKey) {
+
+    if(e.altKey && e.shiftKey) {
+      copyNodeDown(nodeId)
+    } else if (e.altKey)  {
       shiftNodeDown(nodeId)
     } else {
       focusNodeBelow(nodeId)
@@ -121,6 +129,11 @@ export class BulletContent extends Component {
     return 'handled'
   }
 
+  onEditorFocus (e) {
+    const { nodeId, focusNode } = this.props
+    focusNode(nodeId)
+  }
+
   submitContent () {
     const { nodeId, content, updateNodeContent } = this.props
     const currentContent = this.currentContent()
@@ -135,18 +148,13 @@ export class BulletContent extends Component {
   }
 
   maybeFocus () {
-    if (this.props.focused) {
-      setTimeout(() => {
-        this.refs.editor.focus()
-      }, 0)
+    const alreadyFocused = document.activeElement === findDOMNode(this.refs.editor.editor.refs.editor)
+    if (!alreadyFocused && this.props.focused) {
+      this.refs.editor.editor.focus()
     } else {
-      setTimeout(() => {
-        this.refs.editor.blur()
-      }, 0)
+      // this.refs.editor.editor.blur()
     }
   }
-
-  // rendering
 
   render () {
     return (
@@ -161,6 +169,7 @@ export class BulletContent extends Component {
         onTab={(e) => this.onEditorTabDown(e)}
         onBlur={(e) => this.onBlur(e)}
         keyBindingFn={(e) => this.onEditorKeyDown(e)}
+        onFocus={(e) => { this.onEditorFocus(e) }}
       />
     )
   }

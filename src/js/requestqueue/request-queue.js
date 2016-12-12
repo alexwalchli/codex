@@ -24,6 +24,7 @@ function execute () {
   const queuedRequest = requestQueue.shift()
   queuedRequest.func.apply(null, queuedRequest.args)
     .then((response) => {
+      console.info('[Request Queue] request executed')
       queuedRequest.resolve(response)
       if (requestQueue.length > 0) {
         execute()
@@ -32,6 +33,6 @@ function execute () {
     .catch((error) => {
       // TODO: what to do here? Stop further updates(some updates are dependent on previous ones?
       // Need to alert at very least
-      console.debug('Request queue error: ' + error.message)
+      console.error(error)
     })
 }

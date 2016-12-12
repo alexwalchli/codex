@@ -141,7 +141,7 @@ export class Node extends Component {
       bulletClasses += ' completed'
     }
 
-    let currentlySelectedByAnotherUser = currentlySelectedById && currentlySelectedById !== auth.id
+    let currentlySelectedByAnotherUser = currentlySelectedById && currentlySelectedById !== auth.get('id')
     let currentlySelectedCss = currentlySelectedById && currentlySelectedByAnotherUser ? 'currentlySelected' : null
 
     return (
@@ -169,8 +169,7 @@ export class Node extends Component {
               className='content'
               onMouseEnter={(e) => this.onContentMouseEnter(e)}
               onMouseLeave={(e) => this.onContentMouseLeave(e)}
-              onPaste={(e) => this.onContentPaste(e)}
-              onClick={(e) => this.onContentClick(e)}>
+              onPaste={(e) => this.onContentPaste(e)}>
 
               <BulletContent
                 nodeId={id}
@@ -192,7 +191,7 @@ export class Node extends Component {
           </div>
         : null }
 
-        { !collapsedBy[auth.id]
+        { !collapsedBy[auth.get('id')]
           ? <div className='children'>
             { childIds.map(this.renderChild.bind(this)) }
           </div>

@@ -76,7 +76,9 @@ export const focusNode = (nodeId, focusNotes) => (dispatch) => {
 export const focusNodeAbove = (currentNodeId) => (dispatch, getState) => {
   const state = getState()
   const rootNodeId = nodeSelectors.getRootNodeId(state)
-  const nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.currentTreeState(state), state.visibleNodes, currentNodeId, true)
+  const nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(
+    rootNodeId, nodeSelectors.currentTreeState(state), state.visibleNodes, currentNodeId, true
+  )
 
   if (nodeToFocus) {
     dispatch(nodeActions.nodeFocus(nodeToFocus.get('id')))
@@ -86,7 +88,9 @@ export const focusNodeAbove = (currentNodeId) => (dispatch, getState) => {
 export const focusNodeBelow = (currentNodeId) => (dispatch, getState) => {
   const state = getState()
   const rootNodeId = nodeSelectors.getRootNodeId(state)
-  const nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, nodeSelectors.currentTreeState(state), state.visibleNodes, currentNodeId, false)
+  const nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(
+    rootNodeId, nodeSelectors.currentTreeState(state), state.visibleNodes, currentNodeId, false
+  )
 
   if (nodeToFocus) {
     dispatch(nodeActions.nodeFocus(nodeToFocus.get('id')))
@@ -182,4 +186,20 @@ export const shiftNodeDown = (nodeId) => (dispatch, getState) => {
   const node = nodeSelectors.getNode(state, nodeId)
 
   dispatch(nodeActions.nodeShiftDown(nodeId, node.parentId))
+}
+
+export const copyNodeUp = (nodeId) => (dispatch, getState) => {
+  const state = getState()
+  const node = nodeSelectors.getNode(state, nodeId)
+  const newNodeId = nodeRepository.getNewNode()
+
+  dispatch(nodeActions.nodeCopyUp(nodeId, node.parentId, newNodeId))
+}
+
+export const copyNodeDown = (nodeId) => (dispatch, getState) => {
+  const state = getState()
+  const node = nodeSelectors.getNode(state, nodeId)
+  const newNodeId = nodeRepository.getNewNodeId()
+
+  dispatch(nodeActions.nodeCopyDown(nodeId, node.parentId, newNodeId))
 }

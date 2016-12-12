@@ -133,3 +133,14 @@ export const repositionChild = (parentNode, nodeId, offset) => {
           (childIds) => childIds.delete(currentNodeIndex)
                                 .insert(newNodeIndex, nodeId))
 }
+
+export const copyAndShiftNode = (state, nodeId, parentId, newNodeId, offset, userId) => {
+  const copiedNode = copyNode(state, nodeId)
+  state = state.set(newNodeId, copiedNode)
+  state = state.updateIn([parentId], parent => addChild(parentNode, newNodeId, nodeId, offset, userId))
+
+}
+
+export const copyNode = (node) => {
+  // copy node and all descendants
+}

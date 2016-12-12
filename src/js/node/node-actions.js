@@ -170,3 +170,17 @@ export const nodeShiftDown = (nodeId, parentId) => ({
     parentId
   }
 })
+
+export const nodeCopyUp = (nodeId, parentId) => ({
+  type: nodeActionTypes.NODE_COPY_UP,
+  payload: {
+    nodeId, parentId
+  }
+})
+
+export const nodeCopyDown = (nodeId, parentId) => ({
+  type: nodeActionTypes.NODE_COPY_DOWN,
+  payload: {
+    nodeId, parentId
+  }
+})

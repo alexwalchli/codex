@@ -26,7 +26,9 @@ import {
   NODE_UPSERT_FROM_SUBSCRIPTION,
   NODE_DELETION_FROM_SUBSCRIPTION,
   NODE_SHIFT_UP,
-  NODE_SHIFT_DOWN
+  NODE_SHIFT_DOWN,
+  NODE_COPY_UP,
+  NODE_COPY_DOWN
 } from './node-action-types'
 
 const initialTreeState = I.Map({})
@@ -176,8 +178,17 @@ export const tree = reducerFactory(initialTreeState, {
 
   [NODE_SHIFT_DOWN]: (state, action) => {
     const { nodeId, parentId } = action.payload
-
     return state.updateIn([parentId], parentNode => nodeOperations.repositionChild(parentNode, nodeId, 1))
+  },
+
+  [NODE_COPY_UP]: (state, action) => {
+    const { nodeId, parentId } = action.payload
+    return state.update(state => nodeOperations.copyAndShiftNode(state, parentId, nodeId, -1))
+  },
+
+  [NODE_COPY_DOWN]: (state, action) => {
+    const { nodeId, parentId } = action.payload
+    return state.update(state => nodeOperations.copyAndShiftNode(state, parentId, nodeId, 1))
   },
 
   [NODE_DISPLAY_MODE_UPDATE]: (state, action) => {
