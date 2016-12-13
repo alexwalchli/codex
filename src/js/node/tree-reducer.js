@@ -114,33 +114,24 @@ export const tree = reducerFactory(initialTreeState, {
   },
 
   [NODE_EXPANSION_TOGGLE]: (state, action) => {
-    const { nodeId, forceToggleChildrenExpansion, userId } = action.payload
-    const allDescendantIds = forceToggleChildrenExpansion
-                              ? nodeSelectors.getAllDescendantIds(state, nodeId)
-                              : nodeSelectors.getAllUncollapsedDescedantIds(nodeId, state, nodeId)
+    const { nodeId, userId } = action.payload
     if (state.getIn([nodeId, 'collapsedBy', userId])) {
-      state = nodeOperations.expand(state, [ nodeId, ...allDescendantIds ], userId)
+      state = nodeOperations.expand(state, [ nodeId ], userId)
     } else {
-      state = nodeOperations.collapse(state, [ nodeId, ...allDescendantIds ], userId)
+      state = nodeOperations.collapse(state, [ nodeId ], userId)
     }
 
     return state
   },
 
   [NODE_COLLAPSE]: (state, action) => {
-    const { nodeId, forceCollapseChildren, userId } = action.payload
-    const allDescendantIds = forceCollapseChildren
-                              ? nodeSelectors.getAllDescendantIds(state, nodeId)
-                              : nodeSelectors.getAllUncollapsedDescedantIds(nodeId, state, nodeId)
-    return nodeOperations.collapse(state, [ nodeId, ...allDescendantIds ], userId)
+    const { nodeId, userId } = action.payload
+    return nodeOperations.collapse(state, [ nodeId ], userId)
   },
 
   [NODE_EXPANSION]: (state, action) => {
-    const { nodeId, forceCollapseChildren, userId } = action.payload
-    const allDescendantIds = forceCollapseChildren
-                              ? nodeSelectors.getAllDescendantIds(state, nodeId)
-                              : nodeSelectors.getAllUncollapsedDescedantIds(nodeId, state, nodeId)
-    return nodeOperations.expand(state, [ nodeId, ...allDescendantIds ], userId)
+    const { nodeId, userId } = action.payload
+    return nodeOperations.expand(state, [ nodeId ], userId)
   },
 
   [NODE_SELECTION]: (state, action) => {

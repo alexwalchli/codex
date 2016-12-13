@@ -39,7 +39,8 @@ export function getAllDescendantIds (nodes, startNodeId) {
 // recursively retrieves, and flattens, all node Ids excluding children of collapsed nodes, except children of the start node
 export function getAllUncollapsedDescedantIds (rootNodeId, nodes, startNodeId, userId) {
   return nodes.getIn([startNodeId, 'childIds']).reduce((acc, childId) => {
-    if (rootNodeId !== startNodeId && !nodes.get(nodes.getIn([childId, 'parentId'])).getIn(['collapsedBy', userId])) {
+    const parentCollapsed = nodes.get(nodes.getIn([childId, 'parentId'])).getIn(['collapsedBy', userId])
+    if (rootNodeId !== startNodeId && parentCollapsed) {
       return acc
     }
     return [ ...acc, childId, ...getAllUncollapsedDescedantIds(rootNodeId, nodes, childId) ]

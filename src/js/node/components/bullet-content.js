@@ -105,9 +105,9 @@ export class BulletContent extends Component {
 
     this.submitContent()
 
-    if(e.altKey && e.shiftKey) {
+    if (e.altKey && e.shiftKey) {
       copyNodeDown(nodeId)
-    } else if (e.altKey)  {
+    } else if (e.altKey) {
       shiftNodeDown(nodeId)
     } else {
       focusNodeBelow(nodeId)
