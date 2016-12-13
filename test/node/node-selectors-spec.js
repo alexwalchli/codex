@@ -100,7 +100,7 @@ describe('nodeSelectors', () => {
     })
   })
 
-  describe('getAllUncollapsedDescedantIds', () => {
+  describe('getVisibleNodesIfNodeWasExpanded', () => {
     it('should return a flattened, ordered, list of all children node Ids under a start node ' +
       'that are not collapsed under a parent and does not include the start node Id', () => {
       const userId = '123'
@@ -112,7 +112,8 @@ describe('nodeSelectors', () => {
         eee: { id: 'eee', childIds: [], collapsedBy: {}, parentId: 'ddd' }
       })
 
-      expect(nodeSelectors.getAllUncollapsedDescedantIds('aaa', nodes, 'aaa', userId)).to.deep.equal(['bbb', 'ccc'])
+      expect(nodeSelectors.getVisibleNodesIfNodeWasExpanded('bbb', nodes, 'bbb', userId))
+        .to.deep.equal(['ddd', 'eee'])
     })
   })
 

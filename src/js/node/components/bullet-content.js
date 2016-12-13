@@ -5,15 +5,32 @@ import * as actionCreators from '../node-action-creators'
 import Editor, { createEditorStateWithText } from 'draft-js-plugins-editor'
 import createHashtagPlugin from 'draft-js-hashtag-plugin'
 import createLinkifyPlugin from 'draft-js-linkify-plugin'
+import createEmojiPlugin from 'draft-js-emoji-plugin';
 
 const hashTagConfig = { theme: { hashtag: 'hashtag' } }
-const linkifyConfig = { theme: { linkify: 'link' } }
+const linkifyConfig = { 
+  component: (props) => (
+    <a {...props} className='editor-link' onClick={(e) => {
+      var link = e.target.innerText
+      if(link.includes('http://') || link.includes('http://')){
+        window.open(e.target.innerText)
+      } else {
+        window.open(`https://${e.target.innerText}`)
+      }
+    }} />
+  )
+}
+
+const emojiPlugin = createEmojiPlugin();
 const hashtagPlugin = createHashtagPlugin(hashTagConfig)
 const linkifyPlugin = createLinkifyPlugin(linkifyConfig)
 const plugins = [
   hashtagPlugin,
-  linkifyPlugin
+  linkifyPlugin,
+  emojiPlugin
 ]
+
+const { EmojiSuggestions } = emojiPlugin;
 
 export class BulletContent extends Component {
   constructor (props) {
@@ -158,19 +175,22 @@ export class BulletContent extends Component {
 
   render () {
     return (
-      <Editor
-        ref='editor'
-        plugins={plugins}
-        editorState={this.state.editorState}
-        onChange={(editorState) => this.onChange(editorState)}
-        onUpArrow={(e) => this.onEditorArrowUp(e)}
-        onDownArrow={(e) => this.onEditorArrowDown(e)}
-        handleReturn={(e) => this.onEditorEnter(e)}
-        onTab={(e) => this.onEditorTabDown(e)}
-        onBlur={(e) => this.onBlur(e)}
-        keyBindingFn={(e) => this.onEditorKeyDown(e)}
-        onFocus={(e) => { this.onEditorFocus(e) }}
-      />
+      <div>
+        <Editor
+          ref='editor'
+          plugins={plugins}
+          editorState={this.state.editorState}
+          onChange={(editorState) => this.onChange(editorState)}
+          onUpArrow={(e) => this.onEditorArrowUp(e)}
+          onDownArrow={(e) => this.onEditorArrowDown(e)}
+          handleReturn={(e) => this.onEditorEnter(e)}
+          onTab={(e) => this.onEditorTabDown(e)}
+          onBlur={(e) => this.onBlur(e)}
+          keyBindingFn={(e) => this.onEditorKeyDown(e)}
+          onFocus={(e) => { this.onEditorFocus(e) }}
+        />
+        <EmojiSuggestions />
+      </div>
     )
   }
 }

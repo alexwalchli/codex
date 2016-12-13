@@ -37,13 +37,16 @@ export function getAllDescendantIds (nodes, startNodeId) {
 }
 
 // recursively retrieves, and flattens, all node Ids excluding children of collapsed nodes, except children of the start node
-export function getAllUncollapsedDescedantIds (rootNodeId, nodes, startNodeId, userId) {
-  return nodes.getIn([startNodeId, 'childIds']).reduce((acc, childId) => {
-    const parentCollapsed = nodes.get(nodes.getIn([childId, 'parentId'])).getIn(['collapsedBy', userId])
-    if (rootNodeId !== startNodeId && parentCollapsed) {
+export function getVisibleNodesIfNodeWasExpanded (startNodeId, nodes, nodeId, userId) {
+  console.log(nodes.getIn([nodeId, 'childIds']))
+  return nodes.getIn([nodeId, 'childIds']).reduce((acc, childId) => {
+    const parentId = nodes.getIn([childId, 'parentId'])
+    if (parentId !== startNodeId && nodes.getIn([parentId, 'collapsedBy', userId])) {
       return acc
     }
-    return [ ...acc, childId, ...getAllUncollapsedDescedantIds(rootNodeId, nodes, childId) ]
+
+    // the nodes parent is uncollapsed so continue diving deeper into the tree accumulating
+    return [ ...acc, childId, ...getVisibleNodesIfNodeWasExpanded(startNodeId, nodes, childId, userId) ]
   }, [])
 }
 

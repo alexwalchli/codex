@@ -101,9 +101,7 @@ export class Node extends Component {
   renderChild (childId) {
     const { id } = this.props
     return (
-      <div key={childId}>
-        <ConnectedNode id={childId} parentId={id} />
-      </div>
+      <ConnectedNode key={childId} id={childId} parentId={id} />
     )
   }
 

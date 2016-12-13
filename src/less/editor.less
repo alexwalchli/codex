@@ -1,8 +1,12 @@
 .hashtag {
-  color: #2185C5;
+  color: @base-color;
+  background-color: lighten(@base-color, 50%);
+  padding:2px 4px 2px 4px;
+  border-radius: 6px;
 }
 
-.link {
-  color: #2185C5;
-  text-decoration: none;
+.editor-link {
+  color: @base-color;
+  text-decoration: underline;
+  cursor: pointer;
 } 

@@ -145,7 +145,7 @@ export const toggleNodeExpansion = (nodeId) => (dispatch, getState) => {
   const treeState = nodeSelectors.currentTreeState(state)
   const allDescendentIds = nodeSelectors.getAllDescendantIds(treeState, nodeId)
   const rootNodeId = nodeSelectors.getRootNodeId(state)
-  const uncollapsedDescendantIds = nodeSelectors.getAllUncollapsedDescedantIds(rootNodeId, treeState, nodeId, userId)
+  const uncollapsedDescendantIds = nodeSelectors.getVisibleNodesIfNodeWasExpanded(nodeId, treeState, nodeId, userId)
 
   if (treeState.getIn([nodeId, 'collapsedBy', userId])) {
     dispatch(nodeActions.nodeExpansion(nodeId, allDescendentIds, uncollapsedDescendantIds, userId))
