@@ -6,6 +6,9 @@ import Editor, { createEditorStateWithText } from 'draft-js-plugins-editor'
 import createHashtagPlugin from 'draft-js-hashtag-plugin'
 import createLinkifyPlugin from 'draft-js-linkify-plugin'
 import createEmojiPlugin from 'draft-js-emoji-plugin';
+import createMentionPlugin, { defaultSuggestionsFilter } from 'draft-js-mention-plugin';
+import { extractHashtagsWithIndices } from '../utilities/hashtag-extractor'
+import * as I from 'immutable'
 
 const hashTagConfig = { theme: { hashtag: 'hashtag' } }
 const linkifyConfig = { 
@@ -21,15 +24,27 @@ const linkifyConfig = {
   )
 }
 
+const mentions = I.fromJS([
+  {
+    name: 'Collapse All'
+  },
+  {
+    name: 'Expand All'
+  }
+]);
+
+const mentionPlugin = createMentionPlugin()
 const emojiPlugin = createEmojiPlugin();
 const hashtagPlugin = createHashtagPlugin(hashTagConfig)
 const linkifyPlugin = createLinkifyPlugin(linkifyConfig)
 const plugins = [
+  mentionPlugin,
   hashtagPlugin,
   linkifyPlugin,
   emojiPlugin
 ]
 
+const { MentionSuggestions } = mentionPlugin;
 const { EmojiSuggestions } = emojiPlugin;
 
 export class BulletContent extends Component {
@@ -37,7 +52,8 @@ export class BulletContent extends Component {
     super(props)
 
     this.state = {
-      editorState: createEditorStateWithText(this.props.content)
+      editorState: createEditorStateWithText(this.props.content),
+      suggestions: mentions
     }
   }
 
@@ -151,12 +167,24 @@ export class BulletContent extends Component {
     focusNode(nodeId)
   }
 
+  onSearchChange = ({ value }) => {
+    this.setState({
+      suggestions: defaultSuggestionsFilter(value, mentions),
+    });
+  }
+
+  onAddMention = () => {
+    // get the mention object selected
+  }
+
   submitContent () {
     const { nodeId, content, updateNodeContent } = this.props
     const currentContent = this.currentContent()
 
+    var tags = extractHashtagsWithIndices(currentContent)
+
     if (currentContent !== content) {
-      updateNodeContent(nodeId, currentContent.trim())
+      updateNodeContent(nodeId, currentContent.trim(), tags.map(t => t.hashtag))
     }
   }
 
@@ -190,6 +218,12 @@ export class BulletContent extends Component {
           onFocus={(e) => { this.onEditorFocus(e) }}
         />
         <EmojiSuggestions />
+        <MentionSuggestions
+          mentionTrigger='/'
+          onSearchChange={this.onSearchChange}
+          suggestions={this.state.suggestions}
+          onAddMention={this.onAddMention}
+        />
       </div>
     )
   }

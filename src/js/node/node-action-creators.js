@@ -61,12 +61,12 @@ export const deleteNodes = (nodeIds) =>
     dispatch(nodeActions.nodesDeleted(nodeIds))
   }
 
-export const updateNodeContent = (nodeId, content) =>
+export const updateNodeContent = (nodeId, content, tags) =>
   (dispatch, getState) => {
     const state = getState()
     const userId = state.auth.get('id')
 
-    dispatch(nodeActions.nodeContentUpdate(nodeId, content, userId))
+    dispatch(nodeActions.nodeContentUpdate(nodeId, content, userId, tags))
   }
 
 export const focusNode = (nodeId, focusNotes) => (dispatch) => {

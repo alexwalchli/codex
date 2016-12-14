@@ -1,17 +1,17 @@
+import { reducerFactory } from '../redux/reducer-factory'
+import * as I from 'immutable'
 import { TAG_CREATED } from './tag-action-types'
-import { INITIAL_NODE_STATE_LOADED } from '../node/node-action-types'
+import { INITIAL_NODE_STATE_LOADED, NODE_CONTENT_UPDATE } from '../node/node-action-types'
 
-export function tags (state = [], action) {
-  switch (action.type) {
-    case INITIAL_NODE_STATE_LOADED:
-      return Object.assign([], action.payload.initialTagsState)
-    case TAG_CREATED:
-      let newState = Object.assign([], state)
-      if (!state.find(t => t === action.payload.tag.id)) {
-        newState.push(action.payload.tag)
-      }
-      return newState
+const initialTagsState = I.Map({})
+export const tags = reducerFactory(initialTagsState, {
+  [INITIAL_NODE_STATE_LOADED]: (state, action) => {
+
+  },
+  [NODE_CONTENT_UPDATE]: (state, action) => {
+    const { tags } = action.payload
+    return tags.reduce((acc, tag) => {
+      return acc.set(tag, true)
+    }, state)
   }
-
-  return Object.assign([], state)
-}
+})

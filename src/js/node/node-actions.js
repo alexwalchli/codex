@@ -34,12 +34,13 @@ export const nodeDeletion = (nodeId, parentId, allDescendantIds, userId) => ({
   }
 })
 
-export const nodeContentUpdate = (nodeId, content, userId) => ({
+export const nodeContentUpdate = (nodeId, content, userId, tags) => ({
   type: nodeActionTypes.NODE_CONTENT_UPDATE,
   payload: {
     nodeId,
     content,
-    userId
+    userId,
+    tags
   }
 })
 
