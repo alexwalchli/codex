@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Node from '../../node/components/node'
 import AppContextMenu from './app-context-menu'
+import AppSubscriptions from './app-subscriptions'
 import SignIn from '../../auth/components/sign-in'
 import AppLoader from './app-loader'
 import * as appSelectors from '../app-selectors'
@@ -32,6 +33,7 @@ export class App extends Component {
 
         { appIsInitialized
           ? <div id='signed-in'>
+            <AppSubscriptions userIsAuthenticated userPageId={currentUserPage.id} />
             <AppContextMenu />
 
             <div id='tree-container'>
