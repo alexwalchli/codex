@@ -8,6 +8,10 @@ import {
 
 export const userPages = reducerFactory(I.Map({}), {
 
+  [INITIAL_STATE_LOAD]: (state, action) => {
+    return action.payload.userPages
+  },
+
   [USER_PAGE_CREATION]: (state, action) => {
     return state.set(action.payload.get('id'), action.payload)
   },

@@ -185,3 +185,24 @@ export const nodeCopyDown = (nodeId, parentId) => ({
     nodeId, parentId
   }
 })
+
+export const nodeAdditionFromSubscription = (node) => ({
+  type: nodeActionTypes.NODE_ADDITION_FROM_SUBSCRIPTION,
+  payload: {
+    node
+  }
+})
+
+export const nodeUpdateFromSubscription = (node) => ({
+  type: nodeActionTypes.NODE_ADDITION_FROM_SUBSCRIPTION,
+  payload: {
+    node
+  }
+})
+
+export const nodeDeletionFromSubscription = (node) => ({
+  type: nodeActionTypes.NODE_DELETION_FROM_SUBSCRIPTION,
+  payload: {
+    nodeId
+  }
+})

@@ -23,7 +23,8 @@ import {
   NODE_DISPLAY_MODE_UPDATE,
   NODE_TAG_ADDITION,
   NODE_TAG_REMOVAL,
-  NODE_UPSERT_FROM_SUBSCRIPTION,
+  NODE_ADDITION_FROM_SUBSCRIPTION,
+  NODE_UPDATE_FROM_SUBSCRIPTION,
   NODE_DELETION_FROM_SUBSCRIPTION,
   NODE_SHIFT_UP,
   NODE_SHIFT_DOWN,
@@ -56,11 +57,15 @@ export const tree = reducerFactory(initialTreeState, {
     return state
   },
 
-  [NODE_DELETION_FROM_SUBSCRIPTION]: (state, action) => {
+  [NODE_ADDITION_FROM_SUBSCRIPTION]: (state, action) => {
     // TODO:
   },
 
-  [NODE_UPSERT_FROM_SUBSCRIPTION]: (state, action) => {
+  [NODE_UPDATE_FROM_SUBSCRIPTION]: (state, action) => {
+    // TODO:
+  },
+
+  [NODE_DELETION_FROM_SUBSCRIPTION]: (state, action) => {
     // TODO:
   },
 

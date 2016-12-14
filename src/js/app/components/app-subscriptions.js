@@ -1,36 +1,31 @@
 import React, { Component } from 'react'
 import * as userPageRepository from './userpage-repository'
 import * as userPageActionCreators from '../../userpage/userpage-action-creators'
+import * as userPageOperations from '../../userpage/userpage-operations'
 
 export class AppSubscriptions extends Component {
 
   componentDidMount () {
-    // tryInitializeSubscriptions()
+    // tryStartSubscriptions()
   }
 
   componentDidUpdate () {
-    // tryInitializeSubscriptions()
+    // tryStartSubscriptions()
   }
 
-  tryInitializeSubscriptions () {
-    const { userPageId, userIsAuthenticated } = this.props
+  tryStartSubscriptions () {
+    const { userPageId, userId, userIsAuthenticated } = this.props
 
     if(!userIsAuthenticated){
       return
     }
 
     let initialAppState = {}
-
+    
     userPageRepository.getUserPages(userId).then(userPages => {
-      if (!userPages || userPages.count() === 0) {
-        // makeUserPage
+      if (!userPageId || !userPages || userPages.count() === 0) {
+        // TODO:
         // dispatch(userPageActionCreators.createUserPage('Home', true))
-      } else {
-        userPages.forEach(userPage => {
-          dispatch(userPageActions.userPageCreation(userPage))
-        })
-
-        dispatch(appActionCreators.navigateToUserPage(userPages.find(u => u.get('isHome')).get('id')))
       }
 
       initialAppState.userPages = userPages
@@ -38,20 +33,13 @@ export class AppSubscriptions extends Component {
       this.startNodeSubscriptions()
         .then(initialTreeState => {
           initialAppState.tree = initialTreeState
+
+          dispatch(loadInitialState(initialAppState))
+          dispatch(navigateToUserPage(userPageId))
         })
-
-      // initialStateLoad
-
-      // navigateToUserPage
 
       // firebaseDb.ref('userPages/' + userId).on('child_added', snapshot => onUserPageCreated(snapshot, dispatch))
     })
-
-    // get user pages
-    // get nodes
-
-    // dispatch(navigateToUserPage)
-    // dispatch(initialTreeLoad() )
   }
 
   startNodeSubscriptions () {
@@ -96,16 +84,30 @@ export class AppSubscriptions extends Component {
     // dispatch()
   }
 
-  onNodeAdded () {
-
+  onNodeAdded (node) {
+    if(this.wasNotUpdatedByCurrentUser(node)) {
+      dispatch(nodeSubscriptionOnAdded(node.id))
+    }
   }
 
-  onNodeUpdated () {
-
+  onNodeUpdated (node) {
+    if(this.wasNotUpdatedByCurrentUser(node)) {
+      dispatch(nodeSubscriptionOnUpdated(node.id))
+    }
   }
 
-  onNodeDeleted () {
+  onNodeDeleted (node) {
+    if(this.wasNotUpdatedByCurrentUser(node)) {
+      dispatch(nodeSubscriptionOnDelete(node.id))
+    }
+  }
 
+  wasNotUpdatedByCurrentUser (node) {
+    const { userId } = this.props
+    if (node.lastUpdatedById === userId || (!node.lastUpdatedById && node.createdById === userId)) {
+      return false
+    }
+    return true
   }
 
   render () {

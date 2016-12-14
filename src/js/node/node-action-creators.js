@@ -203,3 +203,15 @@ export const copyNodeDown = (nodeId) => (dispatch, getState) => {
 
   dispatch(nodeActions.nodeCopyDown(nodeId, node.parentId, newNodeId))
 }
+
+export const nodeSubscriptionOnAdded = (node) => (dispatch, getState) => {
+  dispatch(nodeActions.nodeAdditionFromSubscription(node))
+}
+
+export const nodeSubscriptionOnUpdated = (node) => (dispatch, getState) => {
+  dispatch(nodeActions.nodeUpdateFromSubscription(node))
+}
+
+export const nodeSubscriptionOnDeleted = (nodeId) => (dispatch, getState) => {
+  dispatch(nodeActions.nodeDeletionFromSubscription(nodeId))
+}
