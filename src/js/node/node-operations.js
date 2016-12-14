@@ -134,6 +134,22 @@ export const repositionChild = (parentNode, nodeId, offset) => {
                                 .insert(newNodeIndex, nodeId))
 }
 
+export const toggleMenu = (node) => {
+  return node.merge({
+    menuVisible: !node.menuVisible
+  })
+}
+
+export const closeAllMenus = (state, exceptNodeId) => {
+  return state.reduce((acc, node) => {
+    if(node.id === exceptNodeId) {
+      return acc.set(node.id, node)
+    }
+    return acc.set(node.id, node.merge({
+      menuVisible: false
+    }))
+  }, I.Map({}))
+}
 // export const copyAndShiftNode = (state, nodeId, parentId, newNodeId, offset, userId) => {
 //   const copiedNode = copyNode(state, nodeId)
 //   state = state.set(newNodeId, copiedNode)

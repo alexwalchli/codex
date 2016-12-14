@@ -29,7 +29,9 @@ import {
   NODE_SHIFT_UP,
   NODE_SHIFT_DOWN,
   NODE_COPY_UP,
-  NODE_COPY_DOWN
+  NODE_COPY_DOWN,
+  NODE_MENU_TOGGLE,
+  NODE_ALL_MENUS_CLOSE
 } from './node-action-types'
 
 const initialTreeState = I.Map({})
@@ -58,11 +60,18 @@ export const tree = reducerFactory(initialTreeState, {
   },
 
   [NODE_ADDITION_FROM_SUBSCRIPTION]: (state, action) => {
-    // TODO:
+    const { node } = action.payload
+
+    if (state.get(node.id)) {
+      return state
+    }
+    return state.set(node.id, node)
   },
 
   [NODE_UPDATE_FROM_SUBSCRIPTION]: (state, action) => {
-    // TODO:
+    // TODO: potentially do a diff here to avoid collisions?
+    const { node } = action.payload
+    return state.set(node.id, node)
   },
 
   [NODE_DELETION_FROM_SUBSCRIPTION]: (state, action) => {
@@ -197,6 +206,16 @@ export const tree = reducerFactory(initialTreeState, {
 
   [NODE_TAG_REMOVAL]: (state, action) => {
 
+  },
+
+  [NODE_MENU_TOGGLE]: (state, action) => {
+    const { nodeId } = action.payload
+    return state.updateIn([nodeId], node => nodeOperations.toggleMenu(node))
+  },
+
+  [NODE_ALL_MENUS_CLOSE]: (state, action) => {
+    const { exceptNodeId } = action.payload
+    return state.update(state => nodeOperations.closeAllMenus(state, exceptNodeId))
   }
 
 })

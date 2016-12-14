@@ -214,4 +214,28 @@ describe('nodeOperations', () => {
       expect(newState.childIds).to.deep.equal(I.List([ '3', '4', '2', '5' ]))
     })
   })
+
+  describe('toggleMenu', () => {
+    const node = new NodeRecord({
+      id: '1',
+      parentId: '0',
+      menuVisible: false
+    })
+    it('should toggle menuVisible', () => {
+      let updatedNode = nodeOperations.toggleMenu(node)
+
+      expect(updatedNode.menuVisible).to.equal(true)
+
+      updatedNode = nodeOperations.toggleMenu(updatedNode)
+
+      expect(updatedNode.menuVisible).to.equal(false)
+    })
+  })
+
+  describe('closeAllMenus', () => {
+    const newState = nodeOperations.closeAllMenus(dummyState)
+    newState.forEach(node => {
+      expect(node.menuVisible).to.equal(false)
+    })
+  })
 })

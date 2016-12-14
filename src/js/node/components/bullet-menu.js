@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actionCreators from '../node-action-creators'
+import * as nodeSelectors from '../node-selectors'
 
 export class BulletMenu extends Component {
 
@@ -62,7 +63,10 @@ export class BulletMenu extends Component {
 // react redux
 
 function mapStateToProps (state, ownProps) {
-  return state.tree.present[ownProps.nodeId]
+  return {
+    ...ownProps,
+    ...nodeSelectors.getNodeProps(state, ownProps.nodeId)  
+  }
 }
 
 const ConnectedBulletMenu = connect(mapStateToProps, actionCreators)(BulletMenu)

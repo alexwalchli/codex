@@ -1,6 +1,5 @@
 import { reducerFactory } from '../redux/reducer-factory'
 import * as I from 'immutable'
-import { TAG_CREATED } from './tag-action-types'
 import { INITIAL_NODE_STATE_LOADED, NODE_CONTENT_UPDATE } from '../node/node-action-types'
 
 const initialTagsState = I.Map({})

@@ -5,6 +5,9 @@ import {
   USER_PAGE_NAME_UPDATE,
   USER_PAGE_DELETION
 } from './userpage-action-types.js'
+import {
+  INITIAL_STATE_LOAD
+} from '../app/app-action-types.js'
 
 export const userPages = reducerFactory(I.Map({}), {
 

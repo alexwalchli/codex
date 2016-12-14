@@ -2,16 +2,17 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Node from '../../node/components/node'
 import AppContextMenu from './app-context-menu'
-import AppSubscriptions from './app-subscriptions'
+// import AppSubscriptions from './app-subscriptions'
 import SignIn from '../../auth/components/sign-in'
 import AppLoader from './app-loader'
 import * as appSelectors from '../app-selectors'
+import * as nodeActionCreators from '../../node/node-action-creators'
 
 export class App extends Component {
 
   onClick (e) {
-    // const { closeAllMenusAndDeselectAllNodes } = this.props
-    // closeAllMenusAndDeselectAllNodes()
+    const { closeAllNodeMenus } = this.props
+    closeAllNodeMenus()
   }
 
   render () {
@@ -33,7 +34,6 @@ export class App extends Component {
 
         { appIsInitialized
           ? <div id='signed-in'>
-            <AppSubscriptions userIsAuthenticated userPageId={currentUserPage.id} />
             <AppContextMenu />
 
             <div id='tree-container'>
@@ -47,7 +47,11 @@ export class App extends Component {
   }
 }
 
-const ConnectedApp = connect((state, ownProps) => appSelectors.getAppProps(state, ownProps))(App)
+const mapStateToProps = (state, ownProps) => {
+  return appSelectors.getAppProps(state, ownProps)
+}
+
+const ConnectedApp = connect(mapStateToProps, nodeActionCreators)(App)
 export default ConnectedApp
 
 // TODO: Reimplement

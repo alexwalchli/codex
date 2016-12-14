@@ -144,18 +144,6 @@ export const nodeCompletionToggle = (nodeId, userId) => ({
   }
 })
 
-export const nodeUpdateFromSubscription = (node) => ({
-  type: nodeActionTypes.NODE_UPDATE_FROM_SUBSCRIPTION,
-  payload: { ...node }
-})
-
-export const nodeDeletionFromSubscription = (nodeId) => ({
-  type: nodeActionTypes.NODE_DELETION_FROM_SUBSCRIPTION,
-  payload: {
-    nodeId
-  }
-})
-
 export const nodeShiftUp = (nodeId, parentId) => ({
   type: nodeActionTypes.NODE_SHIFT_UP,
   payload: {
@@ -200,9 +188,19 @@ export const nodeUpdateFromSubscription = (node) => ({
   }
 })
 
-export const nodeDeletionFromSubscription = (node) => ({
+export const nodeDeletionFromSubscription = (nodeId) => ({
   type: nodeActionTypes.NODE_DELETION_FROM_SUBSCRIPTION,
   payload: {
     nodeId
   }
+})
+
+export const nodeMenuToggle = (nodeId) => ({
+  type: nodeActionTypes.NODE_MENU_TOGGLE,
+  payload: { nodeId }
+})
+
+export const nodeAllMenusClose = (exceptNodeId) => ({
+  type: nodeActionTypes.NODE_ALL_MENUS_CLOSE,
+  payload: { exceptNodeId }
 })

@@ -144,7 +144,6 @@ export const toggleNodeExpansion = (nodeId) => (dispatch, getState) => {
   const userId = state.auth.get('id')
   const treeState = nodeSelectors.currentTreeState(state)
   const allDescendentIds = nodeSelectors.getAllDescendantIds(treeState, nodeId)
-  const rootNodeId = nodeSelectors.getRootNodeId(state)
   const uncollapsedDescendantIds = nodeSelectors.getVisibleNodesIfNodeWasExpanded(nodeId, treeState, nodeId, userId)
 
   if (treeState.getIn([nodeId, 'collapsedBy', userId])) {
@@ -169,8 +168,12 @@ export const toggleNodeComplete = (nodeId) => (dispatch, getState) => {
   dispatch(nodeActions.nodeCompletionToggle(nodeId, userId))
 }
 
+export const closeAllNodeMenus = () => (dispatch, getState) => {
+   dispatch(nodeActions.nodeAllMenusClose())
+}
+
 export const toggleNodeMenu = (nodeId) => (dispatch, getState) => {
-  dispatch(nodeActions.allNodeMenuClose())
+  dispatch(nodeActions.nodeAllMenusClose(nodeId))
   dispatch(nodeActions.nodeMenuToggle(nodeId))
 }
 

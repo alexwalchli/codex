@@ -14,5 +14,6 @@ export const NodeRecord = new I.Record({
   notesFocused: false,
   deleted: false,
   selected: false,
-  completed: false
+  completed: false,
+  menuVisible: false
 })
