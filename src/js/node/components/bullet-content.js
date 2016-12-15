@@ -3,26 +3,9 @@ import { findDOMNode } from 'react-dom'
 import { connect } from 'react-redux'
 import * as actionCreators from '../node-action-creators'
 import Editor, { createEditorStateWithText } from 'draft-js-plugins-editor'
-import createHashtagPlugin from 'draft-js-hashtag-plugin'
-import createLinkifyPlugin from 'draft-js-linkify-plugin'
-import createEmojiPlugin from 'draft-js-emoji-plugin'
-import createMentionPlugin, { defaultSuggestionsFilter } from 'draft-js-mention-plugin'
-import { extractHashtagsWithIndices } from '../utilities/hashtag-extractor'
 import * as I from 'immutable'
-
-const hashTagConfig = { theme: { hashtag: 'hashtag' } }
-const linkifyConfig = {
-  component: (props) => (
-    <a {...props} className='editor-link' onClick={(e) => {
-      var link = e.target.innerText
-      if (link.includes('http://') || link.includes('http://')) {
-        window.open(e.target.innerText)
-      } else {
-        window.open(`https://${e.target.innerText}`)
-      }
-    }} />
-  )
-}
+import { allPlugins, MentionSuggestions, EmojiSuggestions} from '../utilities/editor-plugins'
+import { extractHashtagsWithIndices } from '../utilities/hashtag-extractor'
 
 const mentions = I.fromJS([
   {
@@ -32,20 +15,6 @@ const mentions = I.fromJS([
     name: 'Expand All'
   }
 ])
-
-const mentionPlugin = createMentionPlugin()
-const emojiPlugin = createEmojiPlugin()
-const hashtagPlugin = createHashtagPlugin(hashTagConfig)
-const linkifyPlugin = createLinkifyPlugin(linkifyConfig)
-const plugins = [
-  mentionPlugin,
-  hashtagPlugin,
-  linkifyPlugin,
-  emojiPlugin
-]
-
-const { MentionSuggestions } = mentionPlugin
-const { EmojiSuggestions } = emojiPlugin
 
 export class BulletContent extends Component {
   constructor (props) {
@@ -194,11 +163,11 @@ export class BulletContent extends Component {
 
   maybeFocus () {
     const alreadyFocused = document.activeElement === findDOMNode(this.refs.editor.editor.refs.editor)
-    if (!alreadyFocused && this.props.focused) {
-      this.refs.editor.editor.focus()
-    } else {
-      // this.refs.editor.editor.blur()
-    }
+    setTimeout(() => {
+      if (!alreadyFocused && this.props.focused) {
+        this.refs.editor.editor.focus()
+      }
+    }, 0)
   }
 
   render () {
@@ -206,7 +175,7 @@ export class BulletContent extends Component {
       <div>
         <Editor
           ref='editor'
-          plugins={plugins}
+          plugins={allPlugins}
           editorState={this.state.editorState}
           onChange={(editorState) => this.onChange(editorState)}
           onUpArrow={(e) => this.onEditorArrowUp(e)}

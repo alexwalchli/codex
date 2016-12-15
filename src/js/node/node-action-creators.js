@@ -69,6 +69,13 @@ export const updateNodeContent = (nodeId, content, tags) =>
     dispatch(nodeActions.nodeContentUpdate(nodeId, content, userId, tags))
   }
 
+export const updateNodeNotes = (nodeId, notes, tags) => (dispatch, getState) => {
+  const state = getState()
+  const userId = state.auth.get('id')
+  
+  dispatch(nodeActions.nodeNotesUpdate(nodeId, notes, tags, userId))
+}
+
 export const focusNode = (nodeId, focusNotes) => (dispatch) => {
   dispatch(nodeActions.nodeFocus(nodeId, focusNotes))
 }

@@ -44,11 +44,12 @@ export const nodeContentUpdate = (nodeId, content, userId, tags) => ({
   }
 })
 
-export const nodeNotesUpdate = (nodeId, notes, userId) => ({
+export const nodeNotesUpdate = (nodeId, notes, tags, userId) => ({
   type: nodeActionTypes.NODE_NOTES_UPDATE,
   payload: {
     nodeId,
     notes,
+    tags,
     userId
   }
 })

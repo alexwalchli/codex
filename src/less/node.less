@@ -202,20 +202,16 @@
 .children .node { // depth 1
   .notes {
     margin-left:@node-depth-1-left-content-pad;
+    margin-bottom:@node-depth-1-left-content-pad / 4;
+    padding:0;
+    margin:0;
+    color:lighten(@secondary-color, 50%);
+    background: transparent;
+    height: 100%;
+    font-family: @base-font-face;
+    font-size:1em;
+    min-height:34px;
 
-    textarea, div {
-      padding:0;
-      margin:0;
-      color:lighten(@secondary-color, 50%);
-      background: transparent;
-      height: 100%;
-      font-family: @base-font-face;
-      font-size:1em;
-      min-height:34px;
-    }
-    div {
-      margin-bottom:3px;
-    }
     code, a{
       color:lighten(@secondary-color, 50%);
     }
@@ -223,16 +219,16 @@
 
   .children { // depth 2
     .notes {
-      margin-left:@node-depth-1-left-content-pad;
-      .content, div { font-size: .95em; }
+      margin-left:@node-depth-2-left-content-pad;
+      margin-bottom:@node-depth-2-left-content-pad / 4;
+      font-size: .95em;
     }
 
     .children { // depth 3+
       .notes {
-        margin-left:@node-depth-1-left-content-pad;
-        .content, div {
-            font-size:.85em;
-        }
+        margin-left:@node-depth-3-left-content-pad;
+        margin-bottom:@node-depth-3-left-content-pad / 4;
+        font-size:.85em;
       }
     }
   }

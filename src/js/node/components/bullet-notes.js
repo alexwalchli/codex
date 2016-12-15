@@ -1,58 +1,56 @@
 import React, { Component } from 'react'
+import { findDOMNode } from 'react-dom'
 import { connect } from 'react-redux'
 import * as actionCreators from '../node-action-creators'
 import Textarea from 'react-textarea-autosize'
 import * as nodeSelectors from '../node-selectors'
+import Editor, { createEditorStateWithText } from 'draft-js-plugins-editor'
+import { allPlugins, MentionSuggestions, EmojiSuggestions} from '../utilities/editor-plugins'
+import { extractHashtagsWithIndices } from '../utilities/hashtag-extractor'
+import * as I from 'immutable'
+
+const mentions = I.fromJS([
+  {
+    name: 'Collapse All'
+  },
+  {
+    name: 'Expand All'
+  }
+])
 
 export class BulletNotes extends Component {
   constructor (props) {
     super(props)
 
     this.state = {
-      notes: props.notes
+      editorState: createEditorStateWithText(this.props.notes),
+      suggestions: mentions
     }
+  }
+
+  componentDidMount () {
+    this.maybeFocus()
   }
 
   componentDidUpdate () {
-    const { notesFocused } = this.props
-    if (notesFocused) {
-      this.refs.notesInput.focus()
-    }
-  }
-
-  componentWillMount () {
-    const { notes } = this.props
-    this.setState({
-      renderedNotes: notes
-    })
-  }
-
-  componentWillReceiveProps (newProps) {
-    if (newProps.notes !== this.props.notes) {
-      this.setState({
-        renderedNotes: newProps.notes
-      })
-    }
+    this.maybeFocus()
   }
 
   onBlur (e) {
     const { nodeId, updateNodeNotes } = this.props
-    const notes = this.refs.notesInput.value
-    updateNodeNotes(nodeId, notes)
-    this.setState({
-      editingNotes: false
-    })
+
+    updateNodeNotes(nodeId, this.currentContent())
+    this.setState({ editingNotes: false })
   }
 
-  onKeyDown (e) {
+  onEditorKeyDown (e) {
     const { nodeId, focusNode, focusNodeBelow } = this.props
+
     if (e.key === 'Enter') {
       e.stopPropagation()
-    } else if (e.key === 'Backspace' && !this.refs.notesInput.value) {
+    } else if (e.key === 'Backspace' && !this.currentContent()) {
       e.stopPropagation()
-      this.setState({
-        editingNotes: false
-      })
+      this.setState({ editingNotes: false })
     } else if (e.key === 'ArrowDown') {
       e.preventDefault()
       focusNodeBelow(nodeId)
@@ -60,19 +58,54 @@ export class BulletNotes extends Component {
       e.preventDefault()
       focusNode(nodeId)
     } else {
-      this.setState({
-        editingNotes: true
-      })
+      this.setState({ editingNotes: true })
     }
   }
 
+  onSearchChange = ({ value }) => {
+    this.setState({
+      suggestions: defaultSuggestionsFilter(value, mentions)
+    })
+  }
+
+  onAddMention = () => {
+    // get the mention object selected
+  }
+
   onClick (e) {
+    e.stopPropagation()
     const { nodeId, focusNode } = this.props
+
     focusNode(nodeId, true)
   }
 
-  getHtmlNotes () {
-    return { __html: this.state.renderedNotes }
+  onEditorChange (editorState) {
+    this.setState({ editorState })
+  }
+
+  onEditorArrowDown (editorState) {
+    const { nodeId, focusNodeBelow } = this.props
+
+    focusNodeBelow(nodeId)
+  }
+
+  onEditorArrowUp (editorState) {
+    const { nodeId, focusNode } = this.props
+
+    focusNode(nodeId)
+  }
+
+  currentContent () {
+    return this.state.editorState.getCurrentContent().getPlainText()
+  }
+
+  maybeFocus () {
+    const alreadyFocused = document.activeElement === findDOMNode(this.refs.editor.editor.refs.editor)
+    setTimeout(() => {
+      if (!alreadyFocused && this.props.notesFocused) {
+        this.refs.editor.editor.focus()
+      }
+    }, 0)
   }
 
   render () {
@@ -86,12 +119,23 @@ export class BulletNotes extends Component {
 
     return (
       <div className={notesCssClasses} onClick={(e) => this.onClick(e)}>
-        { editingNotes || notesFocused
-          ? <Textarea ref='notesInput'
-            defaultValue={notes}
-            onBlur={(e) => this.onBlur(e)}
-            onKeyDown={(e) => this.onKeyDown(e)} />
-          : <div dangerouslySetInnerHTML={this.getHtmlNotes()} />}
+        <Editor
+          ref='editor'
+          plugins={allPlugins}
+          editorState={this.state.editorState}
+          onChange={(editorState) => this.onEditorChange(editorState)}
+          onBlur={(e) => this.onBlur(e)}
+          keyBindingFn={(e) => this.onEditorKeyDown(e)}
+          onUpArrow={(e) => this.onEditorArrowUp(e)}
+          onDownArrow={(e) => this.onEditorArrowDown(e)}
+        />
+        <EmojiSuggestions />
+        <MentionSuggestions
+          mentionTrigger='/'
+          onSearchChange={this.onSearchChange}
+          suggestions={this.state.suggestions}
+          onAddMention={this.onAddMention}
+        />
       </div>
     )
   }
@@ -108,3 +152,10 @@ function mapStateToProps (state, ownProps) {
 
 const ConnectedBulletNotes = connect(mapStateToProps, actionCreators)(BulletNotes)
 export default ConnectedBulletNotes
+
+//  { editingNotes || notesFocused
+//           ? <Textarea ref='notesInput'
+//             defaultValue={notes}
+//             onBlur={(e) => this.onBlur(e)}
+//             onKeyDown={(e) => this.onKeyDown(e)} />
+//           : <div dangerouslySetInnerHTML={this.getHtmlNotes()} />}
