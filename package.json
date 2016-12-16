@@ -33,7 +33,7 @@
     "draft-js-hashtag-plugin": "^2.0.0-beta7",
     "draft-js-linkify-plugin": "^2.0.0-beta7",
     "draft-js-mention-plugin": "^2.0.0-beta1",
-    "draft-js-plugins-editor": "^2.0.0-beta7",
+    "draft-js-plugins-editor": "^2.0.0-beta9",
     "firebase": "^3.3.0",
     "immutable": "^3.8.1",
     "immutablediff": "^0.4.4",

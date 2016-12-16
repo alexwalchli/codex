@@ -168,11 +168,9 @@ export class BulletContent extends Component {
 
   maybeFocus () {
     const alreadyFocused = this.currentSelection().get('hasFocus')
-    // setTimeout(() => {
-      if (!alreadyFocused && this.props.focused) {
-        this.refs.editor.editor.focus()
-      }
-    // }, 0)
+    if (!alreadyFocused && this.props.focused) {
+      this.refs.editor.editor.focus()
+    }
   }
 
   render () {

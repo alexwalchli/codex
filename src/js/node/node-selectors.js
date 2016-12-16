@@ -60,7 +60,7 @@ export function getCurrentlyFocusedNodeId (nodes) {
 }
 
 export function getNodeCount (state) {
-  return state.tree.count()
+  return state.tree.filter(node => !node.deleted).count()
 }
 
 // retrieves the next node above or below that is visible
