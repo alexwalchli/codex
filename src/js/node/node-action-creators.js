@@ -72,7 +72,7 @@ export const updateNodeContent = (nodeId, content, tags) =>
 export const updateNodeNotes = (nodeId, notes, tags) => (dispatch, getState) => {
   const state = getState()
   const userId = state.auth.get('id')
-  
+
   dispatch(nodeActions.nodeNotesUpdate(nodeId, notes, tags, userId))
 }
 
@@ -176,7 +176,7 @@ export const toggleNodeComplete = (nodeId) => (dispatch, getState) => {
 }
 
 export const closeAllNodeMenus = () => (dispatch, getState) => {
-   dispatch(nodeActions.nodeAllMenusClose())
+  dispatch(nodeActions.nodeAllMenusClose())
 }
 
 export const toggleNodeMenu = (nodeId) => (dispatch, getState) => {

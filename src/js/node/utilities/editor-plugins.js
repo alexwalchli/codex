@@ -1,8 +1,8 @@
-import React, { Component } from 'react'
+import React from 'react'
 import createHashtagPlugin from 'draft-js-hashtag-plugin'
 import createLinkifyPlugin from 'draft-js-linkify-plugin'
 import createEmojiPlugin from 'draft-js-emoji-plugin'
-import createMentionPlugin, { defaultSuggestionsFilter } from 'draft-js-mention-plugin'
+import createMentionPlugin from 'draft-js-mention-plugin'
 
 const hashTagConfig = { theme: { hashtag: 'hashtag' } }
 const linkifyConfig = {

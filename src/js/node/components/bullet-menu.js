@@ -65,7 +65,7 @@ export class BulletMenu extends Component {
 function mapStateToProps (state, ownProps) {
   return {
     ...ownProps,
-    ...nodeSelectors.getNodeProps(state, ownProps.nodeId)  
+    ...nodeSelectors.getNodeProps(state, ownProps.nodeId)
   }
 }
 

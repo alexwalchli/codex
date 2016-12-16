@@ -142,7 +142,7 @@ export const toggleMenu = (node) => {
 
 export const closeAllMenus = (state, exceptNodeId) => {
   return state.reduce((acc, node) => {
-    if(node.id === exceptNodeId) {
+    if (node.id === exceptNodeId) {
       return acc.set(node.id, node)
     }
     return acc.set(node.id, node.merge({

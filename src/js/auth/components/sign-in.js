@@ -5,7 +5,7 @@ import * as authActionCreators from '../auth-action-creators'
 export class SignIn extends Component {
 
   render () {
-    const { signInWithGithub, signInWithGoogle, signInWithTwitter } = this.props
+    const { signInWithGithub, signInWithGoogle, signInWithTwitter, signInWithFacebook } = this.props
 
     return (
       <div className='g-row sign-in'>
@@ -14,6 +14,10 @@ export class SignIn extends Component {
           <a className='btn-sign-in btn-google' onClick={signInWithGoogle}>
             <span className='fa fa-google' />
                     Sign in with Google
+          </a>
+          <a className='btn-sign-in btn-facebook' onClick={signInWithFacebook}>
+            <span className='fa fa-facebook' />
+                    Sign in with Facebook
           </a>
           <a className='btn-sign-in btn-twitter' onClick={signInWithTwitter}>
             <span className='fa fa-twitter' />

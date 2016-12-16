@@ -2,9 +2,10 @@ import { firebaseAuth } from '../firebase'
 import firebase from 'firebase'
 import * as authActions from './auth-actions'
 
-export const signInWithGithub = () => authenticate(new firebase.auth.GithubAuthProvider())
 export const signInWithGoogle = () => authenticate(new firebase.auth.GoogleAuthProvider())
+export const signInWithFacebook = () => authenticate(new firebase.auth.FacebookAuthProvider())
 export const signInWithTwitter = () => authenticate(new firebase.auth.TwitterAuthProvider())
+export const signInWithGithub = () => authenticate(new firebase.auth.GithubAuthProvider())
 
 const authenticate = (provider) =>
   dispatch => {

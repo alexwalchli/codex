@@ -2,11 +2,11 @@ import React, { Component } from 'react'
 import { findDOMNode } from 'react-dom'
 import { connect } from 'react-redux'
 import * as actionCreators from '../node-action-creators'
-import Textarea from 'react-textarea-autosize'
 import * as nodeSelectors from '../node-selectors'
 import Editor, { createEditorStateWithText } from 'draft-js-plugins-editor'
-import { allPlugins, MentionSuggestions, EmojiSuggestions} from '../utilities/editor-plugins'
-import { extractHashtagsWithIndices } from '../utilities/hashtag-extractor'
+import { allPlugins, MentionSuggestions, EmojiSuggestions } from '../utilities/editor-plugins'
+// import { extractHashtagsWithIndices } from '../utilities/hashtag-extractor'
+import { defaultSuggestionsFilter } from 'draft-js-mention-plugin'
 import * as I from 'immutable'
 
 const mentions = I.fromJS([
@@ -86,26 +86,42 @@ export class BulletNotes extends Component {
   onEditorArrowDown (editorState) {
     const { nodeId, focusNodeBelow } = this.props
 
-    focusNodeBelow(nodeId)
+    if (editorState.getCurrentContent().getBlockMap().first().getKey() === this.currentSelection.FocusKey()) {
+
+    }
+
+    if (this.currentSelection().get('focusOffset') === this.currentContent().length - 1) {
+      focusNodeBelow(nodeId)
+    }
   }
 
   onEditorArrowUp (editorState) {
     const { nodeId, focusNode } = this.props
+    const currentSelection = this.currentSelection()
+    const currentCurrent = this.currentContent()
 
-    focusNode(nodeId)
+    if (currentCurrent.getBlockMap().first().getKey() === currentSelection.FocusKey()) {
+      if (currentSelection.get('focusOffset') === 0) {
+        focusNode(nodeId)
+      }
+    }
   }
 
   currentContent () {
     return this.state.editorState.getCurrentContent().getPlainText()
   }
 
+  currentSelection () {
+    return this.refs.editor.getEditorState().getSelection()
+  }
+
   maybeFocus () {
-    const alreadyFocused = document.activeElement === findDOMNode(this.refs.editor.editor.refs.editor)
-    setTimeout(() => {
+    const alreadyFocused = this.currentSelection().get('hasFocus')
+    // setTimeout(() => {
       if (!alreadyFocused && this.props.notesFocused) {
         this.refs.editor.editor.focus()
       }
-    }, 0)
+    // }, 0)
   }
 
   render () {

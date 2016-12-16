@@ -4,8 +4,9 @@ import { connect } from 'react-redux'
 import * as actionCreators from '../node-action-creators'
 import Editor, { createEditorStateWithText } from 'draft-js-plugins-editor'
 import * as I from 'immutable'
-import { allPlugins, MentionSuggestions, EmojiSuggestions} from '../utilities/editor-plugins'
+import { allPlugins, MentionSuggestions, EmojiSuggestions } from '../utilities/editor-plugins'
 import { extractHashtagsWithIndices } from '../utilities/hashtag-extractor'
+import { defaultSuggestionsFilter } from 'draft-js-mention-plugin'
 
 const mentions = I.fromJS([
   {
@@ -161,13 +162,17 @@ export class BulletContent extends Component {
     return this.state.editorState.getCurrentContent().getPlainText()
   }
 
+  currentSelection () {
+    return this.refs.editor.getEditorState().getSelection()
+  }
+
   maybeFocus () {
-    const alreadyFocused = document.activeElement === findDOMNode(this.refs.editor.editor.refs.editor)
-    setTimeout(() => {
+    const alreadyFocused = this.currentSelection().get('hasFocus')
+    // setTimeout(() => {
       if (!alreadyFocused && this.props.focused) {
         this.refs.editor.editor.focus()
       }
-    }, 0)
+    // }, 0)
   }
 
   render () {
