@@ -86,11 +86,7 @@ export class BulletNotes extends Component {
   onEditorArrowDown (editorState) {
     const { nodeId, focusNodeBelow } = this.props
 
-    if (editorState.getCurrentContent().getBlockMap().first().getKey() === this.currentSelection.FocusKey()) {
-
-    }
-
-    if (this.currentSelection().get('focusOffset') === this.currentContent().length - 1) {
+    if (this.state.editorState.isSelectionAtEndOfContent()) {
       focusNodeBelow(nodeId)
     }
   }
@@ -100,10 +96,8 @@ export class BulletNotes extends Component {
     const currentSelection = this.currentSelection()
     const currentCurrent = this.currentContent()
 
-    if (currentCurrent.getBlockMap().first().getKey() === currentSelection.FocusKey()) {
-      if (currentSelection.get('focusOffset') === 0) {
-        focusNode(nodeId)
-      }
+    if (this.state.editorState.isSelectionAtStartOfContent()) {
+      focusNode(nodeId) // focus the node that these notes belong to
     }
   }
 
