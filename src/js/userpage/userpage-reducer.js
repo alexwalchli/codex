@@ -16,7 +16,7 @@ export const userPages = reducerFactory(I.Map({}), {
   },
 
   [USER_PAGE_CREATION]: (state, action) => {
-    return state.set(action.payload.get('id'), action.payload)
+    return state.set(action.payload.userPage.get('id'), action.payload.userPage)
   },
 
   [USER_PAGE_NAME_UPDATE]: (state, action) => {

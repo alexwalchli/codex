@@ -1,8 +1,12 @@
 import * as userPageActionTypes from './userpage-action-types'
 
-export const userPageCreation = (userPage) => ({
+export const userPageCreation = (userPage, rootNode, firstNode) => ({
   type: userPageActionTypes.USER_PAGE_CREATION,
-  payload: userPage
+  payload: {
+    userPage,
+    rootNode,
+    firstNode
+  }
 })
 
 export const userPageDeletion = (userPageId) => ({

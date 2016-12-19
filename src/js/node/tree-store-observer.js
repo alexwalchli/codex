@@ -34,7 +34,9 @@ const onNodeAdd = (state, updates, diffPath) => {
   const nodeId = diffPath.split('/')[1]
   const userPageId = userPageSelectors.currentPage(state).get('id')
   const userId = state.auth.get('id')
-  updates[`userPage_users_nodes/${userPageId}/${userId}/${nodeId}`] = true
+  // updates[`userPage_users_nodes/${userPageId}/${userId}/${nodeId}`] = true
+  updates[`userpage_nodes/${userPageId}/${nodeId}`] = true
+
   return updates
 }
 

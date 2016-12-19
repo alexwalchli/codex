@@ -6,6 +6,7 @@ __Readme in progress__
 Database Schema
 =================
 
+
 root/userpages/$userpageId/{userpage}
 -------------------------------------
 Contains a UserPage's detailed data. Security access is through user_userpages.
@@ -68,7 +69,7 @@ All Nodes a User has access to.
 ```-->
 
 
-root/user_userpages/$userId/$userpageId
+root/userPagesByUser/$userId/$userpageId
 ---------------------------------------
 All UserPages a User has access to. 
 
@@ -91,7 +92,7 @@ All UserPages a User has access to.
 }
 ```
 
-root/userpage_nodes/$userpageId/$nodeId
+root/nodesByUserPage/$userpageId/$nodeId
 ---------------------------------------
 All Nodes contained in a UserPage. Used simply for retrieving a list of node IDs to subscribe to and retrieve
 when loading a userPage. Also subscribed to for Node creates and deletes.

@@ -1,10 +1,27 @@
 import { firebaseDb } from '../firebase'
 import { queuedRequest } from '../requestqueue/queued-request'
+import { userPageSnapshotUnwrapper } from './userpage-snapshot-unwrapper'
 import * as I from 'immutable'
 
 export const getUserPages = (userId) => {
-  return firebaseDb.ref('userPages/' + userId).once('value').then(snapshot => {
-    return I.fromJS(snapshot.val())
+  return getUserPageIds(userId)
+    .then(userPageIds => {
+      let userPagePromises = userPageIds.map((userPageId) => {
+        return new Promise((resolve, reject) => {
+          firebaseDb.ref(`userPages/${userPageId}`).once('value').then(snapshot => {
+            resolve(userPageSnapshotUnwrapper(snapshot))
+          })
+        })
+      })
+
+      return Promise.all(userPagePromises)
+    })
+}
+
+export const getUserPageIds = (userId) => {
+  return firebaseDb.ref(`user_userpages/${userId}`).once('value').then(snapshot => {
+    const userPageIds = snapshot.val()
+    return userPageIds
   })
 }
 
@@ -12,33 +29,33 @@ export const getNewUserPageId = () => {
   return firebaseDb.ref('userPages').push().key
 }
 
-export const createUserPage = queuedRequest((userPage, rootNode, firstNode) => {
-  const userPageId = userPage.get('id')
-  const createdById = userPage.get('createdById')
-  const rootNodeId = rootNode.get('id')
-  const firstNodeId = firstNode.get('id')
-  let createUserPagesAndInitialNodesUpdates = {}
-  createUserPagesAndInitialNodesUpdates[`nodes/${rootNodeId}`] = rootNode.toJS()
-  createUserPagesAndInitialNodesUpdates[`nodes/${firstNodeId}`] = firstNode.toJS()
-  createUserPagesAndInitialNodesUpdates[`userPages/${createdById}/${userPageId}`] = userPage.toJS()
+// export const createUserPage = queuedRequest((userPage, rootNode, firstNode) => {
+//   const userPageId = userPage.get('id')
+//   const createdById = userPage.get('createdById')
+//   const rootNodeId = rootNode.get('id')
+//   const firstNodeId = firstNode.get('id')
+//   let createUserPagesAndInitialNodesUpdates = {}
+//   createUserPagesAndInitialNodesUpdates[`nodes/${rootNodeId}`] = rootNode.toJS()
+//   createUserPagesAndInitialNodesUpdates[`nodes/${firstNodeId}`] = firstNode.toJS()
+//   createUserPagesAndInitialNodesUpdates[`userPages/${createdById}/${userPageId}`] = userPage.toJS()
 
-  return firebaseDb.ref().update(createUserPagesAndInitialNodesUpdates)
-    .then(snapshot => {
-      let manyToManyConnectionDbUpdates = {}
-      manyToManyConnectionDbUpdates[`userPage_users_nodes/${userPageId}/${userPage.createdById}/${rootNodeId}`] = true
-      manyToManyConnectionDbUpdates[`userPage_users_nodes/${userPageId}/${userPage.createdById}/${firstNodeId}`] = true
-      manyToManyConnectionDbUpdates[`node_userPages_users/${rootNodeId}/${userPageId}/${createdById}`] = true
-      manyToManyConnectionDbUpdates[`node_userPages_users/${firstNodeId}/${userPageId}/${createdById}`] = true
-      manyToManyConnectionDbUpdates[`node_users/${rootNodeId}/${createdById}`] = true
-      manyToManyConnectionDbUpdates[`node_users/${firstNodeId}/${createdById}`] = true
+//   return firebaseDb.ref().update(createUserPagesAndInitialNodesUpdates)
+//     .then(snapshot => {
+//       let manyToManyConnectionDbUpdates = {}
+//       manyToManyConnectionDbUpdates[`userPage_users_nodes/${userPageId}/${userPage.createdById}/${rootNodeId}`] = true
+//       manyToManyConnectionDbUpdates[`userPage_users_nodes/${userPageId}/${userPage.createdById}/${firstNodeId}`] = true
+//       manyToManyConnectionDbUpdates[`node_userPages_users/${rootNodeId}/${userPageId}/${createdById}`] = true
+//       manyToManyConnectionDbUpdates[`node_userPages_users/${firstNodeId}/${userPageId}/${createdById}`] = true
+//       manyToManyConnectionDbUpdates[`node_users/${rootNodeId}/${createdById}`] = true
+//       manyToManyConnectionDbUpdates[`node_users/${firstNodeId}/${createdById}`] = true
 
-      return firebaseDb.ref().update(manyToManyConnectionDbUpdates)
-    })
-})
+//       return firebaseDb.ref().update(manyToManyConnectionDbUpdates)
+//     })
+// })
 
-export const updateUserPageName = queuedRequest((userPage, newUserPageName) => {
-  return firebaseDb.ref(`userPages/${userPage.createdById}/${userPage.id}`).update({ title: newUserPageName })
-})
+// export const updateUserPageName = queuedRequest((userPage, newUserPageName) => {
+//   return firebaseDb.ref(`userPages/${userPage.createdById}/${userPage.id}`).update({ title: newUserPageName })
+// })
 
 export const deleteUserPage = queuedRequest((userPage, rootNode, auth) => {
   let dbUpdates = {}
@@ -108,10 +125,10 @@ export const deleteUserPage = queuedRequest((userPage, rootNode, auth) => {
 //   })
 // })
 
-export function createEmailUser (email, userId) {
-  email = email.replace(/\./g, ',')
-  return firebaseDb.ref('email_users/' + email).set(userId)
-}
+// export function createEmailUser (email, userId) {
+//   email = email.replace(/\./g, ',')
+//   return firebaseDb.ref('email_users/' + email).set(userId)
+// }
 
 // function escapeEmail (email) {
 //   return (email || '').replace('.', ',')

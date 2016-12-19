@@ -28,5 +28,10 @@ export const app = reducerFactory(initialAppState, {
     return state.merge({
       currentUserPageId: action.payload.userPageId
     })
+  },
+  [USER_PAGE_CREATION]: (state, action) => {
+    return state.merge({
+      currentUserPageId: action.payload.userPage.id
+    })
   }
 })
