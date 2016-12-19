@@ -1,9 +1,8 @@
 {
     "rules": {
-
         "nodes": {
           	"$nodeId" : {
-              // 1.) Give access to read if a nodeUsers/$nodeId/$userId record exists
+              // 1.) Give access to read if a node_users/$nodeId/$userId record exists
               ".read": "(auth != null) && root.child('node_users/' + $nodeId + '/' + auth.uid).exists()",
 
               // 1.) Give access to create if no node presently exists with the nodeId

@@ -28,5 +28,5 @@ export const allPlugins = [
   linkifyPlugin,
   emojiPlugin
 ]
-export const { MentionSuggestions } = mentionPlugin
-export const { EmojiSuggestions } = emojiPlugin
+export const MentionSuggestions = mentionPlugin.MentionSuggestions
+export const EmojiSuggestions = emojiPlugin.EmojiSuggestions

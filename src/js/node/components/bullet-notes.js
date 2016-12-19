@@ -137,13 +137,6 @@ export class BulletNotes extends Component {
           onUpArrow={(e) => this.onEditorArrowUp(e)}
           onDownArrow={(e) => this.onEditorArrowDown(e)}
         />
-        <EmojiSuggestions />
-        <MentionSuggestions
-          mentionTrigger='/'
-          onSearchChange={this.onSearchChange}
-          suggestions={this.state.suggestions}
-          onAddMention={this.onAddMention}
-        />
       </div>
     )
   }

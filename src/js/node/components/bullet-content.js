@@ -4,17 +4,23 @@ import { connect } from 'react-redux'
 import * as actionCreators from '../node-action-creators'
 import Editor, { createEditorStateWithText } from 'draft-js-plugins-editor'
 import * as I from 'immutable'
-import { allPlugins, MentionSuggestions, EmojiSuggestions } from '../utilities/editor-plugins'
+import { allPlugins, mentionPlugin } from '../utilities/editor-plugins'
 import { extractHashtagsWithIndices } from '../utilities/hashtag-extractor'
 import { defaultSuggestionsFilter } from 'draft-js-mention-plugin'
 
+const { MentionSuggestions } = mentionPlugin;
+
 const mentions = I.fromJS([
-  {
-    name: 'Collapse All'
+   {
+    name: 'Matthew Russell',
+    link: 'https://twitter.com/mrussell247',
+    avatar: 'https://pbs.twimg.com/profile_images/517863945/mattsailing_400x400.jpg',
   },
   {
-    name: 'Expand All'
-  }
+    name: 'Julian Krispel-Samsel',
+    link: 'https://twitter.com/juliandoesstuff',
+    avatar: 'https://pbs.twimg.com/profile_images/477132877763579904/m5bFc8LF_400x400.png',
+  },
 ])
 
 export class BulletContent extends Component {
@@ -39,13 +45,13 @@ export class BulletContent extends Component {
     }, 0)
   }
 
-  onChange (editorState) {
+  onEditorChange (editorState) {
     this.setState({
       editorState
     })
   }
 
-  onBlur (e) {
+  onEditorBlur (e) {
     this.submitContent()
   }
 
@@ -180,21 +186,19 @@ export class BulletContent extends Component {
           ref='editor'
           plugins={allPlugins}
           editorState={this.state.editorState}
-          onChange={(editorState) => this.onChange(editorState)}
+          onChange={(editorState) => this.onEditorChange(editorState)}
           onUpArrow={(e) => this.onEditorArrowUp(e)}
           onDownArrow={(e) => this.onEditorArrowDown(e)}
           handleReturn={(e) => this.onEditorEnter(e)}
           onTab={(e) => this.onEditorTabDown(e)}
-          onBlur={(e) => this.onBlur(e)}
+          onBlur={(e) => this.onEditorBlur(e)}
           keyBindingFn={(e) => this.onEditorKeyDown(e)}
           onFocus={(e) => { this.onEditorFocus(e) }}
         />
-        <EmojiSuggestions />
         <MentionSuggestions
-          mentionTrigger='/'
-          onSearchChange={this.onSearchChange}
+          onSearchChange={() => this.onSearchChange()}
           suggestions={this.state.suggestions}
-          onAddMention={this.onAddMention}
+          onAddMention={() => this.onAddMention()}
         />
       </div>
     )
