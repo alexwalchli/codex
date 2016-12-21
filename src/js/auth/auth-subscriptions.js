@@ -9,7 +9,7 @@ export function subscribeToAuthStateChanged (dispatch) {
       user => {
         dispatch(authActions.updateAuthState(user))
         if (user) {
-          userPageRepository.createEmailUser(user.email, user.uid)
+          // userPageRepository.createEmailUser(user.email, user.uid)
           dispatch(userPageSubscriptions.subscribeToUserPages())
         }
       },

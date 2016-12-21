@@ -2,7 +2,6 @@ import * as I from 'immutable'
 import { firebaseDb } from '../firebase'
 // import * as nodeActions from '../node-actions'
 import * as nodeRepository from './node-repository'
-import * as userPageUsersNodesRepository from '../userpage/userpage-users-nodes-repository'
 // import nodeSnapshotUnwrapper from './node-snapshot-unwrapper'
 // import { dispatch } from 'redux'
 
@@ -12,7 +11,7 @@ export const initializeNodeSubscriptions = (userPageId, userId) => {
   return new Promise((resolve, reject) => {
     let initialNodePromises = []
 
-    userPageUsersNodesRepository.getNodeIds(userPageId, userId).then(nodeIds => {
+    nodeRepository.getNodeIdsByUserPageId(userPageId).then(nodeIds => {
       let initialTreeState = {}
 
       subscribeToNodeDeletedAndCreated(userPageId, userId)

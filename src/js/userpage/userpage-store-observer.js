@@ -5,7 +5,7 @@ import { diffsToFirebaseUpdate } from '../firebase/firebase-immutable-diff'
 import * as userPageSelectors from '../userpage/userpage-selectors'
 import * as I from 'immutable'
 
-export const observerUserPageStore = (store) => {
+export const observeUserPageStore = (store) => {
   return observeStore(store, (state) => state.userPages, userPagesStateChanged)
 }
 

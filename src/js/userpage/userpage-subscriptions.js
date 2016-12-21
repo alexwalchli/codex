@@ -8,7 +8,7 @@ export function subscribeToUserPages () {
     const state = getState()
     const userId = state.auth.get('id')
     userPageRepository.getUserPages(userId).then(userPages => {
-      if (!userPages || userPages.count() === 0) {
+      if (!userPages) {
         dispatch(userPageActionCreators.createUserPage('Home', true))
       } else {
         userPages.forEach(userPage => {

@@ -33,9 +33,6 @@ import {
   NODE_MENU_TOGGLE,
   NODE_ALL_MENUS_CLOSE
 } from './node-action-types'
-import {
-  USER_PAGE_CREATION
-} from '../userpage/userpage-action-types.js'
 
 const initialTreeState = I.Map({})
 export const tree = reducerFactory(initialTreeState, {
@@ -219,14 +216,5 @@ export const tree = reducerFactory(initialTreeState, {
   [NODE_ALL_MENUS_CLOSE]: (state, action) => {
     const { exceptNodeId } = action.payload
     return state.update(state => nodeOperations.closeAllMenus(state, exceptNodeId))
-  },
-
-  [USER_PAGE_CREATION]: (state, action) => {
-    const { rootNode, firstNode } = action.payload
-    state = initialTreeState
-    state = state.set(rootNode.id, rootNode)
-    state = state.set(firstNode.id, rootNode)
-    return state
   }
-
 })

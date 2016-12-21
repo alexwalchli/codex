@@ -8,7 +8,7 @@ import {
   NODE_DELETION,
   INITIAL_TREE_STATE_LOAD } from './node-action-types'
 
-export const visibleNodes = reducerFactory({}, {
+export const visibleNodes = reducerFactory(I.Map({}), {
   [INITIAL_TREE_STATE_LOAD]: (state, action) => {
     const { initialTreeState, rootNodeId, userId } = action.payload
     return initialTreeState.reduce((visibleNodes, node) => {

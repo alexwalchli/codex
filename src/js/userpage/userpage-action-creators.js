@@ -17,7 +17,11 @@ export const createUserPage = (title, isHomePage) =>
     const newFirstNode = nodeOperations.makeNode(firstNodeId, rootNodeId, [], '', userId)
     const newUserPage = userPageOperations.makeUserPage(newUserPageId, rootNodeId, userId, title, isHomePage)
 
-    dispatch(userPageActions.userPageCreation(newUserPage, newRootNode, newFirstNode))
+    userPageRepository.createUserPage(newUserPage, newRootNode, newFirstNode)
+      .then(snapshot => {
+        dispatch(userPageActions.userPageCreation(newUserPage, newRootNode, newFirstNode))
+        dispatch(appActionCreators.navigateToUserPage(newUserPageId))
+      })
   }
 
 export const deleteUserPage = (userPageId) =>
