@@ -1,51 +1,42 @@
 {
-    "rules": {
-        "nodes": {
-          	"$nodeId" : {
-              // 1.) Give access to read if a node_users/$nodeId/$userId record exists
-              ".read": "(auth != null) && root.child('node_users/' + $nodeId + '/' + auth.uid).exists()",
-
-              // 1.) Give access to create if no node presently exists with the nodeId
-              // 2.) Give access to update/delete if a nodeUsers/$nodeId/$userId record exists
-              ".write": "(auth != null) && (data.val() === null || root.child('node_users/' + $nodeId+ '/' + auth.uid).exists())"
-            }
-        },
-        "userPages": {
-            "$uid": {
-                // Only give access to userPages/$userId for the logged in user
-                ".read": "(auth != null) && $uid === auth.uid",
-                // Give write access if the uid matches the current user or this is a userPage getting created be someone sharing a node
-                "$userPageId": {
-                	".write": "$uid === auth.uid || root.child('node_users/' + newData.child('rootNodeId').val() + '/' + auth.uid).exists()"
-                }
-            }
-        },
-        "node_users": {
-            "$nodeId": {
-                // 1.) Must be authorized
-                // 2.) If a user created a node, give them access to add/remove nodeUsers/$nodeId/$userId
-                //     (for when nodes are created, or for sharing or revoking nodes from another User)
-                // 3.) If a user has a nodeUsers/$nodeId/$userId, give them access to delete(but not create or update) nodeUsers/$nodeId 
-                //     (for when a node is deleted so there are no orphaned nodeUsers from nodes,
-                //      but we also don't want non-creators to be able to give node access to other users)
-                //".write": "(auth != null) && (root.child('nodes/' + $nodeId + '/createdById').val() === auth.uid || (newData.val() === null && root.child('node_users/' + $nodeId + '/' + auth.uid).exists()))",
-                //".read": "(auth != null) && (root.child('node_users/' + $nodeId).val() === auth.uid || root.child('node_users/' + $nodeId + '/' + auth.uid).exists())"
-
-                ".read": "(auth != null)",
-                ".write": "(auth != null)"
-            }
-        },
-        "node_userPages_users": {
-        	".read": "(auth != null)",
-            ".write": "(auth != null)"
-        },
-        "userPage_users_nodes": {
-            ".read": "(auth != null)",
-            ".write": "(auth != null)"
-        },
-        "email_users": {
-            ".read": "(auth != null)",
-            ".write": "(auth != null)"
+  "rules": {
+    "nodes": {
+      "$nodeId": {
+        // a root/userPagesByUser/$userId/$userPageId must exist prior to reading
+        ".read": "(auth != null) && root.child('userPagesByUser/' + auth.uid + '/' + data.child('userPageId').val()).exists()",
+        // a root/userPagesByUser/$userId/$userPageId must exist prior to writing
+        //".write": "(auth != null) && root.child('userPagesByUser/' + auth.uid + '/' + newData.child('userPageId').val()).exists()",
+        //".read": true,
+        ".write": true
+      }
+    },
+    "userPages": {
+      "$userPageId": {
+        // a root/userPagesByUser/$userId/$userpageId must exist prior to reading
+        // ".read": "(auth != null) && root.child('userPagesByUser/' + auth.uid + '/' + $userPageId).exists()",
+        // a root/userPagesByUser/$userId/$userpageId must exist prior to writing
+        // ".write": "(auth != null) && root.child('userPagesByUser/' + auth.uid +  '/' + $userPageId).exists()",
+        ".read": true,
+        ".write": true
+      }
+    },
+    "nodesByUserPage": {
+      "$userpageId": {
+        // must have a userPagesByUser/$userId/$userPageId prior to reading
+        ".read": "(auth != null) && root.child('userPagesByUser/' + auth.uid +  '/' + $userpageId).exists()",
+        ".write": "(auth != null) && root.child('userPagesByUser/' + auth.uid +  '/' + $userpageId).exists()",
+      }
+    },
+    "userPagesByUser": {
+      "$userId": {
+        // must be the current user to read
+        ".read": "(auth != null) && $userId === auth.uid",
+        "$userpageId": {
+          // must be under the current user
+          // or the current user owns this user page already(in this case the user is sharing with another)
+          ".write": "(auth != null) && ($userId === auth.uid || root.child('userPagesByUser/' + auth.uid +  '/' + $userpageId).exists())",
         }
+      }
     }
+  }
 }

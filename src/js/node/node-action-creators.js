@@ -2,6 +2,7 @@
 import * as nodeActions from './node-actions'
 import * as nodeSelectors from './node-selectors'
 import * as nodeRepository from './node-repository'
+import * as userPageSelectors from '../userpage/userpage-selectors'
 
 export const createNode = (originNodeId, originOffset, content) =>
   (dispatch, getState) => {
@@ -29,7 +30,7 @@ export const createNode = (originNodeId, originOffset, content) =>
       nodeIdToUnfocus,
       originOffset,
       content,
-      state.app.get('currentUserPageId'),
+      userPageSelectors.currentPageId(state),
       userId))
   }
 

@@ -3,11 +3,12 @@ import * as I from 'immutable'
 import { NodeRecord } from './node-record'
 import { setMany } from '../utilities/immutable-helpers'
 
-export const makeNode = (id, parentId, childIds, content, createdById) => {
+export const makeNode = (id, parentId, childIds, userPageId, content, createdById) => {
   return new NodeRecord({
     id,
     parentId,
     childIds,
+    userPageId,
     content,
     createdById
   })

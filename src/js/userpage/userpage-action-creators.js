@@ -13,8 +13,8 @@ export const createUserPage = (title, isHomePage) =>
     const rootNodeId = nodeRepository.getNewNodeId()
     const firstNodeId = nodeRepository.getNewNodeId()
     const newUserPageId = userPageRepository.getNewUserPageId()
-    const newRootNode = nodeOperations.makeNode(rootNodeId, null, [ firstNodeId ], '', userId)
-    const newFirstNode = nodeOperations.makeNode(firstNodeId, rootNodeId, [], '', userId)
+    const newRootNode = nodeOperations.makeNode(rootNodeId, null, [ firstNodeId ], newUserPageId, '', userId)
+    const newFirstNode = nodeOperations.makeNode(firstNodeId, rootNodeId, [], newUserPageId, '', userId)
     const newUserPage = userPageOperations.makeUserPage(newUserPageId, rootNodeId, userId, title, isHomePage)
 
     userPageRepository.createUserPage(newUserPage, newRootNode, newFirstNode)

@@ -4,6 +4,7 @@ export const NodeRecord = new I.Record({
   id: undefined,
   parentId: undefined,
   childIds: I.List([]),
+  userPageId: undefined,
   content: '',
   notes: '',
   createdById: undefined,

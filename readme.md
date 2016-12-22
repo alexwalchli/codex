@@ -9,7 +9,7 @@ Database Schema
 
 root/userpages/$userpageId/{userpage}
 -------------------------------------
-Contains a UserPage's detailed data. Security access is through user_userpages.
+Contains a UserPage's detailed data. Security access is through userPagesByUser.
 
 **Security Rules**
 ```
@@ -28,7 +28,7 @@ Contains a UserPage's detailed data. Security access is through user_userpages.
 
 root/nodes/$nodeId/{node}
 -------------------------
-Contains a Node's detailed data. Security access is through nodesByUserPage -> userPagesByUser.
+Contains a Node's detailed data. Security access is through userPagesByUser.
 
 **Security Rules**
 ```
@@ -38,36 +38,12 @@ Contains a Node's detailed data. Security access is through nodesByUserPage -> u
   ".write": "(auth != null)",
   "$nodeId": {
     // a root/user_nodes/$userId/$nodeId must exist prior to reading
-    ".read": "root.child('user_nodes/' + auth.uid + '/' + $nodeId).exists()",
+    ".read": "root.child('userPagesByUser/' + data.child('userPageId').val() +  '/' + auth.uid).exists()",
     // a root/user_nodes/$userId/$nodeId must exist prior to writing
-    ".write": "root.child('user_nodes/' + auth.uid+  '/' + $nodeId).exists()",
+    ".write": "root.child('userPagesByUser/' + data.child('userPageId').val() +  '/' + auth.uid).exists()",
   }
 }
 ```
-
-<!--root/user_nodes/$userId/$nodeId/true
-------------------------------------
-All Nodes a User has access to.
-
-**Security Rules**
-```
-"user_nodes": {
-  // must be authenticated
-  ".read": "(auth != null)",
-  ".write": "(auth != null)",
-  "$userId": {
-    // write: must have access to root/userpage_nodes/$userpageId/$nodeId which in turn must have access to user_userPages and user_nodes
-    // read: must be the current user to access user_nodes/$userId
-    "$nodeId": {
-      // a root/user_nodes/$userId/$nodeId must exist prior to reading
-      ".read": "root.child('user_nodes/' + auth.uid + '/' + $nodeId).exists()",
-      // a root/user_nodes/$userId/$nodeId must exist prior to writing
-      ".write": "root.child('user_nodes/' + auth.uid+  '/' + $nodeId).exists()",
-    }
-  }
-}
-```-->
-
 
 root/userPagesByUser/$userId/$userpageId
 ---------------------------------------
