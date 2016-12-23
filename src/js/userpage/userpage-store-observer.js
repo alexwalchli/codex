@@ -2,8 +2,6 @@ import { observeStore } from '../redux/observe-store'
 import diff from 'immutablediff'
 import * as firebaseRepository from '../firebase/firebase-repository'
 import { diffsToFirebaseUpdate } from '../firebase/firebase-immutable-diff'
-import * as userPageSelectors from '../userpage/userpage-selectors'
-import * as I from 'immutable'
 
 export const observeUserPageStore = (store) => {
   return observeStore(store, (state) => state.userPages, userPagesStateChanged)

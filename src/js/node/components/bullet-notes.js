@@ -1,10 +1,9 @@
 import React, { Component } from 'react'
-import { findDOMNode } from 'react-dom'
 import { connect } from 'react-redux'
 import * as actionCreators from '../node-action-creators'
 import * as nodeSelectors from '../node-selectors'
 import Editor, { createEditorStateWithText } from 'draft-js-plugins-editor'
-import { allPlugins, MentionSuggestions, EmojiSuggestions } from '../utilities/editor-plugins'
+import { allPlugins } from '../utilities/editor-plugins'
 // import { extractHashtagsWithIndices } from '../utilities/hashtag-extractor'
 import { defaultSuggestionsFilter } from 'draft-js-mention-plugin'
 import * as I from 'immutable'
@@ -93,8 +92,6 @@ export class BulletNotes extends Component {
 
   onEditorArrowUp (editorState) {
     const { nodeId, focusNode } = this.props
-    const currentSelection = this.currentSelection()
-    const currentCurrent = this.currentContent()
 
     if (this.state.editorState.isSelectionAtStartOfContent()) {
       focusNode(nodeId) // focus the node that these notes belong to

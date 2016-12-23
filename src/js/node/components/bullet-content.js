@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { findDOMNode } from 'react-dom'
 import { connect } from 'react-redux'
 import * as actionCreators from '../node-action-creators'
 import Editor, { createEditorStateWithText } from 'draft-js-plugins-editor'
@@ -8,19 +7,19 @@ import { allPlugins, mentionPlugin } from '../utilities/editor-plugins'
 import { extractHashtagsWithIndices } from '../utilities/hashtag-extractor'
 import { defaultSuggestionsFilter } from 'draft-js-mention-plugin'
 
-const { MentionSuggestions } = mentionPlugin;
+const { MentionSuggestions } = mentionPlugin
 
 const mentions = I.fromJS([
-   {
+  {
     name: 'Matthew Russell',
     link: 'https://twitter.com/mrussell247',
-    avatar: 'https://pbs.twimg.com/profile_images/517863945/mattsailing_400x400.jpg',
+    avatar: 'https://pbs.twimg.com/profile_images/517863945/mattsailing_400x400.jpg'
   },
   {
     name: 'Julian Krispel-Samsel',
     link: 'https://twitter.com/juliandoesstuff',
-    avatar: 'https://pbs.twimg.com/profile_images/477132877763579904/m5bFc8LF_400x400.png',
-  },
+    avatar: 'https://pbs.twimg.com/profile_images/477132877763579904/m5bFc8LF_400x400.png'
+  }
 ])
 
 export class BulletContent extends Component {

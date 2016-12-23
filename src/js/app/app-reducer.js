@@ -4,8 +4,7 @@ import {
   APP_INITIALIZATION_SUCCESS,
   SHARE_DROPDOWN_TOGGLE,
   SIDE_PANEL_TOGGLE,
-  USER_PAGE_NAVIGATION,
-  USER_PAGE_CREATION
+  USER_PAGE_NAVIGATION
 } from './app-action-types'
 
 const initialAppState = I.Map({})
