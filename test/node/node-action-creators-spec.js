@@ -71,10 +71,6 @@ describe('nodeActionCreators', () => {
   beforeEach(() => {
     dispatch.reset()
     sinon.stub(nodeRepository, 'getNewNodeId', () => (newNodeId))
-    sinon.stub(nodeRepository, 'updateNodes', () => {})
-    sinon.stub(nodeRepository, 'updateNode', () => {})
-    sinon.stub(nodeRepository, 'createNode', () => {})
-    sinon.stub(nodeRepository, 'reassignParentNode', () => {})
     sinon.spy(nodeActions, 'nodeCreation')
     sinon.spy(nodeActions, 'nodeFocus')
     sinon.spy(nodeActions, 'nodeContentUpdate')
@@ -86,10 +82,6 @@ describe('nodeActionCreators', () => {
 
   afterEach(() => {
     nodeRepository.getNewNodeId.restore()
-    nodeRepository.createNode.restore()
-    nodeRepository.updateNodes.restore()
-    nodeRepository.updateNode.restore()
-    nodeRepository.reassignParentNode.restore()
     nodeActions.nodeCreation.restore()
     nodeActions.nodeFocus.restore()
     nodeActions.nodeContentUpdate.restore()

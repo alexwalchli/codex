@@ -48,12 +48,12 @@ describe('userPageActionCreators', () => {
   })
 
   afterEach(() => {
+    appActionCreators.navigateToUserPage.restore()
     nodeRepository.getNewNodeId.restore()
     nodeOperations.makeNode.restore()
     userPageOperations.makeUserPage.restore()
     userPageRepository.getNewUserPageId.restore()
     userPageRepository.createUserPage.restore()
-    appActionCreators.navigateToUserPage.restore()
     userPageRepository.deleteUserPage.restore()
     userPageRepository.updateUserPageName.restore()
     userPageActions.userPageDeletion.restore()

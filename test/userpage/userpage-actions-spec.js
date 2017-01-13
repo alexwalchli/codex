@@ -6,9 +6,15 @@ describe('userpageActions', () => {
   describe('userPageCreation', () => {
     it('should create a userPageCreation action', () => {
       const userPage = { id: 'userpage123' }
-      expect(userPageActions.userPageCreation(userPage)).to.deep.equal({
+      const rootNode = { id: 'rootnode' }
+      const firstNode = { id: 'firstnode' }
+      expect(userPageActions.userPageCreation(userPage, rootNode, firstNode)).to.deep.equal({
         type: userPageActionTypes.USER_PAGE_CREATION,
-        payload: userPage
+        payload: {
+          userPage,
+          rootNode,
+          firstNode
+        }
       })
     })
   })
