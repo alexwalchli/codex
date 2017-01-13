@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import * as actions from '../actions/node'
+import * as actions from './search-input'
 
 export class SearchInput extends Component {
   constructor (props) {
@@ -20,12 +20,12 @@ export class SearchInput extends Component {
         <div className='icon dripicons-tags' />
         <input ref='searchInput' onChange={this.handleInputChange} />
       </div>
-        )
+    )
   }
 }
 
-function mapStateToProps (state, ownProps) {
-  return { ...state, ...ownProps }
+function mapStateToProps (ownProps) {
+  return ownProps
 }
 
 const ConnectedSearchInput = connect(mapStateToProps, actions)(SearchInput)

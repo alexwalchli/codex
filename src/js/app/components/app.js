@@ -5,6 +5,7 @@ import AppContextMenu from './app-context-menu'
 // import AppSubscriptions from './app-subscriptions'
 import SignIn from '../../auth/components/sign-in'
 import AppLoader from './app-loader'
+import TopBar from './top-bar'
 import * as appSelectors from '../app-selectors'
 import * as nodeActionCreators from '../../node/node-action-creators'
 
@@ -34,12 +35,12 @@ export class App extends Component {
 
         { appIsInitialized
           ? <div id='signed-in'>
-            <AppContextMenu />
+              <TopBar />
+              <AppContextMenu />
 
-            <div id='tree-container'>
-              <Node id={currentUserPage.get('rootNodeId')} />
-            </div>
-
+              <div id='tree-container'>
+                <Node id={currentUserPage.get('rootNodeId')} />
+              </div>
           </div>
           : null }
       </div>
