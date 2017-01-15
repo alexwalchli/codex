@@ -179,7 +179,6 @@ describe('nodeActionCreators', () => {
       expect(nodeActions.nodeDemotion).to.have.been.calledWith(
         nodeId,
         '1',
-        '1',
         '123',
         undefined,
         visibleNodes,

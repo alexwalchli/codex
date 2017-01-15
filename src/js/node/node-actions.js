@@ -71,6 +71,12 @@ export const nodeUnfocus = (nodeId) => ({
   }
 })
 
+export const nodeUnfocusAll = () => ({
+  type: nodeActionTypes.NODE_UNFOCUS_ALL,
+  undoable: false,
+  payload: {}
+})
+
 export const nodeDemotion = (nodeId, currentParentId, newParentId, addNodeAfterNewSiblingId, visibleNodes, userId) => ({
   type: nodeActionTypes.NODE_DEMOTION,
   payload: {

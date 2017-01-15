@@ -114,7 +114,7 @@ export const demoteNode = (nodeId) => (dispatch, getState) => {
   const addAfterSibling = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, treeState, state.visibleNodes, nodeId, true)
 
   if (!addAfterSibling || addAfterSibling.get('id') === currentParentId) {
-      // can't demote the node when there isn't a sibling above to attach it too
+    // can't demote the node when there isn't a sibling above to attach it too
     return
   }
 

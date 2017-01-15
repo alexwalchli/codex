@@ -82,6 +82,10 @@ export const unfocus = (node) => {
   })
 }
 
+export const unfocusAll = (nodes) => {
+  return nodes.map(unfocus)
+}
+
 export const focus = (state, nodeId, focusNotes = false) => {
   const currentlyFocusedNodeId = nodeSelectors.getCurrentlyFocusedNodeId(state)
   if (currentlyFocusedNodeId && currentlyFocusedNodeId !== nodeId) {

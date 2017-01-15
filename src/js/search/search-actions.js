@@ -1,8 +1,8 @@
 import * as searchActionTypes from './search-action-types'
 
-export const searchResult = (nodeIdsResult) => {(
-    type: searchActionTypes.SEARCH_RESULT,
-    payload: {
-        nodeIdsResult
-    }
-)}
+export const searchResult = (nodeIdsResult) => ({
+  type: searchActionTypes.SEARCH_RESULT,
+  payload: {
+    nodeIdsResult
+  }
+})

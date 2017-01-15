@@ -10,6 +10,7 @@ import {
   NODE_CONTENT_UPDATE,
   NODE_FOCUS,
   NODE_UNFOCUS,
+  NODE_UNFOCUS_ALL,
   NODE_DEMOTION,
   NODE_PROMOTION,
   NODE_EXPANSION_TOGGLE,
@@ -101,6 +102,10 @@ export const tree = reducerFactory(initialTreeState, {
   [NODE_UNFOCUS]: (state, action) => {
     const { nodeId } = action.payload
     return state.updateIn([nodeId], node => nodeOperations.unfocus(state.get(nodeId)))
+  },
+
+  [NODE_UNFOCUS_ALL]: (state, action) => {
+    return nodeOperations.unfocusAll(state)
   },
 
   [NODE_DEMOTION]: (state, action) => {

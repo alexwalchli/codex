@@ -7,6 +7,9 @@ import {
   NODE_EXPANSION,
   NODE_DELETION,
   INITIAL_TREE_STATE_LOAD } from './node-action-types'
+import {
+  SEARCH_RESULT
+} from '../search/search-action-types.js'
 
 export const visibleNodes = reducerFactory(I.Map({}), {
   [INITIAL_TREE_STATE_LOAD]: (state, action) => {
@@ -55,5 +58,13 @@ export const visibleNodes = reducerFactory(I.Map({}), {
     return [ nodeId, ...allDescendantIds ].reduce((acc, nid) => {
       return acc.set(nid, false)
     }, state)
+  },
+  [SEARCH_RESULT]: (state, action) => {
+    return state.map((isVisible, nodeId) => {
+      if (action.payload.nodeIdsResult[nodeId]) {
+        return true
+      }
+      return false
+    })
   }
 })

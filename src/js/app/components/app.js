@@ -35,12 +35,12 @@ export class App extends Component {
 
         { appIsInitialized
           ? <div id='signed-in'>
-              <TopBar />
-              <AppContextMenu />
+            <TopBar />
+            <AppContextMenu />
 
-              <div id='tree-container'>
-                <Node id={currentUserPage.get('rootNodeId')} />
-              </div>
+            <div id='tree-container'>
+              <Node id={currentUserPage.get('rootNodeId')} />
+            </div>
           </div>
           : null }
       </div>
