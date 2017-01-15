@@ -85,13 +85,22 @@ describe('treeReducer', () => {
       const content = 'some content'
       const userPageId = 'abc123'
       const userId = 'abc'
-      const nodeCreationAction = nodeActions.nodeCreation(nodeId, originNodeId, parentId, [], parentId, originOffset, content, userPageId, userId)
+      const nodeCreationAction = nodeActions.nodeCreation(
+        nodeId, originNodeId, parentId, [],
+        parentId, originOffset, content,
+        userPageId, userId
+      )
 
       const newState = tree(state, nodeCreationAction)
 
       expect(newState.get(nodeId)).to.be.defined
       expect(nodeOperations.makeNode).to.have.been.calledWith(
-        nodeCreationAction.payload.nodeId, '2', [], nodeCreationAction.payload.content, nodeCreationAction.payload.userId
+        nodeCreationAction.payload.nodeId,
+        '2',
+        I.List([]),
+        userPageId,
+        nodeCreationAction.payload.content,
+        nodeCreationAction.payload.userId
       )
     })
     it('should create the node as a sibling if the currently selected node is not a parent', () => {
@@ -102,12 +111,21 @@ describe('treeReducer', () => {
       const content = 'some content'
       const userPageId = 'abc123'
       const userId = 'abc'
-      const nodeCreationAction = nodeActions.nodeCreation(nodeId, originNodeId, parentId, [], parentId, originOffset, content, userPageId, userId)
+      const nodeCreationAction = nodeActions.nodeCreation(
+        nodeId, originNodeId, parentId,
+        [], parentId, originOffset, content,
+        userPageId, userId
+      )
 
       tree(state, nodeCreationAction)
 
       expect(nodeOperations.makeNode).to.have.been.calledWith(
-        nodeCreationAction.payload.nodeId, '1', [], nodeCreationAction.payload.content, nodeCreationAction.payload.userId
+        nodeCreationAction.payload.nodeId,
+        '1',
+        I.List([]),
+        userPageId,
+        nodeCreationAction.payload.content,
+        nodeCreationAction.payload.userId
       )
     })
     it('should create the node as a sibling if the currently selected node is collapsed', () => {

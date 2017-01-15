@@ -21,9 +21,11 @@ describe('nodeOperations', () => {
       const childIds = I.List(['4', '5'])
       const content = 'some content'
       const createdById = 'abc123'
-      expect(nodeOperations.makeNode(nodeId, parentId, childIds, content, createdById))
+      const userPageId = '111'
+
+      expect(nodeOperations.makeNode(nodeId, parentId, childIds, userPageId, content, createdById))
         .to.deep.equal(new NodeRecord({
-          id: nodeId, parentId, childIds, content, createdById
+          id: nodeId, parentId, childIds, userPageId, content, createdById
         }))
     })
   })

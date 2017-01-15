@@ -186,7 +186,7 @@ describe('nodeActionCreators', () => {
     })
   })
   describe('promoteNode', () => {
-    it('should not dispatch or update persistence if the node has the root node as a parent', () => {
+    it('should not dispatch if the node has the root node as a parent', () => {
       const nodeId = '123'
       const node = nodes.get(nodeId)
       const parentNode = nodes.get(node.get('parentId'))
@@ -194,32 +194,31 @@ describe('nodeActionCreators', () => {
       const newParentId = parentNode.get('parentId')
       const siblingIds = parentNode.get('childIds')
 
-      nodeActionCreators.promoteNode(nodeId, siblingIds, currentParentId, newParentId, visibleNodes, userId)(dispatch, getState)
+      nodeActionCreators.promoteNode(
+        nodeId, siblingIds, currentParentId,
+        newParentId, visibleNodes, userId
+      )(dispatch, getState)
 
       expect(dispatch).to.not.have.been.called
-      expect(nodeRepository.reassignParentNode).to.not.have.been.called
     })
-    // it('should dispatch a nodePromotion action and update persistence', () => {
-    //   const nodeId = '456'
-    //   const node = nodes[nodeId]
-    //   const parentNode = nodes[node.parentId]
-    //   const currentParentId = parentNode.id
-    //   const newParentId = parentNode.parentId
-    //   const siblingIds = parentNode.childIds
+    it('should dispatch a nodePromotion action', () => {
+      const nodeId = '789'
+      const node = nodes.get(nodeId)
+      const parentNode = nodes.get(node.get('parentId'))
+      const currentParentId = parentNode.get('id')
+      const newParentId = parentNode.get('parentId')
+      const siblingIds = parentNode.get('childIds')
 
-    //   nodeActionCreators.promoteNode(nodeId, siblingIds, currentParentId, newParentId, visibleNodes, userId)(dispatch, getState)
+      nodeActionCreators.promoteNode(
+        nodeId, siblingIds, currentParentId,
+        newParentId, visibleNodes, userId
+      )(dispatch, getState)
 
-    //   expect(dispatch).to.not.have.been.called
-    //   expect(nodeRepository.reassignParentNode).to.not.have.been.called
-    //   // expect(dispatch).to.have.been.called
-    //   // expect(nodeActions.nodePromotion).to.have.been.calledWith(nodeId, siblingIds, currentParentId, newParentId, visibleNodes, state.auth.id)
-    //   // expect(nodeRepository.updateNodes).to.have.been.calledWith([
-    //   //   nodes[currentParentId],
-    //   //   nodes[newParentId],
-    //   //   nodes[nodeId],
-    //   //   ...siblingIds.map(siblingId => nodes[siblingId])
-    //   // ])
-    // })
+      expect(dispatch).to.have.been.called
+      expect(nodeActions.nodePromotion).to.have.been.calledWith(
+        nodeId, siblingIds, currentParentId, newParentId, visibleNodes, userId
+      )
+    })
   })
   describe('selectNode', () => {
     it('should dispatch a nodeSelection action', () => {

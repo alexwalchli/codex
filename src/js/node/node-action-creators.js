@@ -122,12 +122,13 @@ export const demoteNode = (nodeId) => (dispatch, getState) => {
   const addAfterLastChildOfSiblingAboveId = addAfterSibling.get('childIds')[addAfterSibling.get('childIds').count() - 1]
 
   dispatch(nodeActions.nodeDemotion(
-      nodeId,
-      currentParentId,
-      newParentId,
-      addAfterLastChildOfSiblingAboveId,
-      state.visibleNodes,
-      userId))
+    nodeId,
+    currentParentId,
+    newParentId,
+    addAfterLastChildOfSiblingAboveId,
+    state.visibleNodes,
+    userId)
+  )
 }
 
 export const promoteNode = (nodeId) => (dispatch, getState) => {
@@ -144,7 +145,14 @@ export const promoteNode = (nodeId) => (dispatch, getState) => {
     return
   }
 
-  dispatch(nodeActions.nodePromotion(nodeId, siblingIds, currentParentId, newParentId, state.visibleNodes, userId))
+  dispatch(nodeActions.nodePromotion(
+    nodeId,
+    siblingIds,
+    currentParentId,
+    newParentId,
+    state.visibleNodes,
+    userId)
+  )
 }
 
 export const toggleNodeExpansion = (nodeId) => (dispatch, getState) => {

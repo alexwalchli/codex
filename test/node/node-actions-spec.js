@@ -51,14 +51,16 @@ describe('node actions', () => {
       const nodeId = '2'
       const content = 'some content'
       const userId = 'user123'
+      const tags = []
 
-      expect(nodeActions.nodeContentUpdate(nodeId, content, userId))
+      expect(nodeActions.nodeContentUpdate(nodeId, content, userId, tags))
         .to.deep.equal({
           type: nodeActionTypes.NODE_CONTENT_UPDATE,
           payload: {
             nodeId,
             content,
-            userId
+            userId,
+            tags
           }
         })
     })
@@ -68,13 +70,15 @@ describe('node actions', () => {
       const nodeId = '2'
       const notes = 'some notes'
       const userId = 'user123'
+      const tags = []
 
-      expect(nodeActions.nodeNotesUpdate(nodeId, notes, userId))
+      expect(nodeActions.nodeNotesUpdate(nodeId, notes, tags, userId))
         .to.deep.equal({
           type: nodeActionTypes.NODE_NOTES_UPDATE,
           payload: {
             nodeId,
             notes,
+            tags,
             userId
           }
         })
