@@ -37,12 +37,12 @@ export const deleteUserPage = (userPageId) =>
     userPageRepository.deleteUserPage(userPage, rootNode, auth)
   }
 
-export const updateUserPageName = (userPageId, newUserPageName) =>
-  (dispatch, getState) => {
-    const state = getState()
-    userPageRepository.updateUserPageName(state.userPages.get(userPageId), newUserPageName)
-    dispatch(userPageActions.userPageNameUpdate(userPageId, newUserPageName))
-  }
+// export const updateUserPageName = (userPageId, newUserPageName) =>
+//   (dispatch, getState) => {
+//     const state = getState()
+//     userPageRepository.updateUserPageName(state.userPages.get(userPageId), newUserPageName)
+//     dispatch(userPageActions.userPageNameUpdate(userPageId, newUserPageName))
+//   }
 
 export const shareUserPage = (userPageId, emails) =>
   (dispatch, getState) => {

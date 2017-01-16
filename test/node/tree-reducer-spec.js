@@ -64,7 +64,9 @@ describe('treeReducer', () => {
 
       tree(null, initialTreeStateLoadedAction)
 
-      expect(nodeOperations.focus).to.have.been.calledWith(initialTreeStateLoadedAction.payload.initialTreeState, '456', false)
+      expect(nodeOperations.focus).to.have.been.calledWith(
+        initialTreeStateLoadedAction.payload.initialTreeState, '456', false
+      )
     })
   })
   describe('NODE_CREATION', () => {
@@ -160,7 +162,10 @@ describe('treeReducer', () => {
       const content = 'some content'
       const userPageId = 'abc123'
       const userId = 'abc'
-      const nodeCreationAction = nodeActions.nodeCreation(nodeId, originNodeId, parentId, [], parentId, originOffset, content, userPageId, userId)
+      const nodeCreationAction = nodeActions.nodeCreation(
+        nodeId, originNodeId, parentId, [],
+        parentId, originOffset, content, userPageId, userId
+      )
 
       const newState = tree(state, nodeCreationAction)
 
@@ -174,7 +179,10 @@ describe('treeReducer', () => {
       const content = 'some content'
       const userPageId = 'abc123'
       const userId = 'abc'
-      const nodeCreationAction = nodeActions.nodeCreation(nodeId, originNodeId, parentId, [], parentId, originOffset, content, userPageId, userId)
+      const nodeCreationAction = nodeActions.nodeCreation(
+        nodeId, originNodeId, parentId, [], parentId,
+        originOffset, content, userPageId, userId
+      )
 
       tree(state, nodeCreationAction)
 

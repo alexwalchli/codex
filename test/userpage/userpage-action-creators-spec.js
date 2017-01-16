@@ -33,7 +33,7 @@ describe('userPageActionCreators', () => {
   const newUserPage = {}
   const userPageNavigationActionStub = { navigateToUserPage: true }
   const userPageDeletionActionStub = { userPageDeletion: true }
-  const userPageNameUpdateActionStub = { userPageNameUpdate: true }
+  // const userPageNameUpdateActionStub = { userPageNameUpdate: true }
   beforeEach(() => {
     sinon.stub(nodeRepository, 'getNewNodeId', () => (newNodeId))
     sinon.stub(nodeOperations, 'makeNode', () => (newNode))
@@ -41,10 +41,10 @@ describe('userPageActionCreators', () => {
     sinon.stub(userPageRepository, 'getNewUserPageId', () => (newUserPageId))
     sinon.stub(userPageRepository, 'createUserPage', (newUserPage, newRootNode, newFirstNode) => (Promise.resolve(newUserPage)))
     sinon.stub(userPageRepository, 'deleteUserPage', (userPageId) => (Promise.resolve()))
-    sinon.stub(userPageRepository, 'updateUserPageName', (userPageId, name) => (Promise.resolve()))
+    // sinon.stub(userPageRepository, 'updateUserPageName', (userPageId, name) => (Promise.resolve()))
     sinon.stub(appActionCreators, 'navigateToUserPage', () => (userPageNavigationActionStub))
     sinon.stub(userPageActions, 'userPageDeletion', () => (userPageDeletionActionStub))
-    sinon.stub(userPageActions, 'userPageNameUpdate', () => (userPageNameUpdateActionStub))
+    // sinon.stub(userPageActions, 'userPageNameUpdate', () => (userPageNameUpdateActionStub))
   })
 
   afterEach(() => {
@@ -55,17 +55,17 @@ describe('userPageActionCreators', () => {
     userPageRepository.getNewUserPageId.restore()
     userPageRepository.createUserPage.restore()
     userPageRepository.deleteUserPage.restore()
-    userPageRepository.updateUserPageName.restore()
+    // userPageRepository.updateUserPageName.restore()
     userPageActions.userPageDeletion.restore()
-    userPageActions.userPageNameUpdate.restore()
+    // userPageActions.userPageNameUpdate.restore()
   })
 
   describe('createUserPage', () => {
     it('should create a userPage then navigate to the new userPage', (done) => {
       userPageActionCreators.createUserPage('Home', true)(dispatch, getState)
 
-      expect(nodeOperations.makeNode).to.have.been.calledWith(newNodeId, null, [newNodeId], '', userId)
-      expect(nodeOperations.makeNode).to.have.been.calledWith(newNodeId, newNodeId, [], '', userId)
+      expect(nodeOperations.makeNode).to.have.been.calledWith(newNodeId, null, [newNodeId], newUserPageId, '', userId)
+      expect(nodeOperations.makeNode).to.have.been.calledWith(newNodeId, newNodeId, [], newUserPageId, '', userId)
       expect(userPageOperations.makeUserPage).to.have.been.calledWith(newUserPageId, newNodeId, userId, 'Home', true)
       expect(userPageRepository.createUserPage).to.have.been.calledWith(newUserPage, newNode, newNode)
 
@@ -87,14 +87,14 @@ describe('userPageActionCreators', () => {
       expect(dispatch).to.have.been.calledWith(userPageDeletionActionStub)
     })
   })
-  describe('updateUserPageName', () => {
-    it('should update the page in persistence and state', () => {
-      userPageActionCreators.updateUserPageName('1', 'new name')(dispatch, getState)
+  // describe('updateUserPageName', () => {
+  //   it('should update the page in persistence and state', () => {
+  //     userPageActionCreators.updateUserPageName('1', 'new name')(dispatch, getState)
 
-      expect(userPageRepository.updateUserPageName).to.have.been.calledWith(userPage, 'new name')
-      expect(dispatch).to.have.been.calledWith(userPageNameUpdateActionStub)
-    })
-  })
+  //     expect(userPageRepository.updateUserPageName).to.have.been.calledWith(userPage, 'new name')
+  //     expect(dispatch).to.have.been.calledWith(userPageNameUpdateActionStub)
+  //   })
+  // })
   // describe('shareUserPage', () => {
   //   it('should share the page via userPageRepository', () => {
 
