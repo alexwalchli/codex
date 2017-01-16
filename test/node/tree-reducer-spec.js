@@ -98,7 +98,7 @@ describe('treeReducer', () => {
         nodeCreationAction.payload.nodeId,
         '2',
         I.List([]),
-        userPageId,
+        nodeCreationAction.payload.userPageId,
         nodeCreationAction.payload.content,
         nodeCreationAction.payload.userId
       )
@@ -123,7 +123,7 @@ describe('treeReducer', () => {
         nodeCreationAction.payload.nodeId,
         '1',
         I.List([]),
-        userPageId,
+        nodeCreationAction.payload.userPageId,
         nodeCreationAction.payload.content,
         nodeCreationAction.payload.userId
       )
@@ -136,12 +136,20 @@ describe('treeReducer', () => {
       const content = 'some content'
       const userPageId = 'abc123'
       const userId = 'abc'
-      const nodeCreationAction = nodeActions.nodeCreation(nodeId, originNodeId, parentId, [], parentId, originOffset, content, userPageId, userId)
+      const nodeCreationAction = nodeActions.nodeCreation(
+        nodeId, originNodeId, parentId, [], parentId,
+        originOffset, content, userPageId, userId
+      )
 
       tree(state, nodeCreationAction)
 
       expect(nodeOperations.makeNode).to.have.been.calledWith(
-        nodeCreationAction.payload.nodeId, '1', [], nodeCreationAction.payload.content, nodeCreationAction.payload.userId
+        nodeCreationAction.payload.nodeId,
+        '1',
+        I.List([]),
+        nodeCreationAction.payload.userPageId,
+        nodeCreationAction.payload.content,
+        nodeCreationAction.payload.userId
       )
     })
     it('should focus the new node if the originOffset is greater than 0', () => {
@@ -231,7 +239,7 @@ describe('treeReducer', () => {
     })
   })
   describe('NODE_EXPANSION_TOGGLE', () => {
-    it('should expand the node and its collapsed descendents if it is currently collapsed by the current user', () => {
+    it('should expand the node', () => {
       const state = I.fromJS({
         '1': { id: '1', parentId: undefined, childIds: [ '2' ] },
         '2': { id: '2', parentId: '1', childIds: ['3', '4', '5'], collapsedBy: { 'user123': true } },
@@ -242,11 +250,9 @@ describe('treeReducer', () => {
       const nodeExpansionToggleAction = nodeActions.nodeExpansionToggle('2', true, 'user123')
 
       const newState = tree(state, nodeExpansionToggleAction)
-
       expect(newState.getIn(['2', 'collapsedBy'])).to.deep.equal(I.Map({ 'user123': false }))
-      expect(newState.getIn(['4', 'collapsedBy'])).to.deep.equal(I.Map({ 'user123': false }))
     })
-    it('should collapse the node and its expanded descendents if it is currently collapsed by the current user', () => {
+    it('should collapse the node', () => {
       const state = I.fromJS({
         '1': { id: '1', parentId: undefined, childIds: [ '2' ] },
         '2': { id: '2', parentId: '1', childIds: ['3', '4', '5'], collapsedBy: { 'user123': false } },
@@ -259,7 +265,6 @@ describe('treeReducer', () => {
       const newState = tree(state, nodeExpansionToggleAction)
 
       expect(newState.getIn(['2', 'collapsedBy'])).to.deep.equal(I.Map({ 'user123': true }))
-      expect(newState.getIn(['4', 'collapsedBy'])).to.deep.equal(I.Map({ 'user123': true }))
     })
   })
   describe('NODE_SELECTION', () => {
@@ -299,31 +304,10 @@ describe('treeReducer', () => {
   })
   describe('NODE_NOTES_UPDATE', () => {
     it('should update the node notes', () => {
-      const newState = tree(dummyState, nodeActions.nodeNotesUpdate('2', 'new notes', 'user123'))
+      const newState = tree(dummyState, nodeActions.nodeNotesUpdate('2', 'new notes', [], 'user123'))
 
       expect(newState.getIn(['2', 'notes'])).to.equal('new notes')
       expect(newState.getIn(['2', 'lastUpdatedById'])).to.equal('user123')
     })
   })
-  // describe('NODES_COMPLETION', () => {
-  //   it('should set all nodes to complete', () => {
-  //     throw new Error('not impl')
-  //   })
-  // })
-
-  // describe('NODE_DISPLAY_MODE_UPDATE', () => {
-  //   it('should update the node display mode', () => {
-  //     throw new Error('not impl')
-  //   })
-  // })
-  // describe('NODE_TAG_ADDITION', () => {
-  //   it('should add the tag to the node if it does not exist', () => {
-  //     throw new Error('not impl')
-  //   })
-  // })
-  // describe('NODE_TAG_REMOVAL', () => {
-  //   it('should remove the tag from the node', () => {
-  //     throw new Error('not impl')
-  //   })
-  // })
 })
