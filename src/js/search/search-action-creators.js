@@ -14,14 +14,17 @@ export const searchNodes = (phrase, tags) => (dispatch, getState) => {
         phrase.trim() === '' ||
         wordsInContent.find(word => word.toLowerCase().startsWith(loweredPhrase))) {
       results[node.id] = true
+
+      const ancestors = nodeSelectors.getAncestorIds(treeState, rootNodeId, node.id)
+      ancestors.forEach((ancestorId) => {
+        results[ancestorId] = true
+      })
     }
-        // get ancestors for each results
-        // results = ...nodeSelectors.getAscendants(node.id)
 
     return results
   }, {})
 
-  dispatch(searchActions.searchResult(nodeIdsResult))
+  dispatch(searchActions.searchResult(phrase, nodeIdsResult))
 }
 
 export const searchFocus = () => (dispatch) => {

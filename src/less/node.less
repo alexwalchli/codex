@@ -234,9 +234,9 @@
   }
 }
 
-/////////////////////////////////////////////
-// rendered content and plain text content //
-/////////////////////////////////////////////
+/////////////
+// content //
+/////////////
 
 .children .node { // depth 1
   .content {
@@ -249,6 +249,11 @@
     font-size: @node-depth-1-font-size;
     color: @tree-depth-1-font-color;
     font-family: @base-font-face;
+
+    .highlight {
+      background-color:yellow;
+      text-decoration: underline;
+    }
 
     .rendered-content {
       line-height: inherit;

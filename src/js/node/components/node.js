@@ -107,7 +107,8 @@ export class Node extends Component {
 
   render () {
     const { parentId, childIds, id, focused, collapsedBy, visible, selected, completed, notes, positionInOrderedList,
-            nodeInitialized, currentlySelectedBy, currentlySelectedById, auth, menuVisible, rootNodeId, lastChild } = this.props
+            nodeInitialized, currentlySelectedBy, currentlySelectedById, auth, menuVisible, rootNodeId, lastChild,
+            currentlySearchingOn } = this.props
     const { content } = this.state
 
     if (!nodeInitialized) {
@@ -173,6 +174,7 @@ export class Node extends Component {
                 nodeId={id}
                 content={content}
                 focused={focused}
+                highlightText={currentlySearchingOn}
               />
             </div>
 

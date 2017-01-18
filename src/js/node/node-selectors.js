@@ -36,6 +36,16 @@ export function getAllDescendantIds (nodes, startNodeId) {
   }, [])
 }
 
+// retrieves a node's lineage to the root as an array of node IDs
+export function getAncestorIds (nodes, rootNodeId, startNodeId) {
+  if (startNodeId === rootNodeId) {
+    return []
+  }
+  const parentId = nodes.getIn([startNodeId, 'parentId'])
+
+  return [ parentId, ...getAncestorIds(nodes, rootNodeId, parentId) ]
+}
+
 // recursively retrieves, and flattens, all node Ids excluding children of collapsed nodes, except children of the start node
 export function getVisibleNodesIfNodeWasExpanded (startNodeId, nodes, nodeId, userId) {
   console.log(nodes.getIn([nodeId, 'childIds']))
@@ -93,6 +103,7 @@ export const getNodeProps = (state, id) => {
   const parentNode = parentId ? tree.get(parentId) : undefined
   const parentNodeChildIds = parentId ? parentNode.get('childIds') : []
   const rootNodeId = getRootNodeId(state)
+  const currentlySearchingOn = state.search.get('currentlySearchingOn')
 
   let positionInOrderedList
   if (parentNode && parentNode.displayMode === 'ordered') {
@@ -103,9 +114,11 @@ export const getNodeProps = (state, id) => {
     rootNodeId,
     nodeInitialized: !!nodeFromState,
     auth: state.auth,
+    search: state.search,
     positionInOrderedList,
     lastChild: parentNode && parentNodeChildIds.indexOf(id) === parentNodeChildIds.length - 1,
     visible: state.visibleNodes.get(id),
-    ...nodeFromState.toJS()
+    ...nodeFromState.toJS(),
+    currentlySearchingOn
   }
 }

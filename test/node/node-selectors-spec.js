@@ -100,6 +100,23 @@ describe('nodeSelectors', () => {
     })
   })
 
+  describe('getAncestorIds', () => {
+    it('should return an array of ancestors leading to and including the root', () => {
+      const userId = '123'
+      const nodes = I.fromJS({
+        root: { id: 'root', childIds: ['aaa'], collapsedBy: {}, parentId: null },
+        aaa: { id: 'aaa', childIds: ['bbb', 'ccc'], collapsedBy: {}, parentId: 'root' },
+        bbb: { id: 'bbb', childIds: ['ddd'], collapsedBy: { '123': userId }, parentId: 'aaa' },
+        ccc: { id: 'ccc', childIds: [], collapsedBy: {}, parentId: 'aaa' },
+        ddd: { id: 'ddd', childIds: ['eee'], collapsedBy: {}, parentId: 'ccc' },
+        eee: { id: 'eee', childIds: [], collapsedBy: {}, parentId: 'ddd' }
+      })
+
+      expect(nodeSelectors.getAncestorIds(nodes, 'root', 'eee'))
+        .to.deep.equal(['ddd', 'ccc', 'aaa', 'root'])
+    })
+  })
+
   describe('getVisibleNodesIfNodeWasExpanded', () => {
     it('should return a flattened, ordered, list of all children node Ids under a start node ' +
       'that are not collapsed under a parent and does not include the start node Id', () => {

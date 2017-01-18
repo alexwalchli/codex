@@ -6,6 +6,11 @@ import * as I from 'immutable'
 import { allPlugins, mentionPlugin } from '../utilities/editor-plugins'
 import { extractHashtagsWithIndices } from '../utilities/hashtag-extractor'
 import { defaultSuggestionsFilter } from 'draft-js-mention-plugin'
+import {
+  ContentState,
+  EditorState,
+} from 'draft-js';
+import { createHighlightDecorator } from '../draftjs/highlight-decorator'
 
 const { MentionSuggestions } = mentionPlugin
 
@@ -27,7 +32,10 @@ export class BulletContent extends Component {
     super(props)
 
     this.state = {
-      editorState: createEditorStateWithText(this.props.content),
+      editorState: EditorState.createWithContent(
+        ContentState.createFromText(this.props.content),
+        createHighlightDecorator()
+      ),
       suggestions: mentions
     }
   }
@@ -42,6 +50,15 @@ export class BulletContent extends Component {
     setTimeout(() => {
       this.maybeFocus()
     }, 0)
+  }
+
+  componentWillReceiveProps () {
+    this.setState({
+      editorState: EditorState.createWithContent(
+        ContentState.createFromText(this.currentContent()),
+        createHighlightDecorator()
+      )
+    })
   }
 
   onEditorChange (editorState) {
