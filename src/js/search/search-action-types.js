@@ -1,1 +1,2 @@
 export const SEARCH_RESULT = 'SEARCH_RESULT'
+export const SEARCH_CLEAR = 'SEARCH_CLEAR'

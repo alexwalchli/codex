@@ -8,7 +8,8 @@ import {
   NODE_DELETION,
   INITIAL_TREE_STATE_LOAD } from './node-action-types'
 import {
-  SEARCH_RESULT
+  SEARCH_RESULT,
+  SEARCH_CLEAR
 } from '../search/search-action-types.js'
 
 export const visibleNodes = reducerFactory(I.Map({}), {
@@ -61,10 +62,16 @@ export const visibleNodes = reducerFactory(I.Map({}), {
   },
   [SEARCH_RESULT]: (state, action) => {
     return state.map((isVisible, nodeId) => {
-      if (action.payload.nodeIdsResult[nodeId]) {
+      if (action.payload.ancestorIdsOfSearchResult[nodeId]
+          || action.payload.nodeIdsResult[nodeId]) {
         return true
       }
       return false
+    })
+  },
+  [SEARCH_CLEAR]: (state, action) => {
+    return state.map((isVisible) => {
+      return true
     })
   }
 })

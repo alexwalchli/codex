@@ -108,7 +108,7 @@ export class Node extends Component {
   render () {
     const { parentId, childIds, id, focused, collapsedBy, visible, selected, completed, notes, positionInOrderedList,
             nodeInitialized, currentlySelectedBy, currentlySelectedById, auth, menuVisible, rootNodeId, lastChild,
-            currentlySearchingOn } = this.props
+            currentlySearchingOn, isAncestorOfSearchResult } = this.props
     const { content } = this.state
 
     if (!nodeInitialized) {
@@ -138,6 +138,10 @@ export class Node extends Component {
     }
     if (completed) {
       bulletClasses += ' completed'
+    }
+
+    if (isAncestorOfSearchResult) {
+      bulletClasses += ' ancestor-of-search-result'
     }
 
     let currentlySelectedByAnotherUser = currentlySelectedById && currentlySelectedById !== auth.get('id')

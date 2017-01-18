@@ -5,8 +5,14 @@ import * as actions from '../search-action-creators'
 export class SearchInput extends Component {
 
   onInputChange () {
-    const { searchNodes } = this.props
-    searchNodes(this.refs.searchInput.value)
+    const { searchNodes, clearSearch } = this.props
+    const phrase = this.refs.searchInput.value
+
+    if (phrase !== '') {
+      searchNodes(phrase)
+    } else {
+      clearSearch()
+    }
   }
 
   onInputClick (e) {

@@ -254,26 +254,11 @@
       background-color:yellow;
       text-decoration: underline;
     }
+  }
 
-    .rendered-content {
-      line-height: inherit;
-      font-size:inherit;
-      padding:0;
-      border:none;
-      outline: none;
-
-      code {
-          border-radius:6px;
-          color:@secondary-color;
-          background-color:lighten(@base-color, 50%);
-          font-family: 'Roboto Slab', serif;
-          padding: 0px 6px;
-          font-size:.9em;
-      }
-
-      a {
-          color:@base-color
-      }
+  &.ancestor-of-search-result > .depth {
+    .content {
+      color: lighten(@tree-depth-1-font-color, 80%);
     }
   }
 
@@ -497,6 +482,21 @@
         top:13px;
         font-size:.95em;
       }
+    }
+  }
+
+  &.ancestor-of-search-result.no-children > .depth > .bullet-container {
+    .inner-circle {
+      background-color:lighten(@bullet-color, 40%) !important;
+    }
+  }
+
+  &.ancestor-of-search-result.has-children > .depth > .bullet-container {
+    .inner-circle {
+      background-color:lighten(@bullet-color, 40%) !important;
+    }
+    .outer-circle {
+      border-color:lighten(@bullet-color, 40%) !important;
     }
   }
 

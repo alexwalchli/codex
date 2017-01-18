@@ -52,14 +52,14 @@ export class BulletContent extends Component {
     }, 0)
   }
 
-  componentWillReceiveProps () {
-    this.setState({
-      editorState: EditorState.createWithContent(
-        ContentState.createFromText(this.currentContent()),
-        createHighlightDecorator()
-      )
-    })
-  }
+  // componentWillReceiveProps () {
+  //   this.setState({
+  //     editorState: EditorState.createWithContent(
+  //       ContentState.createFromText(this.currentContent()),
+  //       createHighlightDecorator()
+  //     )
+  //   })
+  // }
 
   onEditorChange (editorState) {
     this.setState({

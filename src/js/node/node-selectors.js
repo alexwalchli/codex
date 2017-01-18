@@ -104,6 +104,8 @@ export const getNodeProps = (state, id) => {
   const parentNodeChildIds = parentId ? parentNode.get('childIds') : []
   const rootNodeId = getRootNodeId(state)
   const currentlySearchingOn = state.search.get('currentlySearchingOn')
+  const isAncestorOfSearchResult = state.search.get('ancestorIdsOfSearchResult').get(id)
+    && !state.search.get('nodeIdsInSearchResult').get(id)
 
   let positionInOrderedList
   if (parentNode && parentNode.displayMode === 'ordered') {
@@ -119,6 +121,7 @@ export const getNodeProps = (state, id) => {
     lastChild: parentNode && parentNodeChildIds.indexOf(id) === parentNodeChildIds.length - 1,
     visible: state.visibleNodes.get(id),
     ...nodeFromState.toJS(),
-    currentlySearchingOn
+    currentlySearchingOn,
+    isAncestorOfSearchResult
   }
 }
