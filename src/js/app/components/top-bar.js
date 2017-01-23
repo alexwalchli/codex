@@ -3,6 +3,18 @@ import { connect } from 'react-redux'
 import * as actions from '../app-action-creators'
 import SearchInput from '../../search/components/search-input'
 // import ShareForm from '../containers/share-form'
+import TopBarDropdown from './top-bar-dropdown'
+
+var colours = [{
+  name: "Red",
+  hex: "#F21B1B"
+}, {
+  name: "Blue",
+  hex: "#1B66F2"
+}, {
+  name: "Green",
+  hex: "#07BA16"
+}];
 
 export class Topbar extends Component {
 
@@ -17,6 +29,7 @@ export class Topbar extends Component {
         <div className='top-bar-right'>
           <ul className='menu'>
             <li><a><i className='icon dripicons-archive' /></a></li>
+            <li><a><i className='icon dripicons-gear' /></a></li>
             <li><a><i className='icon dripicons-user' /></a></li>
           </ul>
         </div>
@@ -43,3 +56,5 @@ export default ConnectedTopbar
 //     </div>
 //     : null }
 // </li>
+
+// <li><TopBarDropdown iconCss='icon dripicons-gear' list={colours} selected={colours[0]} /></li>

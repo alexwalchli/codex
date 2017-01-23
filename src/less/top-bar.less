@@ -60,31 +60,133 @@
     font-size:24px;
 }
 
-.top-bar li .dropdown{
-    position:absolute;
-    background-color:@panel-bg-color;
-    min-width:300px;
-    right:0;
-    border-radius:10px;
-    border:1px solid @panel-border-color;
-    z-index:1;
-
-    .dropdown-content {
-        font-size:1em;
-        color:@secondary-color;
-        padding:10px;
-
-        label, p, i, input{
-            font-size:14px;
-        }
-
-        .btn{
-            padding:14px;
-        }
+.top-bar li {
+    .transition (@transition) {
+        -webkit-transition: @transition;  
+        -moz-transition:    @transition;
+        -ms-transition:     @transition; 
+        -o-transition:      @transition;  
     }
+    .transform(@string){
+        -webkit-transform: @string;
+        -moz-transform: 	 @string;
+        -ms-transform: 		 @string;
+        -o-transform: 		 @string;
+    }
+    .scale (@factor) {
+        -webkit-transform: scale(@factor);
+        -moz-transform: 	 scale(@factor);
+        -ms-transform: 		 scale(@factor);
+        -o-transform: 		 scale(@factor);
+    }
+    .box-sizing (@type: border-box) {
+        -webkit-box-sizing: @type;
+        -moz-box-sizing:    @type;
+        box-sizing:         @type;
+    }
+    .vertical-align(@height) {
+        height:@height;
+        position: relative;
+        top: 50%;
+        -webkit-transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+    }
+    @height:40px;
+    @spacing:10px;
+    @select-colour:#2875C7;
+    @font-size:14px;
+    @border-colour:#DDD;
+        
+    div.dropdown-container {
+        &.show > div.dropdown-list {
+            .transform(scale(1, 1));
+        }
 
-    .share-form{
-        width:400px;
+        @icon-width:14px;
+                
+        >div.dropdown-display {
+            float:left;
+            width:100%;
+            background:white;
+            height:@height;
+            cursor:pointer;
+            border:solid 1px @border-colour;
+            .box-sizing();
+
+            >* {
+                float:left;
+                height:100%;
+                .vertical-align(@height);
+            }
+            
+            >span {
+                font-size:@font-size;
+                width:100%;
+                position:relative;
+                .box-sizing();
+                padding-right:@icon-width+@spacing*2;
+                padding-left:@spacing;
+            }
+            
+            >i {
+                position:relative;
+                width:@icon-width;
+                margin-left:(@spacing+@icon-width)*-1;
+                font-size:1.125em;
+                font-weight:bold;
+                padding-right:@spacing;
+                text-align:right;
+            }
+        }
+
+        >div.dropdown-list {
+            float:left;
+            width:100%;
+            position:relative;
+            width:100%;
+            .transform(scale(1, 0));
+            .transition(-webkit-transform ease 250ms);
+            .transition(transform ease 250ms);
+
+            >div {
+                position:absolute;
+                width:100%;
+                z-index:2;
+                cursor:pointer;
+                background:white;
+
+                >div {
+                    float:left;
+                    width:100%;
+                    padding:0 @spacing;
+                    font-size:@font-size;
+                    .box-sizing();
+                    border:solid 1px @border-colour;
+                    border-top:none;
+
+                    @icon-width:20px;
+
+                    &:hover {
+                        background:#F0F0F0;
+                    }
+
+                    &.selected {
+                        background:@select-colour;
+                        color:white;
+                    }
+
+                    >* {
+                        .vertical-align(@height);
+                    }
+
+                    >span {
+                        float:left;
+                        width:100%;
+                    }
+                }
+            }
+        }
     }
 }
 
