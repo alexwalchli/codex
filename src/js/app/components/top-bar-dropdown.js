@@ -6,47 +6,54 @@ export default class TopBarDropdown extends Component {
     this.state = {
       listVisible: false
     }
+
+    this.hide = this.hide.bind(this)
   }
 
   select (item) {
-    this.props.selected = item;
+    const { onItemSelected } = this.props
+    this.props.selected = item
+    onItemSelected(item)
   }
-        
+
   show () {
-    this.setState({ listVisible: true });
-    document.addEventListener("click", this.hide.bind(this));
+    this.setState({ listVisible: true })
+    document.addEventListener('click', this.hide)
   }
-        
+
   hide () {
-    this.setState({ listVisible: false });
-    document.removeEventListener("click", this.hide);
+    this.setState({ listVisible: false })
+    document.removeEventListener('click', this.hide)
   }
 
   render () {
+    
+
     return (
-      <div className={"dropdown-container" + (this.state.listVisible ? " show" : "")}>
-        <div className={"dropdown-display" + (this.state.listVisible ? " clicked": "")} onClick={() => this.show()}>
-          <span><i className={this.props.iconCss} /></span>
-          <i className="fa fa-angle-down"></i>
-        </div>
-        <div className="dropdown-list">
-          <div>
-            {this.renderListItems()}
+      <div>
+        <div className={'dropdown-container' + (this.state.listVisible ? ' show' : '')}>
+          <div className={'dropdown-display' + (this.state.listVisible ? ' clicked' : '')} onClick={() => this.show()}>
+            <a><i className={this.props.iconCss} /></a>
           </div>
+          <div className='dropdown-list'>
+            <div>
+              {this.props.children}
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
     )
   }
-        
+
   renderListItems () {
-    var items = [];
+    var items = []
     for (var i = 0; i < this.props.list.length; i++) {
-      var item = this.props.list[i];
+      var item = this.props.list[i]
       items.push(<div onClick={() => this.select(item)}>
         <span style={{ color: item.hex }}>{item.name}</span>
-      </div>);
+      </div>)
     }
-    return items;
+    return items
   }
 }
 
@@ -56,21 +63,21 @@ export default class TopBarDropdown extends Component {
   //     listVisible: false
   //   };
   // },
-  
+
   // select: function(item) {
   //   this.props.selected = item;
   // },
-        
+
   // show: function() {
   //   this.setState({ listVisible: true });
   //   document.addEventListener("click", this.hide);
   // },
-        
+
   // hide: function() {
   //   this.setState({ listVisible: false });
   //   document.removeEventListener("click", this.hide);
   // },
-      
+
 //   render: function() {
 //     return <div className={"dropdown-container" + (this.state.listVisible ? " show" : "")}>
 //       <div className={"dropdown-display" + (this.state.listVisible ? " clicked": "")} onClick={this.show}>
@@ -84,7 +91,7 @@ export default class TopBarDropdown extends Component {
 //       </div>
 //     </div>;
 //   },
-        
+
 //   renderListItems: function() {
 //     var items = [];
 //     for (var i = 0; i < this.props.list.length; i++) {
@@ -96,4 +103,4 @@ export default class TopBarDropdown extends Component {
 //     return items;
 //   }
 // });
-      
+

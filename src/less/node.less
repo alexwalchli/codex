@@ -316,10 +316,25 @@
 }
 
 ///////////////////
-// node statuses //
+// node content  //
 ///////////////////
 
 .children .node {
+
+  > .depth > .content .DraftEditor-root {
+    .hashtag {
+      color: @base-color;
+      background-color: lighten(@base-color, 50%);
+      padding:2px 4px 2px 4px;
+      border-radius: 6px;
+    }
+
+    .editor-link {
+      color: @base-color;
+      text-decoration: underline;
+      cursor: pointer;
+    } 
+  }
 
   &.selected {
     background-color:#E2E2E8;
@@ -330,9 +345,20 @@
   }
 
   &.completed {
-    > .depth > .content .rendered-content, > .depth > .content textarea {
-        color:lighten(@secondary-color, 80%) !important;
-        text-decoration: line-through;
+    > .depth > .content {
+      color:lighten(@secondary-color, 90%) !important;
+      text-decoration: line-through;
+
+      .DraftEditor-root {
+        .hashtag {
+          color: lighten(@base-color, 40%);
+          background-color: lighten(@base-color, 53%);
+        }
+
+        .editor-link {
+          color: lighten(@base-color, 40%);
+        } 
+      }
     }
   }
 

@@ -8,8 +8,8 @@ import { extractHashtagsWithIndices } from '../utilities/hashtag-extractor'
 import { defaultSuggestionsFilter } from 'draft-js-mention-plugin'
 import {
   ContentState,
-  EditorState,
-} from 'draft-js';
+  EditorState
+} from 'draft-js'
 import { createHighlightDecorator } from '../draftjs/highlight-decorator'
 
 const { MentionSuggestions } = mentionPlugin

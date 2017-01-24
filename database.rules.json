@@ -24,7 +24,7 @@
       "$userpageId": {
         // must have a userPagesByUser/$userId/$userPageId prior to reading
         ".read": "(auth != null) && root.child('userPagesByUser/' + auth.uid +  '/' + $userpageId).exists()",
-        ".write": "(auth != null) && root.child('userPagesByUser/' + auth.uid +  '/' + $userpageId).exists()",
+        ".write": "(auth != null) && root.child('userPagesByUser/' + auth.uid +  '/' + $userpageId).exists()"
       }
     },
     "userPagesByUser": {
@@ -34,7 +34,7 @@
         "$userpageId": {
           // must be under the current user
           // or the current user owns this user page already(in this case the user is sharing with another)
-          ".write": "(auth != null) && ($userId === auth.uid || root.child('userPagesByUser/' + auth.uid +  '/' + $userpageId).exists())",
+          ".write": "(auth != null) && ($userId === auth.uid || root.child('userPagesByUser/' + auth.uid +  '/' + $userpageId).exists())"
         }
       }
     }

@@ -1,3 +1,5 @@
+@import "_mixins";
+
 .top-bar{
     height:84px;
     margin-bottom:42px;
@@ -61,37 +63,6 @@
 }
 
 .top-bar li {
-    .transition (@transition) {
-        -webkit-transition: @transition;  
-        -moz-transition:    @transition;
-        -ms-transition:     @transition; 
-        -o-transition:      @transition;  
-    }
-    .transform(@string){
-        -webkit-transform: @string;
-        -moz-transform: 	 @string;
-        -ms-transform: 		 @string;
-        -o-transform: 		 @string;
-    }
-    .scale (@factor) {
-        -webkit-transform: scale(@factor);
-        -moz-transform: 	 scale(@factor);
-        -ms-transform: 		 scale(@factor);
-        -o-transform: 		 scale(@factor);
-    }
-    .box-sizing (@type: border-box) {
-        -webkit-box-sizing: @type;
-        -moz-box-sizing:    @type;
-        box-sizing:         @type;
-    }
-    .vertical-align(@height) {
-        height:@height;
-        position: relative;
-        top: 50%;
-        -webkit-transform: translateY(-50%);
-        -ms-transform: translateY(-50%);
-        transform: translateY(-50%);
-    }
     @height:40px;
     @spacing:10px;
     @select-colour:#2875C7;
@@ -111,7 +82,6 @@
             background:white;
             height:@height;
             cursor:pointer;
-            border:solid 1px @border-colour;
             .box-sizing();
 
             >* {
@@ -156,7 +126,8 @@
                 cursor:pointer;
                 background:white;
 
-                >div {
+                .item {
+                    position:absolute;
                     float:left;
                     width:100%;
                     padding:0 @spacing;
@@ -176,14 +147,15 @@
                         color:white;
                     }
 
-                    >* {
-                        .vertical-align(@height);
-                    }
+                    // >* {
+                    //     .vertical-align(@height);
+                    // }
 
-                    >span {
-                        float:left;
-                        width:100%;
-                    }
+                    // .item {
+                    //     position:absolute;
+                    //     float:left;
+                    //     width:300px;
+                    // }
                 }
             }
         }

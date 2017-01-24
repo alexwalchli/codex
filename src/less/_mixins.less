@@ -1,0 +1,31 @@
+.transition (@transition) {
+    -webkit-transition: @transition;  
+    -moz-transition:    @transition;
+    -ms-transition:     @transition; 
+    -o-transition:      @transition;  
+}
+.transform(@string){
+    -webkit-transform: @string;
+    -moz-transform: 	 @string;
+    -ms-transform: 		 @string;
+    -o-transform: 		 @string;
+}
+.scale (@factor) {
+    -webkit-transform: scale(@factor);
+    -moz-transform: 	 scale(@factor);
+    -ms-transform: 		 scale(@factor);
+    -o-transform: 		 scale(@factor);
+}
+.box-sizing (@type: border-box) {
+    -webkit-box-sizing: @type;
+    -moz-box-sizing:    @type;
+    box-sizing:         @type;
+}
+.vertical-align(@height) {
+    height:@height;
+    position: relative;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+}

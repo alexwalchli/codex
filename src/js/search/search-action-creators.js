@@ -14,13 +14,11 @@ export const searchNodes = (phrase, tags) => (dispatch, getState) => {
     if (node.id === rootNodeId ||
         phrase.trim() === '' ||
         wordsInContent.find(word => word.toLowerCase().startsWith(loweredPhrase))) {
-
       results[node.id] = true
       const ancestors = nodeSelectors.getAncestorIds(treeState, rootNodeId, node.id)
       ancestors.forEach((ancestorId) => {
         ancestorIdsOfSearchResult[ancestorId] = true
       })
-
     }
 
     return results

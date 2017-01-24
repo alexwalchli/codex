@@ -4,11 +4,11 @@ import { store } from '../../redux/configure-store'
 
 export const createHighlightDecorator = () => (
   new CompositeDecorator([
-  {
-    strategy: findText,
-    component: highlightSpan
-  }
-]))
+    {
+      strategy: findText,
+      component: highlightSpan
+    }
+  ]))
 
 function findText (contentBlock, callback) {
   const phrase = store.getState().search.get('currentlySearchingOn')
