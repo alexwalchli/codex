@@ -27,8 +27,6 @@ export default class TopBarDropdown extends Component {
   }
 
   render () {
-    
-
     return (
       <div>
         <div className={'dropdown-container' + (this.state.listVisible ? ' show' : '')}>

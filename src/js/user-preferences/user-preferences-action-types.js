@@ -1,0 +1,1 @@
+export const TYPE_SCALE_UPDATE = 'TYPE_SCALE_UPDATE'
