@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actionCreators from '../node-action-creators'
-import Editor, { createEditorStateWithText } from 'draft-js-plugins-editor'
+import Editor from 'draft-js-plugins-editor'
 import * as I from 'immutable'
 import { allPlugins, mentionPlugin } from '../utilities/editor-plugins'
 import { extractHashtagsWithIndices } from '../utilities/hashtag-extractor'

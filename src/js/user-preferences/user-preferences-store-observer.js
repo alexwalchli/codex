@@ -2,7 +2,6 @@ import { observeStore } from '../redux/observe-store'
 import diff from 'immutablediff'
 import * as userPreferencesRepository from './user-preferences-repository'
 import { diffsToFirebaseUpdate } from '../firebase/firebase-immutable-diff'
-import * as I from 'immutable'
 
 export const observeTreeStore = (store) => {
   return observeStore(store, (state) => state.tree, userPreferencesChanged)

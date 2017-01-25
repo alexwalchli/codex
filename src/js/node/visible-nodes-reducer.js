@@ -62,8 +62,8 @@ export const visibleNodes = reducerFactory(I.Map({}), {
   },
   [SEARCH_RESULT]: (state, action) => {
     return state.map((isVisible, nodeId) => {
-      if (action.payload.ancestorIdsOfSearchResult[nodeId]
-          || action.payload.nodeIdsResult[nodeId]) {
+      if (action.payload.ancestorIdsOfSearchResult[nodeId] ||
+          action.payload.nodeIdsResult[nodeId]) {
         return true
       }
       return false
