@@ -1,7 +1,8 @@
 # Codex
 
+Eventually your AI-powered personal wiki. 
 
-__Readme in progress__
+https://codex-f90ff.firebaseapp.com
 
 Database Schema
 =================
