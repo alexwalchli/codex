@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import * as actions from '../app-action-creators'
+import * as appActionCreators from '../app-action-creators'
+import * as userPreferencesActionCreators from '../../user-preferences/user-preferences-action-creators'
 import SearchInput from '../../search/components/search-input'
 // import ShareForm from '../containers/share-form'
 import TopBarDropdown from './top-bar-dropdown'
@@ -18,7 +19,15 @@ var colours = [{
 
 export class Topbar extends Component {
 
+  onTypeScaleClick (e, typeScale) {
+    e.stopPropagation()
+    const { updateTypeScale } = this.props
+    updateTypeScale(typeScale)
+  }
+
   render () {
+    const { updateTypeScale } = this.props
+
     return (
       <nav className='top-bar clearfix'>
         <div className='top-bar-left'>
@@ -33,6 +42,8 @@ export class Topbar extends Component {
               <TopBarDropdown iconCss='icon dripicons-gear' list={colours} selected={colours[0]}>
                 <div className='item'>
                   <h4>Type Scale</h4>
+                  <a onClick={(e) => this.onTypeScaleClick(e, 1.25)}>1.25</a>
+                  <a onClick={(e) => this.onTypeScaleClick(e, 1.00)}>1.00</a>
                 </div>
                 <div className='item'>
                   <h4>Theme</h4>
@@ -51,7 +62,10 @@ function mapStateToProps (state, ownProps) {
   return ownProps
 }
 
-const ConnectedTopbar = connect(mapStateToProps, actions)(Topbar)
+const ConnectedTopbar = connect(
+  mapStateToProps,
+  { ...appActionCreators, ...userPreferencesActionCreators}
+)(Topbar)
 export default ConnectedTopbar
 
 // <li><span className='logo'>codex</span></li>

@@ -37,6 +37,13 @@
           ".write": "(auth != null) && ($userId === auth.uid || root.child('userPagesByUser/' + auth.uid +  '/' + $userpageId).exists())"
         }
       }
+    },
+    "userPreferences": {
+      "$userId": {
+        // must be the current user to read and write
+        ".read": "(auth != null) && $userId === auth.uid",
+        ".write": "(auth != null) && $userId === auth.uid"
+      }
     }
   }
 }

@@ -6,6 +6,7 @@ import { auth } from '../auth/auth-reducer'
 import { userPages } from '../userpage/userpage-reducer'
 import { tags } from '../tag/tag-reducer'
 import { search } from '../search/search-reducer'
+import { userPreferences } from '../user-preferences/user-preferences-reducer'
 // import undoable from 'redux-undo'
 
 // const undoableActionFilter = action => action.undoable !== false
@@ -23,7 +24,8 @@ const rootReducer = combineReducers({
   visibleNodes,
   userPages,
   tags,
-  search
+  search,
+  userPreferences
 })
 
 export default rootReducer

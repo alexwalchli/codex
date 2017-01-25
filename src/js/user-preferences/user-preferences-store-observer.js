@@ -3,8 +3,8 @@ import diff from 'immutablediff'
 import * as userPreferencesRepository from './user-preferences-repository'
 import { diffsToFirebaseUpdate } from '../firebase/firebase-immutable-diff'
 
-export const observeTreeStore = (store) => {
-  return observeStore(store, (state) => state.tree, userPreferencesChanged)
+export const observeUserPreferencesStore = (store) => {
+  return observeStore(store, (state) => state.userPreferences, userPreferencesChanged)
 }
 
 function userPreferencesChanged (state, currentUserPreferencesState, nextUserPreferencesState) {
@@ -14,7 +14,7 @@ function userPreferencesChanged (state, currentUserPreferencesState, nextUserPre
 
   const treeDiff = diff(currentUserPreferencesState, nextUserPreferencesState)
   const firebaseUpdates = diffsToFirebaseUpdate(
-    'userPreferences',
+    'userPreferences/' + state.auth.get('id'),
     treeDiff
   )
 

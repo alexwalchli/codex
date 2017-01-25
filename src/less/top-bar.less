@@ -111,6 +111,7 @@
         }
 
         >div.dropdown-list {
+            z-index:2;
             float:left;
             width:100%;
             position:relative;
@@ -122,27 +123,26 @@
             >div {
                 position:absolute;
                 width:100%;
-                z-index:2;
-                cursor:pointer;
-                background:white;
 
                 .item {
                     width:100%;
                     padding:0 @spacing;
                     font-size:@font-size;
-                    .box-sizing();
+                    // .box-sizing();
                     border:solid 1px @border-colour;
                     border-top:none;
-
                     @icon-width:20px;
 
-                    &:hover {
-                        background:#F0F0F0;
+                    h4 {
+                        color: darken(@base-color, 20%);
+                        padding: 5px;
                     }
 
-                    &.selected {
-                        background:@select-colour;
-                        color:white;
+                    a {
+                        cursor:pointer;
+                        color: @base-color;
+                        padding:0;
+                        margin:0;
                     }
 
                     // >* {

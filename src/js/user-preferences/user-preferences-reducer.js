@@ -5,10 +5,10 @@ import {
 } from './user-preferences-action-types'
 
 const initialAppState = I.Map({})
-export const app = reducerFactory(initialAppState, {
+export const userPreferences = reducerFactory(initialAppState, {
   [TYPE_SCALE_UPDATE]: (state, action) => {
     return state.merge({
-      typeScale: action.typeScale
+      typeScale: action.payload.typeScale
     })
   }
 })
