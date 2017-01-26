@@ -15,11 +15,15 @@ function treeStateChanged (state, currentTreeState, nextTreeState) {
     return
   }
 
-  const treeDiff = diff(currentTreeState, nextTreeState)
+  const treeDiff = diff(currentTreeState.present, nextTreeState.present)
   const firebaseUpdates = diffsToFirebaseUpdate(
     'nodes',
     treeDiff,
-    { add: onNodeAdd.bind(null, state) },
+    {
+      // only call onNodeAddOrRemove for the /{nodeId} path and not anything deeper in the heirarchy, ex: /{nodeId}/childIDs
+      add: { predicate: (path) => path.split('/').length === 2, callback: onNodeAddOrRemove.bind(null, state, true) },
+      remove: { predicate: (path) => path.split('/').length === 2, callback: onNodeAddOrRemove.bind(null, state, false) }
+    },
     I.Map({
       childIds: onChildIdsUpdate.bind(null, state)
     })
@@ -30,18 +34,20 @@ function treeStateChanged (state, currentTreeState, nextTreeState) {
   }
 }
 
-const onNodeAdd = (state, updates, diffPath) => {
+const onNodeAddOrRemove = (state, add, updates, diffPath) => {
   const nodeId = diffPath.split('/')[1]
   const userPageId = userPageSelectors.currentPage(state).get('id')
-  updates[`nodesByUserPage/${userPageId}/${nodeId}`] = true
+  updates[`nodesByUserPage/${userPageId}/${nodeId}`] = add ? true : null
 
   return updates
 }
 
 const onChildIdsUpdate = (state, updates, diffPath) => {
+  // firebase doesn't allow deleting specific items from an array with a multi update
+  // so we'll need to just replace the whole array
   const nodeId = diffPath.split('/')[1]
   const childIdsPath = diffPath.substring(0, diffPath.lastIndexOf('/'))
-  const updatedChildIds = state.tree.getIn([nodeId, 'childIds']).toJS()
+  const updatedChildIds = state.tree.present.getIn([nodeId, 'childIds']).toJS()
   updates[childIdsPath] = updatedChildIds
   return updates
 }

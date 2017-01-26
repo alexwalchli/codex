@@ -7,21 +7,21 @@ import { userPages } from '../userpage/userpage-reducer'
 import { tags } from '../tag/tag-reducer'
 import { search } from '../search/search-reducer'
 import { userPreferences } from '../user-preferences/user-preferences-reducer'
-// import undoable from 'redux-undo'
+import undoable from 'redux-undo'
 
-// const undoableActionFilter = action => action.undoable !== false
-// const undoableTree = undoable(tree, {
-//   filter: undoableActionFilter
-// })
-// const undoableVisibleNodes = undoable(visibleNodes, {
-//   filter: undoableActionFilter
-// })
+const undoableActionFilter = action => action.undoable !== false
+const undoableTree = undoable(tree, {
+  filter: undoableActionFilter
+})
+const undoableVisibleNodes = undoable(visibleNodes, {
+  filter: undoableActionFilter
+})
 
 const rootReducer = combineReducers({
   app,
   auth,
-  tree,
-  visibleNodes,
+  tree: undoableTree,
+  visibleNodes: undoableVisibleNodes,
   userPages,
   tags,
   search,

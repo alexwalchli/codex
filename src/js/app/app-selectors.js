@@ -7,6 +7,7 @@ export const getAppProps = (state, ownProps) => {
     appState: state,
     currentUserPage: userPageSelectors.currentPage(state),
     isAuthenticated: authSelectors.isAuthenticated(state),
-    initialAuthChecked: state.auth.get('initialCheck')
+    initialAuthChecked: state.auth.get('initialCheck'),
+    typeScale: state.userPreferences.get('typeScale')
   }
 }

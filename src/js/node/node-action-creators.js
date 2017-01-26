@@ -1,4 +1,4 @@
-// import { ActionCreators } from 'redux-undo'
+import { ActionCreators } from 'redux-undo'
 import * as nodeActions from './node-actions'
 import * as nodeSelectors from './node-selectors'
 import * as nodeRepository from './node-repository'
@@ -85,7 +85,7 @@ export const focusNodeAbove = (currentNodeId) => (dispatch, getState) => {
   const state = getState()
   const rootNodeId = nodeSelectors.getRootNodeId(state)
   const nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(
-    rootNodeId, nodeSelectors.currentTreeState(state), state.visibleNodes, currentNodeId, true
+    rootNodeId, nodeSelectors.currentTreeState(state), state.visibleNodes.present, currentNodeId, true
   )
 
   if (nodeToFocus) {
@@ -97,7 +97,7 @@ export const focusNodeBelow = (currentNodeId) => (dispatch, getState) => {
   const state = getState()
   const rootNodeId = nodeSelectors.getRootNodeId(state)
   const nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(
-    rootNodeId, nodeSelectors.currentTreeState(state), state.visibleNodes, currentNodeId, false
+    rootNodeId, nodeSelectors.currentTreeState(state), state.visibleNodes.present, currentNodeId, false
   )
 
   if (nodeToFocus) {
@@ -111,7 +111,7 @@ export const demoteNode = (nodeId) => (dispatch, getState) => {
   const rootNodeId = nodeSelectors.getRootNodeId(state)
   const currentParentId = treeState.getIn([nodeId, 'parentId'])
   const userId = state.auth.get('id')
-  const addAfterSibling = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, treeState, state.visibleNodes, nodeId, true)
+  const addAfterSibling = nodeSelectors.getNextNodeThatIsVisible(rootNodeId, treeState, state.visibleNodes.present, nodeId, true)
 
   if (!addAfterSibling || addAfterSibling.get('id') === currentParentId) {
     // can't demote the node when there isn't a sibling above to attach it too
@@ -126,7 +126,7 @@ export const demoteNode = (nodeId) => (dispatch, getState) => {
     currentParentId,
     newParentId,
     addAfterLastChildOfSiblingAboveId,
-    state.visibleNodes,
+    state.visibleNodes.present,
     userId)
   )
 }
@@ -150,7 +150,7 @@ export const promoteNode = (nodeId) => (dispatch, getState) => {
     siblingIds,
     currentParentId,
     newParentId,
-    state.visibleNodes,
+    state.visibleNodes.present,
     userId)
   )
 }
@@ -221,6 +221,14 @@ export const copyNodeDown = (nodeId) => (dispatch, getState) => {
   const newNodeId = nodeRepository.getNewNodeId()
 
   dispatch(nodeActions.nodeCopyDown(nodeId, node.parentId, newNodeId))
+}
+
+export const undo = () => (dispatch) => {
+  dispatch(ActionCreators.undo())
+}
+
+export const redo = () => (dispatch) => {
+  dispatch(ActionCreators.redo())
 }
 
 export const nodeSubscriptionOnAdded = (node) => (dispatch, getState) => {

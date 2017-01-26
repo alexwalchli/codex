@@ -28,7 +28,7 @@ export const deleteUserPage = (userPageId) =>
   (dispatch, getState) => {
     const state = getState()
     const userPage = state.userPages.get(userPageId)
-    const rootNode = state.tree.get(userPage.get('rootNodeId'))
+    const rootNode = state.tree.present.get(userPage.get('rootNodeId'))
     const auth = state.auth
 
     dispatch(appActionCreators.navigateToUserPage(state.userPages.find(u => u.get('isHome')).get('id')))

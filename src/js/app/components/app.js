@@ -17,8 +17,8 @@ export class App extends Component {
   }
 
   render () {
-    const { appState, currentUserPage, isAuthenticated, initialAuthChecked } = this.props
-    let appIsInitialized = isAuthenticated && currentUserPage && appState.tree.get(currentUserPage.get('rootNodeId'))
+    const { appState, currentUserPage, isAuthenticated, initialAuthChecked, typeScale } = this.props
+    let appIsInitialized = isAuthenticated && currentUserPage && appState.tree.present.get(currentUserPage.get('rootNodeId'))
     let userIsAuthenticated = isAuthenticated
     let showSignIn = !userIsAuthenticated && initialAuthChecked
     let showLoading = userIsAuthenticated && !appIsInitialized

@@ -6,3 +6,10 @@ export const typeScaleUpdate = (typeScale) => ({
     typeScale
   }
 })
+
+export const initialLoad = (userPreferences) => ({
+  type: userPreferencesActionTypes.USER_PREFERENCES_INITIAL_LOAD,
+  payload: {
+    userPreferences
+  }
+})

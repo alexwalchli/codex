@@ -6,12 +6,12 @@ export function dictionaryToArray (dictionary) {
 }
 
 export function getNode (state, nodeId) {
-  return state.tree.get(nodeId)
+  return state.tree.present.get(nodeId)
 }
 
 export function currentTreeState (state) {
   // const currentTreeState = state.get('tree').get('present') When I reimplment undo functionality we'll need this
-  return state.tree.filter(node => !node.get('deleted'))
+  return state.tree.present.filter(node => !node.get('deleted'))
 }
 
 // retrieves the root node ID of the current page
@@ -70,7 +70,7 @@ export function getCurrentlyFocusedNodeId (nodes) {
 }
 
 export function getNodeCount (state) {
-  return state.tree.filter(node => !node.deleted).count()
+  return state.tree.present.filter(node => !node.deleted).count()
 }
 
 // retrieves the next node above or below that is visible
@@ -119,7 +119,7 @@ export const getNodeProps = (state, id) => {
     search: state.search,
     positionInOrderedList,
     lastChild: parentNode && parentNodeChildIds.indexOf(id) === parentNodeChildIds.length - 1,
-    visible: state.visibleNodes.get(id),
+    visible: state.visibleNodes.present.get(id),
     ...nodeFromState.toJS(),
     currentlySearchingOn,
     isAncestorOfSearchResult

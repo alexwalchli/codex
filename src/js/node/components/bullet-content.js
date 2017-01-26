@@ -73,8 +73,6 @@ export class BulletContent extends Component {
 
   onEditorKeyDown (e) {
     const { nodeId, focusNodeAbove, deleteNode, undo, redo } = this.props
-    // e.stopPropagation()
-
     if (e.key === 'Backspace' && !this.currentContent()) {
       e.preventDefault()
       focusNodeAbove(nodeId)
@@ -84,7 +82,7 @@ export class BulletContent extends Component {
       // else do nothing
     } else if (e.key === 'c' && (e.metaKey || e.cntrlKey)) {
       // determine what nodes are selected, and copy them to a clipboardData
-    } else if (e.key === 'z' && e.shiftKey && (e.metaKey || e.cntrlKey)) {
+    } else if (e.key === 'Z' && e.shiftKey && (e.metaKey || e.cntrlKey)) {
       redo()
     } else if (e.key === 'z' && (e.metaKey || e.cntrlKey)) {
       undo()

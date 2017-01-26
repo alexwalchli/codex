@@ -1,11 +1,14 @@
 import * as I from 'immutable'
 
-const noop = (updates) => (updates)
+const noopCallback = {
+  predicate: (diffPath) => (false),
+  callback: (updates) => (updates)
+}
 
 export const diffsToFirebaseUpdate = (collectionName, diff, callbacks = {}, specialPropHandling = I.Map({})) => {
-  callbacks.add = callbacks.add || noop
-  callbacks.remove = callbacks.remove || noop
-  callbacks.replace = callbacks.replace || noop
+  callbacks.add = callbacks.add || noopCallback
+  callbacks.remove = callbacks.remove || noopCallback
+  callbacks.replace = callbacks.replace || noopCallback
 
   return diff.reduce((updates, d) => {
     const op = d.get('op')
@@ -22,8 +25,9 @@ export const diffsToFirebaseUpdate = (collectionName, diff, callbacks = {}, spec
         updates[diffPath] = value
       }
     }
-
-    updates = callbacks[op](updates, diffPath)
+    if (callbacks[op].predicate(diffPath)) {
+      updates = callbacks[op].callback(updates, diffPath)
+    }
 
     return updates
   }, {})
