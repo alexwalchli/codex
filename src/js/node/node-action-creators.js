@@ -11,7 +11,7 @@ export const createNode = (originNodeId, originOffset, content) =>
     const userId = state.auth.get('id')
     const newNodeId = nodeRepository.getNewNodeId()
     const originNode = treeState.get(originNodeId)
-    const parentId = originNode.get('childIds').count() === 0 || originNode.getIn(['collapsed', userId])
+    const parentId = originNode.get('childIds').count() === 0 || originNode.getIn(['collapsedBy', userId])
                       ? originNode.get('parentId')
                       : originNodeId
 

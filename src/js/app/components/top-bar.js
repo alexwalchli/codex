@@ -26,8 +26,6 @@ export class Topbar extends Component {
   }
 
   render () {
-    const { updateTypeScale } = this.props
-
     return (
       <nav className='top-bar clearfix'>
         <div className='top-bar-left'>
@@ -64,7 +62,7 @@ function mapStateToProps (state, ownProps) {
 
 const ConnectedTopbar = connect(
   mapStateToProps,
-  { ...appActionCreators, ...userPreferencesActionCreators}
+  { ...appActionCreators, ...userPreferencesActionCreators }
 )(Topbar)
 export default ConnectedTopbar
 
