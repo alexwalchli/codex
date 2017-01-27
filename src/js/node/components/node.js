@@ -159,8 +159,9 @@ export class Node extends Component {
 
         { typeof parentId !== 'undefined'
           ? <div onClick={(e) => this.onNodeClick(e)} className={`depth ${currentlySelectedCss}`}>
-            <div className='add-btn inline-btn' onClick={(e) => this.onAddBulletButtonClick(e)}><i className='icon dripicons-plus' /></div>
-            <div className='menu-btn inline-btn' onClick={(e) => this.onToggleBulletMenuClick(e)}><i className='icon dripicons-menu' /></div>
+            <div className='inline-btn'>
+              <div className='menu-btn btn' onClick={(e) => this.onToggleBulletMenuClick(e)}><i className='icon dripicons-dots-3' /></div>
+            </div>
             { menuVisible
               ? <BulletMenu
                 nodeId={id}

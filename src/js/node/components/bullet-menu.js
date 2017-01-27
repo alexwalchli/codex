@@ -45,14 +45,6 @@ export class BulletMenu extends Component {
               ? 'Re-open'
               : 'Complete' }
           </li>
-          { childIds.length > 0
-            ? <li onClick={(e) => this.onChangeDisplayModeClick(e)}>
-              <i className='icon dripicons-list' />
-              { displayMode === 'unordered'
-                  ? <span>Numbered List</span>
-                  : <span>Unordered List</span> }
-            </li>
-            : null}
           <li onClick={(e) => this.onDeleteClick(e)}><i className='icon dripicons-cross' />Delete</li>
         </ul>
       </div>

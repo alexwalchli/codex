@@ -147,49 +147,56 @@
 // inline buttons //
 ////////////////////
 
-.depth:hover > .inline-btn {
-  display: block !important;
+.depth:hover > .inline-btn > .btn {
+  visibility: visible !important;
 }
 
 .children .node { // depth 1
 
-  .inline-btn{
-    display:none;
-    top: 21px;
-    width:30px;
-    position: absolute;
-    color:@base-color;
-    cursor:pointer;
-    font-size:20px;
-    cursor:pointer;
+  .inline-btn {
+    position:absolute;
+    top: @node-depth-1-bullet-icon-outer-circle-top;
+    width:24px;
+    height:24px;
+    left: -24px;
+
+    .btn{
+      visibility:hidden;
+      width:@node-depth-1-bullet-icon-outer-circle-diameter;
+      height:@node-depth-1-bullet-icon-outer-circle-diameter;
+      position: absolute;
+      color:@base-color;
+      cursor:pointer;
+      font-size:20px;
+      cursor:pointer;
+      border: 1px solid @base-color;
+      border-radius: 50%;
+    }
+
+    &:hover .btn{
+      visibility: visible !important;
+    }
   }
-  .add-btn{
-    left: -54px;
-  }
-  .menu-btn{
-    left: -30px;
-  }
+
   .children { // depth 2
     .inline-btn{
-      top:13px;
-      font-size:16px;
-    }
-    .menu-btn{
+      top: @node-depth-2-bullet-icon-outer-circle-top;
       left:-25px;
-    }
-    .add-btn{
-      left:-45px;
+      .btn{
+        font-size:16px;
+        width:@node-depth-2-bullet-icon-outer-circle-diameter;
+        height:@node-depth-2-bullet-icon-outer-circle-diameter;
+      }
     }
     .children { // depth 3
       .inline-btn{
-        top:12px;
-        font-size:14px;
-      }
-    .menu-btn{
+        top: @node-depth-3-bullet-icon-outer-circle-top;
         left:-20px;
-      }
-      .add-btn{
-        left:-40px;
+        .btn{
+          font-size:12px;
+          width:@node-depth-3-bullet-icon-outer-circle-diameter;
+          height:@node-depth-3-bullet-icon-outer-circle-diameter;
+        }
       }
     }
   }
