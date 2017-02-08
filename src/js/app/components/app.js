@@ -17,11 +17,10 @@ export class App extends Component {
   }
 
   render () {
-    const { appState, currentUserPage, isAuthenticated, initialAuthChecked } = this.props
-    let appIsInitialized = isAuthenticated && currentUserPage && appState.tree.present.get(currentUserPage.get('rootNodeId'))
+    const { appInitialized, currentUserPage, isAuthenticated, initialAuthChecked } = this.props
     let userIsAuthenticated = isAuthenticated
     let showSignIn = !userIsAuthenticated && initialAuthChecked
-    let showLoading = userIsAuthenticated && !appIsInitialized
+    let showLoading = userIsAuthenticated && !appInitialized
 
     return (
       <div id='app' onClick={(e) => this.onClick(e)}>
@@ -33,7 +32,7 @@ export class App extends Component {
           ? <AppLoader />
           : null }
 
-        { appIsInitialized
+        { appInitialized
           ? <div id='signed-in'>
             <TopBar />
             <AppContextMenu />

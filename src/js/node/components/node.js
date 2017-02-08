@@ -23,6 +23,25 @@ export class Node extends Component {
   // component events //
   // ////////////////////
 
+  shouldComponentUpdate (nextProps, nextState) {
+     const { content, parentId, childIds, id, focused, collapsedBy, visible, selected, completed, notes, positionInOrderedList,
+            nodeInitialized, currentlySelectedBy, currentlySelectedById, auth, menuVisible, rootNodeId, lastChild,
+            currentlySearchingOn, isAncestorOfSearchResult } = this.props
+
+    if(parentId != nextProps.parentId
+      || !_.isEqual(childIds, nextProps.childIds)
+      || content !== nextProps.content
+      || focused !== nextProps.focused
+      || !_.isEqual(collapsedBy, nextProps.collapsedBy)
+      || visible != nextProps.visible
+      || completed != nextProps.completed
+      || notes != nextProps.notes){
+        return true
+      }
+
+      return false
+  }
+
   componentWillReceiveProps (newProps) {
     this.setState({
       externalData: newProps.externalData,
@@ -145,6 +164,7 @@ export class Node extends Component {
             currentlySearchingOn, isAncestorOfSearchResult } = this.props
     const { content, dragOver } = this.state
 
+    console.log(`Rendering Node ${id}`)
     if (!nodeInitialized) {
       return (false)
     }

@@ -65,7 +65,7 @@
 /******/ 	}
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "5e6622604f3725ada8d4"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "9e52385593bd5e122e86"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
 /******/ 	
@@ -16834,7 +16834,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.nodeSubscriptionOnDeleted = exports.nodeSubscriptionOnUpdated = exports.nodeSubscriptionOnAdded = exports.redo = exports.undo = exports.copyNodeDown = exports.copyNodeUp = exports.shiftNodeDown = exports.shiftNodeUp = exports.toggleNodeMenu = exports.closeAllNodeMenus = exports.toggleNodeComplete = exports.deselectNode = exports.selectNode = exports.toggleNodeExpansion = exports.promoteNode = exports.demoteNode = exports.focusNodeBelow = exports.focusNodeAbove = exports.focusNode = exports.updateNodeNotes = exports.updateNodeContent = exports.deleteNodes = exports.deleteNode = exports.createNode = undefined;
+	exports.nodeSubscriptionOnDeleted = exports.nodeSubscriptionOnUpdated = exports.nodeSubscriptionOnAdded = exports.redo = exports.undo = exports.copyNodeDown = exports.copyNodeUp = exports.shiftNodeDown = exports.shiftNodeUp = exports.toggleNodeMenu = exports.closeAllNodeMenus = exports.toggleNodeComplete = exports.deselectNode = exports.selectNode = exports.toggleNodeExpansion = exports.promoteNode = exports.demoteNode = exports.focusNodeBelow = exports.focusNodeAbove = exports.focusNode = exports.updateNodeNotes = exports.updateNodeContent = exports.deleteNodes = exports.deleteNode = exports.moveNode = exports.createNode = undefined;
 	
 	var _reduxUndo = __webpack_require__(357);
 	
@@ -16873,6 +16873,16 @@
 	    }
 	
 	    dispatch(nodeActions.nodeCreation(newNodeId, originNodeId, parentId, nodeIdsToDeselect, nodeIdToUnfocus, originOffset, content, userPageSelectors.currentPageId(state), userId));
+	  };
+	};
+	
+	var moveNode = exports.moveNode = function moveNode(nodeId, newParentId) {
+	  return function (dispatch, getState) {
+	    var state = getState();
+	    var currentParentId = nodeSelectors.getNode(state, nodeId).parentId;
+	    var userId = state.auth.get('id');
+	
+	    dispatch(nodeActions.nodeMove(nodeId, newParentId, currentParentId, userId));
 	  };
 	};
 	
@@ -18795,6 +18805,7 @@
 	// new action types
 	var INITIAL_TREE_STATE_LOAD = exports.INITIAL_TREE_STATE_LOAD = 'INITIAL_TREE_STATE_LOAD';
 	var NODE_CREATION = exports.NODE_CREATION = 'NODE_CREATION';
+	var NODE_MOVE = exports.NODE_MOVE = 'NODE_MOVE';
 	var NODES_DELETION = exports.NODES_DELETION = 'NODES_DELTION';
 	var NODE_DELETION = exports.NODE_DELETION = 'NODE_DELETION';
 	var NODE_CONTENT_UPDATE = exports.NODE_CONTENT_UPDATE = 'NODE_CONTENT_UPDATE';
@@ -18831,7 +18842,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.nodeAllMenusClose = exports.nodeMenuToggle = exports.nodeDeletionFromSubscription = exports.nodeUpdateFromSubscription = exports.nodeAdditionFromSubscription = exports.nodeCopyDown = exports.nodeCopyUp = exports.nodeShiftDown = exports.nodeShiftUp = exports.nodeCompletionToggle = exports.nodeDeselection = exports.nodeSelection = exports.nodeCollapse = exports.nodeExpansion = exports.nodeExpansionToggle = exports.nodePromotion = exports.nodeDemotion = exports.nodeUnfocusAll = exports.nodeUnfocus = exports.nodeFocus = exports.nodeNotesUpdate = exports.nodeContentUpdate = exports.nodeDeletion = exports.nodeCreation = exports.initialTreeStateLoad = undefined;
+	exports.nodeAllMenusClose = exports.nodeMenuToggle = exports.nodeDeletionFromSubscription = exports.nodeUpdateFromSubscription = exports.nodeAdditionFromSubscription = exports.nodeCopyDown = exports.nodeCopyUp = exports.nodeShiftDown = exports.nodeShiftUp = exports.nodeCompletionToggle = exports.nodeDeselection = exports.nodeSelection = exports.nodeCollapse = exports.nodeExpansion = exports.nodeExpansionToggle = exports.nodePromotion = exports.nodeDemotion = exports.nodeUnfocusAll = exports.nodeUnfocus = exports.nodeFocus = exports.nodeNotesUpdate = exports.nodeContentUpdate = exports.nodeDeletion = exports.nodeMove = exports.nodeCreation = exports.initialTreeStateLoad = undefined;
 	
 	var _nodeActionTypes = __webpack_require__(109);
 	
@@ -18862,6 +18873,18 @@
 	      originOffset: originOffset,
 	      content: content,
 	      userPageId: userPageId,
+	      userId: userId
+	    }
+	  };
+	};
+	
+	var nodeMove = exports.nodeMove = function nodeMove(nodeId, newParentId, currentParentId, userId) {
+	  return {
+	    type: nodeActionTypes.NODE_MOVE,
+	    payload: {
+	      nodeId: nodeId,
+	      newParentId: newParentId,
+	      currentParentId: currentParentId,
 	      userId: userId
 	    }
 	  };
@@ -23195,7 +23218,8 @@
 	
 	var diffsToFirebaseUpdate = exports.diffsToFirebaseUpdate = function diffsToFirebaseUpdate(collectionName, diff) {
 	  var callbacks = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-	  var specialPropHandling = arguments.length <= 3 || arguments[3] === undefined ? I.Map({}) : arguments[3];
+	  var specialPropHandling = arguments[3];
+	  var exclude = arguments[4];
 	
 	  callbacks.add = callbacks.add || noopCallback;
 	  callbacks.remove = callbacks.remove || noopCallback;
@@ -23205,21 +23229,26 @@
 	    var op = d.get('op');
 	    var diffPath = collectionName + d.get('path');
 	    var value = extractValue(d.get('value'));
-	
-	    var handleSpecial = specialPropHandling.find(function (v, k) {
+	    var handleSpecial = specialPropHandling && specialPropHandling.find(function (v, k) {
 	      return diffPath.includes(k);
 	    });
-	    if (handleSpecial) {
-	      updates = handleSpecial(updates, diffPath, value);
-	    } else {
-	      if (op === 'remove') {
-	        updates[diffPath] = null;
+	    var excludeUpdate = exclude && exclude.find(function (v, k) {
+	      return diffPath.includes(k);
+	    });
+	
+	    if (!excludeUpdate) {
+	      if (handleSpecial) {
+	        updates = handleSpecial(updates, diffPath, value);
 	      } else {
-	        updates[diffPath] = value;
+	        if (op === 'remove') {
+	          updates[diffPath] = null;
+	        } else {
+	          updates[diffPath] = value;
+	        }
 	      }
-	    }
-	    if (callbacks[op].predicate(diffPath)) {
-	      updates = callbacks[op].callback(updates, diffPath);
+	      if (callbacks[op].predicate(diffPath)) {
+	        updates = callbacks[op].callback(updates, diffPath);
+	      }
 	    }
 	
 	    return updates;
@@ -24139,7 +24168,7 @@
 	exports.i(__webpack_require__(593), "");
 	
 	// module
-	exports.push([module.id, "form label {\n  font-weight: 300;\n  width: 100%;\n}\nform input[type=text] {\n  font-size: 1.2em;\n  border-radius: 4px;\n  border: 1px solid #000;\n  width: 100%;\n}\nform a.btn {\n  background-color: #2185C5;\n  font-size: 1.2em;\n  border-radius: 4px;\n  border: 1px solid #2185C5;\n  color: #fff;\n  margin-right: 10px;\n  padding: 4px;\n  cursor: pointer;\n}\nform a.btn.secondary-btn {\n  background-color: transparent;\n  border: none;\n  color: #2185C5;\n}\nform a.btn.secondary-btn:hover {\n  text-decoration: underline;\n}\n.app-loader {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  margin: auto;\n  width: 220px;\n  height: 400px;\n  font-size: 40px;\n  color: #2185C5;\n  text-align: center;\n}\n.app-loader .spinner-container {\n  float: left;\n  margin-top: 4px;\n}\n.app-loader .spinner-container .spinner {\n  display: inline-block;\n  height: 40px;\n  -webkit-animation: spin 2s linear infinite;\n  -moz-animation: spin 2s linear infinite;\n  animation: spin 2s linear infinite;\n}\n@-moz-keyframes spin {\n  100% {\n    -moz-transform: rotate(360deg);\n  }\n}\n@-webkit-keyframes spin {\n  100% {\n    -webkit-transform: rotate(360deg);\n  }\n}\n@keyframes spin {\n  100% {\n    -webkit-transform: rotate(360deg);\n    transform: rotate(360deg);\n  }\n}\n.side-panel-toggle {\n  position: absolute;\n  padding: 6px 6px 2px 6px;\n  left: 0px;\n  top: 70px;\n  font-size: 1.6em;\n  z-index: 2;\n  cursor: pointer;\n  color: #2185C5;\n  border-right: 1px solid #999999;\n  border-bottom: 1px solid #999999;\n}\n.side-panel-toggle.toggled {\n  background-color: #f2f2f2;\n  left: 200px;\n}\n.pages-side-panel {\n  float: left;\n  height: 100%;\n  width: 200px;\n  background-color: #f2f2f2;\n  border-right: 1px solid #999999;\n  z-index: 1;\n  margin-top: -56px;\n}\n.pages-side-panel .pages .page {\n  width: 100%;\n  min-height: 100px;\n  cursor: pointer;\n  position: relative;\n}\n.pages-side-panel .pages .page:hover {\n  background-color: #f7f7f7;\n}\n.pages-side-panel .pages .page .title {\n  width: 100%;\n  text-align: center;\n  line-height: 100px;\n  font-size: 1.4em;\n  color: #000;\n}\n.pages-side-panel .pages .page input.title {\n  background-color: #ffffff;\n  padding: 0;\n  border: 0;\n  outline: none;\n  font-family: 'Lato', sans-serif;\n}\n.pages-side-panel .pages .page .button {\n  position: absolute;\n  z-index: 1;\n  color: #2185C5;\n  font-size: 1.2em;\n  display: none;\n}\n.pages-side-panel .pages .page:hover .button {\n  position: absolute;\n  z-index: 1;\n  color: #2185C5;\n  font-size: 1.2em;\n  display: block;\n}\n.pages-side-panel .pages .page .button:hover {\n  color: #2185C5;\n}\n.pages-side-panel .pages .page .delete {\n  position: absolute;\n  right: 10px;\n  bottom: 10px;\n}\n.pages-side-panel .pages .page .share {\n  position: absolute;\n  right: 10px;\n  top: 42px;\n}\n.pages-side-panel .pages .page .edit-name {\n  position: absolute;\n  right: 10px;\n  top: 10px;\n}\n.sign-in {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  margin: auto;\n  width: 300px;\n  height: 400px;\n}\n.sign-in-logo {\n  font-family: 'Lora', sans-serif;\n  color: #2185C5;\n  font-size: 40px;\n  text-align: center;\n  margin-bottom: 40px;\n}\n.btn-sign-in {\n  display: block;\n  padding: 6px 12px;\n  margin-bottom: 10px;\n  font-size: 14px;\n  font-weight: normal;\n  line-height: 1.42857143;\n  text-align: center;\n  vertical-align: middle;\n  -ms-touch-action: manipulation;\n  touch-action: manipulation;\n  cursor: pointer;\n  -webkit-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n  background-image: none;\n  border: 1px solid transparent;\n  border-radius: 4px;\n  position: relative;\n  padding-left: 44px;\n  text-align: left;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.btn-sign-in > :first-child {\n  position: absolute;\n  left: 0;\n  top: 0;\n  bottom: 0;\n  width: 32px;\n  line-height: 34px;\n  font-size: 1.6em;\n  text-align: center;\n  border-right: 1px solid rgba(0, 0, 0, 0.2);\n}\n.btn-block {\n  display: block;\n  width: 100%;\n}\n.btn-google {\n  color: #fff;\n  background-color: #dd4b39;\n  border-color: rgba(0, 0, 0, 0.2);\n}\n.btn-facebook {\n  color: #fff;\n  background-color: #3B5998;\n  border-color: rgba(0, 0, 0, 0.2);\n}\n.btn-github {\n  color: #fff;\n  background-color: #444;\n  border-color: rgba(0, 0, 0, 0.2);\n}\n.btn-twitter {\n  color: #fff;\n  background-color: #55acee;\n  border-color: rgba(0, 0, 0, 0.2);\n}\n.top-bar {\n  height: 84px;\n  margin-bottom: 42px;\n  padding-left: 42px;\n  padding-right: 42px;\n  background-color: transparent;\n}\n.top-bar .top-bar-left {\n  float: left;\n  width: auto;\n}\n.top-bar .top-bar-right {\n  float: right;\n  width: auto;\n}\n.top-bar .top-bar-right a {\n  cursor: pointer;\n}\n.top-bar .top-bar-right a:hover {\n  text-decoration: underline;\n}\n.top-bar ul {\n  list-style-type: none;\n  padding: 0;\n}\n.top-bar li {\n  position: relative;\n  vertical-align: middle;\n  outline: 0;\n  display: table-cell;\n  font-size: 20px;\n  color: #2185C5;\n}\n.top-bar li a {\n  padding: 1.2em;\n  line-height: 2.6em;\n}\n.top-bar li .logo {\n  font-family: 'Lora', sans-serif;\n  color: #2185C5;\n}\n.top-bar .menu li a,\n.top-bar .menu li i {\n  font-size: 16px;\n}\n.top-bar .menu li a.icon:hover,\n.top-bar .menu li i.icon:hover {\n  text-decoration: none;\n}\n.top-bar li i {\n  font-size: 24px;\n}\n.top-bar li div.dropdown-container.show > div.dropdown-list {\n  -webkit-transform: scale(1, 1);\n  -moz-transform: scale(1, 1);\n  -ms-transform: scale(1, 1);\n  -o-transform: scale(1, 1);\n}\n.top-bar li div.dropdown-container > div.dropdown-display {\n  float: left;\n  width: 100%;\n  background: white;\n  height: 40px;\n  cursor: pointer;\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  box-sizing: border-box;\n}\n.top-bar li div.dropdown-container > div.dropdown-display > * {\n  float: left;\n  height: 100%;\n  height: 40px;\n  position: relative;\n  top: 50%;\n  -webkit-transform: translateY(-50%);\n  -ms-transform: translateY(-50%);\n  transform: translateY(-50%);\n}\n.top-bar li div.dropdown-container > div.dropdown-display > span {\n  font-size: 14px;\n  width: 100%;\n  position: relative;\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  box-sizing: border-box;\n  padding-right: 34px;\n  padding-left: 10px;\n}\n.top-bar li div.dropdown-container > div.dropdown-display > i {\n  position: relative;\n  width: 14px;\n  margin-left: -24px;\n  font-size: 1.125em;\n  font-weight: bold;\n  padding-right: 10px;\n  text-align: right;\n}\n.top-bar li div.dropdown-container > div.dropdown-list {\n  z-index: 2;\n  float: left;\n  position: relative;\n  width: 100%;\n  -webkit-transform: scale(1, 0);\n  -moz-transform: scale(1, 0);\n  -ms-transform: scale(1, 0);\n  -o-transform: scale(1, 0);\n  -webkit-transition: -webkit-transform ease 250ms;\n  -moz-transition: -webkit-transform ease 250ms;\n  -ms-transition: -webkit-transform ease 250ms;\n  -o-transition: -webkit-transform ease 250ms;\n  -webkit-transition: transform ease 250ms;\n  -moz-transition: transform ease 250ms;\n  -ms-transition: transform ease 250ms;\n  -o-transition: transform ease 250ms;\n}\n.top-bar li div.dropdown-container > div.dropdown-list > div {\n  position: absolute;\n  width: 100%;\n}\n.top-bar li div.dropdown-container > div.dropdown-list > div .item {\n  width: 100%;\n  padding: 0 10px;\n  font-size: 14px;\n  border: solid 1px #DDD;\n  border-top: none;\n}\n.top-bar li div.dropdown-container > div.dropdown-list > div .item h4 {\n  color: #124a6e;\n  padding: 5px;\n}\n.top-bar li div.dropdown-container > div.dropdown-list > div .item a {\n  cursor: pointer;\n  color: #2185C5;\n  padding: 0;\n  margin: 0;\n}\n.top-bar .logo {\n  font-size: 30px;\n}\n.top-bar .search {\n  position: relative;\n  margin-right: 20px;\n}\n.top-bar .search .icon {\n  color: #808080;\n}\n.top-bar .search .dripicons-search {\n  position: absolute;\n  right: 8px;\n  top: 8px;\n}\n.top-bar .search .dripicons-tags {\n  position: absolute;\n  transform: scaleX(-1);\n  right: 40px;\n  top: 8px;\n}\n.top-bar .search input {\n  margin-left: 22px;\n  border-radius: 4px;\n  min-width: 400px;\n  border: 1px solid #ccc;\n  font-size: 20px;\n  padding: .2em;\n  color: #2185C5;\n  outline-style: none;\n  background-color: transparent;\n}\n.top-bar .search input:focus {\n  border-color: #2185C5;\n}\n.top-bar span {\n  font-size: 30px;\n}\n#app-context-menu {\n  position: absolute;\n  z-index: 2;\n}\n#tree-container {\n  padding-right: 60px;\n  padding-left: 60px;\n}\n.node {\n  position: relative;\n}\n.depth {\n  cursor: text;\n}\n.children .node .children .node .vertex-horizontal {\n  height: 1px;\n  position: absolute;\n  width: 100%;\n  background-color: #cccccc;\n  top: 24px;\n  left: -38px;\n  width: 24px;\n}\n.children .node .children .node .vertex-vertical {\n  width: 1px;\n  height: 100%;\n  position: absolute;\n  background-color: #cccccc;\n  left: -38px;\n  top: 0px;\n}\n.children .node .children .node:last-child > .vertex-vertical {\n  height: 24px;\n}\n.children .node .children .node .children .node .vertex-horizontal {\n  top: 19.2px;\n  left: -30.4px;\n  width: -30.4px;\n}\n.children .node .children .node .children .node .vertex-vertical {\n  left: -30.4px;\n  top: 0px;\n}\n.children .node .children .node .children .node:last-child > .vertex-vertical {\n  height: 19px;\n}\n.depth:hover > .inline-btn > .btn {\n  visibility: visible !important;\n}\n.children .node .inline-btn {\n  position: absolute;\n  top: 20px;\n  width: 24px;\n  height: 24px;\n  left: -24px;\n}\n.children .node .inline-btn .btn {\n  visibility: hidden;\n  width: 20px;\n  height: 20px;\n  position: absolute;\n  color: #2185C5;\n  font-size: 20px;\n  cursor: pointer;\n  border: 1px solid #2185C5;\n  border-radius: 50%;\n}\n.children .node .inline-btn:hover .btn {\n  visibility: visible !important;\n}\n.children .node .children .inline-btn {\n  top: 16px;\n  left: -25px;\n}\n.children .node .children .inline-btn .btn {\n  font-size: 16px;\n  width: 16px;\n  height: 16px;\n}\n.children .node .children .children .inline-btn {\n  top: 12px;\n  left: -20px;\n}\n.children .node .children .children .inline-btn .btn {\n  font-size: 12px;\n  width: 12px;\n  height: 12px;\n}\n.children .node .notes {\n  margin-left: 48px;\n  margin-bottom: 12px;\n  padding: 0;\n  margin: 0;\n  color: #808080;\n  background: transparent;\n  height: 100%;\n  font-family: 'Lato', sans-serif;\n  font-size: 1em;\n  min-height: 34px;\n}\n.children .node .notes code,\n.children .node .notes a {\n  color: #808080;\n}\n.children .node .children .notes {\n  margin-left: 48px;\n  margin-bottom: 12px;\n  font-size: .95em;\n}\n.children .node .children .children .notes {\n  margin-left: 38.4px;\n  margin-bottom: 9.6px;\n  font-size: .85em;\n}\n.children .node .content {\n  cursor: text;\n  line-height: 60px;\n  min-height: 60px;\n  width: 100%;\n  margin-left: 48px;\n  position: relative;\n  font-size: 1.8em;\n  color: #000;\n  font-family: 'Lato', sans-serif;\n}\n.children .node .content .highlight {\n  background-color: yellow;\n  text-decoration: underline;\n}\n.children .node.ancestor-of-search-result > .depth .content {\n  color: #cccccc;\n}\n.children .node .children .content {\n  line-height: 48px;\n  min-height: 48px;\n  margin-left: 48px;\n  font-size: 1.44em;\n}\n.children .node .children .content .rendered-content,\n.children .node .children .content .plain-text-content {\n  font-size: inherit;\n  line-height: inherit;\n}\n.children .node .children .children .content {\n  line-height: 36px;\n  min-height: 36px;\n  margin-left: 38.4px;\n  font-size: 1.152em;\n}\n.children .node .children .children .content .rendered-content,\n.children .node .children .children .content .plain-text-content {\n  font-size: inherit;\n  line-height: inherit;\n}\n.children .node .children {\n  padding-left: 48px;\n}\n.children .node .children:after {\n  visibility: hidden;\n  display: block;\n  font-size: 0;\n  content: \" \";\n  clear: both;\n  height: 0;\n}\n.children .node .children .children {\n  padding-left: 38.4px;\n}\n.children .node > .depth > .content .DraftEditor-root .hashtag {\n  color: #2185C5;\n  background-color: #eaf4fb;\n  padding: 2px 4px 2px 4px;\n  border-radius: 6px;\n}\n.children .node > .depth > .content .DraftEditor-root .editor-link {\n  color: #2185C5;\n  text-decoration: underline;\n  cursor: pointer;\n}\n.children .node.selected {\n  background-color: #E2E2E8;\n}\n.children .node.hidden {\n  display: none;\n}\n.children .node.completed > .depth > .content {\n  color: #e6e6e6 !important;\n  text-decoration: line-through;\n}\n.children .node.completed > .depth > .content .DraftEditor-root .hashtag {\n  color: #bedff4;\n  background-color: #f7fbfe;\n}\n.children .node.completed > .depth > .content .DraftEditor-root .editor-link {\n  color: #bedff4;\n}\n.children .node.currentlySelected {\n  position: absolute;\n  left: 0;\n  top: 0;\n  background-color: #000;\n  color: #fff;\n  font-size: 0.8em;\n}\n.children .node.currentlySelected > span {\n  padding: 2px 4px 2px 4px;\n}\n.children .node .bullet-container {\n  cursor: pointer;\n  position: absolute;\n  height: 60px;\n  width: 20px;\n}\n.children .node .bullet-container.dragging {\n  cursor: move;\n  /* fallback if grab cursor is unsupported */\n  cursor: grab;\n  cursor: -moz-grabbing;\n  cursor: -webkit-grabbing;\n}\n.children .node .bullet-container .pulse {\n  animation: pulse 3s ease-out;\n  animation-iteration-count: infinite;\n  width: 40px;\n  height: 40px;\n  border: 5px solid #2185C5;\n  border-radius: 30px;\n  background-color: transparent;\n  z-index: 10;\n  position: absolute;\n  top: 7px;\n  left: -13px;\n}\n@keyframes pulse {\n  0% {\n    transform: scale(0);\n    opacity: 0.0;\n  }\n  25% {\n    transform: scale(0);\n    opacity: 0.1;\n  }\n  50% {\n    transform: scale(0.1);\n    opacity: 0.3;\n  }\n  75% {\n    transform: scale(0.5);\n    opacity: 0.5;\n  }\n  100% {\n    transform: scale(1);\n    opacity: 0.0;\n  }\n}\n.children .node .bullet-container .inner-circle {\n  border-radius: 50%;\n  width: 10px;\n  height: 10px;\n  background-color: #2185C5;\n  position: absolute;\n  top: 26px;\n  left: 6px;\n}\n.children .node .bullet-container .outer-circle {\n  border-radius: 50%;\n  width: 20px;\n  height: 20px;\n  border: 1px solid #2185C5;\n  position: absolute;\n  top: 20px;\n  animation: explode 300ms ease-out;\n  animation-iteration-count: 1;\n  animation-delay: 0;\n}\n@keyframes explode {\n  0% {\n    transform: scale(0);\n  }\n  25% {\n    transform: scale(0.2);\n  }\n  50% {\n    transform: scale(0.5);\n  }\n  75% {\n    transform: scale(1.2);\n  }\n  100% {\n    transform: scale(1);\n  }\n}\n.children .node .bullet-container .number {\n  color: #2185C5;\n  font-size: 20px;\n  font-weight: bold;\n  top: 5px;\n  left: 5px;\n  position: absolute;\n}\n.children .node.no-children > .depth > .bullet-container {\n  cursor: default;\n}\n.children .node.no-children > .depth > .bullet-container .outer-circle {\n  display: none;\n}\n.children .node.no-children > .depth > .bullet-container .inner-circle {\n  width: 12px;\n  height: 12px;\n}\n.children .node.has-children.collapsed > .depth > .bullet-container {\n  cursor: pointer;\n}\n.children .node.has-children.collapsed > .depth > .bullet-container .inner-circle {\n  background-color: #fff !important;\n  z-index: 1;\n}\n.children .node.has-children.collapsed > .depth > .bullet-container .outer-circle {\n  background-color: #2185C5 !important;\n  display: block;\n}\n.children .node.has-children.collapsed > .depth > .bullet-container .number {\n  color: #fff;\n}\n.children .node.has-children.collapsed > .depth > .bullet-container .ordered-bullet .number {\n  top: 13px;\n  font-size: .95em;\n}\n.children .node.ancestor-of-search-result.no-children > .depth > .bullet-container .inner-circle {\n  background-color: #bedff4 !important;\n}\n.children .node.ancestor-of-search-result.has-children > .depth > .bullet-container .inner-circle {\n  background-color: #bedff4 !important;\n}\n.children .node.ancestor-of-search-result.has-children > .depth > .bullet-container .outer-circle {\n  border-color: #bedff4 !important;\n}\n.children .node .children .node .bullet-container {\n  height: 48px;\n  width: 20px;\n}\n.children .node .children .node .bullet-container .inner-circle {\n  width: 8px;\n  height: 8px;\n  top: 20.8px;\n  left: 4.8px;\n}\n.children .node .children .node .bullet-container .outer-circle {\n  width: 16px;\n  height: 16px;\n  top: 16px;\n  left: 0;\n}\n.children .node .children .node.no-children > .depth > .bullet-container .inner-circle {\n  width: 9.6px;\n  height: 9.6px;\n}\n.children .node .children .node .children .node .bullet-container {\n  height: 38.4px;\n  width: 20px;\n}\n.children .node .children .node .children .node .bullet-container .inner-circle {\n  width: 6px;\n  height: 6px;\n  top: 16px;\n  left: 3.84px;\n}\n.children .node .children .node .children .node .bullet-container .outer-circle {\n  width: 12px;\n  height: 12px;\n  top: 12px;\n  left: 0;\n}\n.children .node .children .node .children .node .bullet-container .number {\n  font-size: 18px;\n}\n.children .node .children .node .children .node.no-children .bullet-container .inner-circle {\n  width: 7px;\n  height: 7px;\n}\n.bullet-menu {\n  position: absolute;\n  top: 50px;\n  left: -30px;\n  background-color: #f2f2f2;\n  width: 200px;\n  z-index: 1;\n  color: #000;\n  border-radius: 6px;\n  border: 1px solid #999999;\n}\n.bullet-menu ul {\n  padding: 0;\n  margin: 0;\n}\n.bullet-menu ul li {\n  list-style: none;\n  padding: 10px;\n  font-size: 14px;\n  cursor: pointer;\n}\n.bullet-menu ul li i {\n  margin-top: 4px;\n}\n.bullet-menu ul li:hover {\n  background-color: #f7f7f7;\n}\n.intellisense-container {\n  position: relative;\n}\n.intellisense-container .highlighter {\n  line-height: inherit;\n  font-size: inherit;\n  display: block;\n  background-color: transparent;\n  font-family: inherit;\n  color: transparent;\n  white-space: pre-wrap;\n  word-wrap: break-word;\n}\n.intellisense-container .highlighter span:not(.caret) {\n  visibility: hidden;\n}\n.intellisense-container .highlighter strong.tag {\n  font-weight: inherit;\n  background-color: #d4eaf8;\n}\n.intellisense-container textarea {\n  width: 100%;\n  resize: none;\n  border: 0 none;\n  padding: 0;\n  outline: none;\n  font-size: inherit;\n  line-height: inherit;\n  background: transparent;\n  position: absolute;\n  font-family: inherit;\n  white-space: pre-wrap;\n  word-wrap: break-word;\n}\n.intellisense-container .intellisense-suggestion-box {\n  z-index: 3;\n  background-color: #2185C5;\n  color: #fff;\n  position: absolute;\n  top: 50px;\n  left: 50px;\n  width: 200px;\n}\n.intellisense-container .intellisense-suggestion-box .instruction {\n  font-size: .6em;\n  text-align: center;\n  line-height: 30px;\n}\n.intellisense-container .intellisense-suggestion-box ul.suggestions {\n  margin: 0;\n  padding: 0;\n}\n.intellisense-container .intellisense-suggestion-box ul.suggestions li.suggestion {\n  font-size: .6em;\n  list-style: none;\n  padding: 6px 6px 6px 24px;\n  line-height: 30px;\n}\n.intellisense-container .intellisense-suggestion-box ul.suggestions li.suggestion.selected {\n  background-color: #3b9ede;\n}\nhtml,\nbody {\n  background-color: #fff;\n  font-family: 'Lato', sans-serif;\n  font-size: 14px;\n  padding: 0;\n  margin: 0;\n  height: 100%;\n}\n#root {\n  padding: 0;\n  margin: 0;\n}\n#root,\n#app,\n#signed-in,\n#tree-container {\n  height: 100%;\n}\n.right {\n  float: right;\n}\n.clearfix:after {\n  visibility: hidden;\n  display: block;\n  font-size: 0;\n  content: \" \";\n  clear: both;\n  height: 0;\n}\n.clearfix:after {\n  visibility: hidden;\n  display: block;\n  font-size: 0;\n  content: \" \";\n  clear: both;\n  height: 0;\n}\n.hidden {\n  display: none;\n}\n", ""]);
+	exports.push([module.id, "form label {\n  font-weight: 300;\n  width: 100%;\n}\nform input[type=text] {\n  font-size: 1.2em;\n  border-radius: 4px;\n  border: 1px solid #000;\n  width: 100%;\n}\nform a.btn {\n  background-color: #2185C5;\n  font-size: 1.2em;\n  border-radius: 4px;\n  border: 1px solid #2185C5;\n  color: #fff;\n  margin-right: 10px;\n  padding: 4px;\n  cursor: pointer;\n}\nform a.btn.secondary-btn {\n  background-color: transparent;\n  border: none;\n  color: #2185C5;\n}\nform a.btn.secondary-btn:hover {\n  text-decoration: underline;\n}\n.app-loader {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  margin: auto;\n  width: 220px;\n  height: 400px;\n  font-size: 40px;\n  color: #2185C5;\n  text-align: center;\n}\n.app-loader .spinner-container {\n  float: left;\n  margin-top: 4px;\n}\n.app-loader .spinner-container .spinner {\n  display: inline-block;\n  height: 40px;\n  -webkit-animation: spin 2s linear infinite;\n  -moz-animation: spin 2s linear infinite;\n  animation: spin 2s linear infinite;\n}\n@-moz-keyframes spin {\n  100% {\n    -moz-transform: rotate(360deg);\n  }\n}\n@-webkit-keyframes spin {\n  100% {\n    -webkit-transform: rotate(360deg);\n  }\n}\n@keyframes spin {\n  100% {\n    -webkit-transform: rotate(360deg);\n    transform: rotate(360deg);\n  }\n}\n.side-panel-toggle {\n  position: absolute;\n  padding: 6px 6px 2px 6px;\n  left: 0px;\n  top: 70px;\n  font-size: 1.6em;\n  z-index: 2;\n  cursor: pointer;\n  color: #2185C5;\n  border-right: 1px solid #999999;\n  border-bottom: 1px solid #999999;\n}\n.side-panel-toggle.toggled {\n  background-color: #f2f2f2;\n  left: 200px;\n}\n.pages-side-panel {\n  float: left;\n  height: 100%;\n  width: 200px;\n  background-color: #f2f2f2;\n  border-right: 1px solid #999999;\n  z-index: 1;\n  margin-top: -56px;\n}\n.pages-side-panel .pages .page {\n  width: 100%;\n  min-height: 100px;\n  cursor: pointer;\n  position: relative;\n}\n.pages-side-panel .pages .page:hover {\n  background-color: #f7f7f7;\n}\n.pages-side-panel .pages .page .title {\n  width: 100%;\n  text-align: center;\n  line-height: 100px;\n  font-size: 1.4em;\n  color: #000;\n}\n.pages-side-panel .pages .page input.title {\n  background-color: #ffffff;\n  padding: 0;\n  border: 0;\n  outline: none;\n  font-family: 'Lato', sans-serif;\n}\n.pages-side-panel .pages .page .button {\n  position: absolute;\n  z-index: 1;\n  color: #2185C5;\n  font-size: 1.2em;\n  display: none;\n}\n.pages-side-panel .pages .page:hover .button {\n  position: absolute;\n  z-index: 1;\n  color: #2185C5;\n  font-size: 1.2em;\n  display: block;\n}\n.pages-side-panel .pages .page .button:hover {\n  color: #2185C5;\n}\n.pages-side-panel .pages .page .delete {\n  position: absolute;\n  right: 10px;\n  bottom: 10px;\n}\n.pages-side-panel .pages .page .share {\n  position: absolute;\n  right: 10px;\n  top: 42px;\n}\n.pages-side-panel .pages .page .edit-name {\n  position: absolute;\n  right: 10px;\n  top: 10px;\n}\n.sign-in {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  margin: auto;\n  width: 300px;\n  height: 400px;\n}\n.sign-in-logo {\n  font-family: 'Lora', sans-serif;\n  color: #2185C5;\n  font-size: 40px;\n  text-align: center;\n  margin-bottom: 40px;\n}\n.btn-sign-in {\n  display: block;\n  padding: 6px 12px;\n  margin-bottom: 10px;\n  font-size: 14px;\n  font-weight: normal;\n  line-height: 1.42857143;\n  text-align: center;\n  vertical-align: middle;\n  -ms-touch-action: manipulation;\n  touch-action: manipulation;\n  cursor: pointer;\n  -webkit-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n  background-image: none;\n  border: 1px solid transparent;\n  border-radius: 4px;\n  position: relative;\n  padding-left: 44px;\n  text-align: left;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.btn-sign-in > :first-child {\n  position: absolute;\n  left: 0;\n  top: 0;\n  bottom: 0;\n  width: 32px;\n  line-height: 34px;\n  font-size: 1.6em;\n  text-align: center;\n  border-right: 1px solid rgba(0, 0, 0, 0.2);\n}\n.btn-block {\n  display: block;\n  width: 100%;\n}\n.btn-google {\n  color: #fff;\n  background-color: #dd4b39;\n  border-color: rgba(0, 0, 0, 0.2);\n}\n.btn-facebook {\n  color: #fff;\n  background-color: #3B5998;\n  border-color: rgba(0, 0, 0, 0.2);\n}\n.btn-github {\n  color: #fff;\n  background-color: #444;\n  border-color: rgba(0, 0, 0, 0.2);\n}\n.btn-twitter {\n  color: #fff;\n  background-color: #55acee;\n  border-color: rgba(0, 0, 0, 0.2);\n}\n.top-bar {\n  height: 84px;\n  margin-bottom: 42px;\n  padding-left: 42px;\n  padding-right: 42px;\n  background-color: transparent;\n}\n.top-bar .top-bar-left {\n  float: left;\n  width: auto;\n}\n.top-bar .top-bar-right {\n  float: right;\n  width: auto;\n}\n.top-bar .top-bar-right a {\n  cursor: pointer;\n}\n.top-bar .top-bar-right a:hover {\n  text-decoration: underline;\n}\n.top-bar ul {\n  list-style-type: none;\n  padding: 0;\n}\n.top-bar li {\n  position: relative;\n  vertical-align: middle;\n  outline: 0;\n  display: table-cell;\n  font-size: 20px;\n  color: #2185C5;\n}\n.top-bar li a {\n  padding: 1.2em;\n  line-height: 2.6em;\n}\n.top-bar li .logo {\n  font-family: 'Lora', sans-serif;\n  color: #2185C5;\n}\n.top-bar .menu li a,\n.top-bar .menu li i {\n  font-size: 16px;\n}\n.top-bar .menu li a.icon:hover,\n.top-bar .menu li i.icon:hover {\n  text-decoration: none;\n}\n.top-bar li i {\n  font-size: 24px;\n}\n.top-bar li div.dropdown-container.show > div.dropdown-list {\n  -webkit-transform: scale(1, 1);\n  -moz-transform: scale(1, 1);\n  -ms-transform: scale(1, 1);\n  -o-transform: scale(1, 1);\n}\n.top-bar li div.dropdown-container > div.dropdown-display {\n  float: left;\n  width: 100%;\n  background: white;\n  height: 40px;\n  cursor: pointer;\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  box-sizing: border-box;\n}\n.top-bar li div.dropdown-container > div.dropdown-display > * {\n  float: left;\n  height: 100%;\n  height: 40px;\n  position: relative;\n  top: 50%;\n  -webkit-transform: translateY(-50%);\n  -ms-transform: translateY(-50%);\n  transform: translateY(-50%);\n}\n.top-bar li div.dropdown-container > div.dropdown-display > span {\n  font-size: 14px;\n  width: 100%;\n  position: relative;\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  box-sizing: border-box;\n  padding-right: 34px;\n  padding-left: 10px;\n}\n.top-bar li div.dropdown-container > div.dropdown-display > i {\n  position: relative;\n  width: 14px;\n  margin-left: -24px;\n  font-size: 1.125em;\n  font-weight: bold;\n  padding-right: 10px;\n  text-align: right;\n}\n.top-bar li div.dropdown-container > div.dropdown-list {\n  z-index: 2;\n  float: left;\n  position: relative;\n  width: 100%;\n  -webkit-transform: scale(1, 0);\n  -moz-transform: scale(1, 0);\n  -ms-transform: scale(1, 0);\n  -o-transform: scale(1, 0);\n  -webkit-transition: -webkit-transform ease 250ms;\n  -moz-transition: -webkit-transform ease 250ms;\n  -ms-transition: -webkit-transform ease 250ms;\n  -o-transition: -webkit-transform ease 250ms;\n  -webkit-transition: transform ease 250ms;\n  -moz-transition: transform ease 250ms;\n  -ms-transition: transform ease 250ms;\n  -o-transition: transform ease 250ms;\n}\n.top-bar li div.dropdown-container > div.dropdown-list > div {\n  position: absolute;\n  width: 100%;\n}\n.top-bar li div.dropdown-container > div.dropdown-list > div .item {\n  width: 100%;\n  padding: 0 10px;\n  font-size: 14px;\n  border: solid 1px #DDD;\n  border-top: none;\n}\n.top-bar li div.dropdown-container > div.dropdown-list > div .item h4 {\n  color: #124a6e;\n  padding: 5px;\n}\n.top-bar li div.dropdown-container > div.dropdown-list > div .item a {\n  cursor: pointer;\n  color: #2185C5;\n  padding: 0;\n  margin: 0;\n}\n.top-bar .logo {\n  font-size: 30px;\n}\n.top-bar .search {\n  position: relative;\n  margin-right: 20px;\n}\n.top-bar .search .icon {\n  color: #808080;\n}\n.top-bar .search .dripicons-search {\n  position: absolute;\n  right: 8px;\n  top: 8px;\n}\n.top-bar .search .dripicons-tags {\n  position: absolute;\n  transform: scaleX(-1);\n  right: 40px;\n  top: 8px;\n}\n.top-bar .search input {\n  margin-left: 22px;\n  border-radius: 4px;\n  min-width: 400px;\n  border: 1px solid #ccc;\n  font-size: 20px;\n  padding: .2em;\n  color: #2185C5;\n  outline-style: none;\n  background-color: transparent;\n}\n.top-bar .search input:focus {\n  border-color: #2185C5;\n}\n.top-bar span {\n  font-size: 30px;\n}\n#app-context-menu {\n  position: absolute;\n  z-index: 2;\n}\n#tree-container {\n  padding-right: 60px;\n  padding-left: 60px;\n}\n.node {\n  position: relative;\n}\n.depth {\n  cursor: text;\n}\n.children .node .children .node .vertex-horizontal {\n  height: 1px;\n  position: absolute;\n  width: 100%;\n  background-color: #cccccc;\n  top: 24px;\n  left: -38px;\n  width: 24px;\n}\n.children .node .children .node .vertex-vertical {\n  width: 1px;\n  height: 100%;\n  position: absolute;\n  background-color: #cccccc;\n  left: -38px;\n  top: 0px;\n}\n.children .node .children .node:last-child > .vertex-vertical {\n  height: 24px;\n}\n.children .node .children .node .children .node .vertex-horizontal {\n  top: 19.2px;\n  left: -30.4px;\n  width: -30.4px;\n}\n.children .node .children .node .children .node .vertex-vertical {\n  left: -30.4px;\n  top: 0px;\n}\n.children .node .children .node .children .node:last-child > .vertex-vertical {\n  height: 19px;\n}\n.depth:hover > .inline-btn > .btn {\n  visibility: visible !important;\n}\n.children .node .inline-btn {\n  position: absolute;\n  top: 20px;\n  width: 24px;\n  height: 24px;\n  left: -24px;\n}\n.children .node .inline-btn .btn {\n  visibility: hidden;\n  width: 20px;\n  height: 20px;\n  position: absolute;\n  color: #2185C5;\n  font-size: 20px;\n  cursor: pointer;\n  border: 1px solid #2185C5;\n  border-radius: 50%;\n}\n.children .node .inline-btn:hover .btn {\n  visibility: visible !important;\n}\n.children .node .children .inline-btn {\n  top: 16px;\n  left: -25px;\n}\n.children .node .children .inline-btn .btn {\n  font-size: 16px;\n  width: 16px;\n  height: 16px;\n}\n.children .node .children .children .inline-btn {\n  top: 12px;\n  left: -20px;\n}\n.children .node .children .children .inline-btn .btn {\n  font-size: 12px;\n  width: 12px;\n  height: 12px;\n}\n.children .node .notes {\n  margin-left: 48px;\n  margin-bottom: 12px;\n  padding: 0;\n  margin: 0;\n  color: #808080;\n  background: transparent;\n  height: 100%;\n  font-family: 'Lato', sans-serif;\n  font-size: 1em;\n  min-height: 34px;\n}\n.children .node .notes code,\n.children .node .notes a {\n  color: #808080;\n}\n.children .node .children .notes {\n  margin-left: 48px;\n  margin-bottom: 12px;\n  font-size: .95em;\n}\n.children .node .children .children .notes {\n  margin-left: 38.4px;\n  margin-bottom: 9.6px;\n  font-size: .85em;\n}\n.children .node .content {\n  cursor: text;\n  line-height: 60px;\n  min-height: 60px;\n  width: 100%;\n  margin-left: 48px;\n  position: relative;\n  font-size: 1.8em;\n  color: #000;\n  font-family: 'Lato', sans-serif;\n}\n.children .node .content .highlight {\n  background-color: yellow;\n  text-decoration: underline;\n}\n.children .node.ancestor-of-search-result > .depth .content {\n  color: #cccccc;\n}\n.children .node .children .content {\n  line-height: 48px;\n  min-height: 48px;\n  margin-left: 48px;\n  font-size: 1.44em;\n}\n.children .node .children .content .rendered-content,\n.children .node .children .content .plain-text-content {\n  font-size: inherit;\n  line-height: inherit;\n}\n.children .node .children .children .content {\n  line-height: 36px;\n  min-height: 36px;\n  margin-left: 38.4px;\n  font-size: 1.152em;\n}\n.children .node .children .children .content .rendered-content,\n.children .node .children .children .content .plain-text-content {\n  font-size: inherit;\n  line-height: inherit;\n}\n.children .node .children {\n  padding-left: 48px;\n}\n.children .node .children:after {\n  visibility: hidden;\n  display: block;\n  font-size: 0;\n  content: \" \";\n  clear: both;\n  height: 0;\n}\n.children .node .children .children {\n  padding-left: 38.4px;\n}\n.children .node > .depth > .content .DraftEditor-root .hashtag {\n  color: #2185C5;\n  background-color: #eaf4fb;\n  padding: 2px 4px 2px 4px;\n  border-radius: 6px;\n}\n.children .node > .depth > .content .DraftEditor-root .editor-link {\n  color: #2185C5;\n  text-decoration: underline;\n  cursor: pointer;\n}\n.children .node.selected {\n  background-color: #E2E2E8;\n}\n.children .node.hidden {\n  display: none;\n}\n.children .node.completed > .depth > .content {\n  color: #e6e6e6 !important;\n  text-decoration: line-through;\n}\n.children .node.completed > .depth > .content .DraftEditor-root .hashtag {\n  color: #bedff4;\n  background-color: #f7fbfe;\n}\n.children .node.completed > .depth > .content .DraftEditor-root .editor-link {\n  color: #bedff4;\n}\n.children .node.currentlySelected {\n  position: absolute;\n  left: 0;\n  top: 0;\n  background-color: #000;\n  color: #fff;\n  font-size: 0.8em;\n}\n.children .node.currentlySelected > span {\n  padding: 2px 4px 2px 4px;\n}\n.children .node .depth.drag-over {\n  border-bottom: 4px solid #2185C5;\n}\n.children .node .drop-area {\n  display: none;\n  height: 2px;\n  width: 100%;\n  background-color: #2185C5;\n}\n.children .node .bullet-container {\n  cursor: pointer;\n  position: absolute;\n  height: 60px;\n  width: 20px;\n}\n.children .node .bullet-container.dragging {\n  cursor: move;\n  /* fallback if grab cursor is unsupported */\n  cursor: grab;\n  cursor: -moz-grabbing;\n  cursor: -webkit-grabbing;\n}\n.children .node .bullet-container .pulse {\n  animation: pulse 3s ease-out;\n  animation-iteration-count: infinite;\n  width: 40px;\n  height: 40px;\n  border: 5px solid #2185C5;\n  border-radius: 30px;\n  background-color: transparent;\n  z-index: 10;\n  position: absolute;\n  top: 7px;\n  left: -13px;\n}\n@keyframes pulse {\n  0% {\n    transform: scale(0);\n    opacity: 0.0;\n  }\n  25% {\n    transform: scale(0);\n    opacity: 0.1;\n  }\n  50% {\n    transform: scale(0.1);\n    opacity: 0.3;\n  }\n  75% {\n    transform: scale(0.5);\n    opacity: 0.5;\n  }\n  100% {\n    transform: scale(1);\n    opacity: 0.0;\n  }\n}\n.children .node .bullet-container .inner-circle {\n  border-radius: 50%;\n  width: 10px;\n  height: 10px;\n  background-color: #2185C5;\n  position: absolute;\n  top: 26px;\n  left: 6px;\n}\n.children .node .bullet-container .outer-circle {\n  border-radius: 50%;\n  width: 20px;\n  height: 20px;\n  border: 1px solid #2185C5;\n  position: absolute;\n  top: 20px;\n  animation: explode 300ms ease-out;\n  animation-iteration-count: 1;\n  animation-delay: 0;\n}\n@keyframes explode {\n  0% {\n    transform: scale(0);\n  }\n  25% {\n    transform: scale(0.2);\n  }\n  50% {\n    transform: scale(0.5);\n  }\n  75% {\n    transform: scale(1.2);\n  }\n  100% {\n    transform: scale(1);\n  }\n}\n.children .node .bullet-container .number {\n  color: #2185C5;\n  font-size: 20px;\n  font-weight: bold;\n  top: 5px;\n  left: 5px;\n  position: absolute;\n}\n.children .node.no-children > .depth > .bullet-container {\n  cursor: default;\n}\n.children .node.no-children > .depth > .bullet-container .outer-circle {\n  display: none;\n}\n.children .node.no-children > .depth > .bullet-container .inner-circle {\n  width: 12px;\n  height: 12px;\n}\n.children .node.has-children.collapsed > .depth > .bullet-container {\n  cursor: pointer;\n}\n.children .node.has-children.collapsed > .depth > .bullet-container .inner-circle {\n  background-color: #fff !important;\n  z-index: 1;\n}\n.children .node.has-children.collapsed > .depth > .bullet-container .outer-circle {\n  background-color: #2185C5 !important;\n  display: block;\n}\n.children .node.has-children.collapsed > .depth > .bullet-container .number {\n  color: #fff;\n}\n.children .node.has-children.collapsed > .depth > .bullet-container .ordered-bullet .number {\n  top: 13px;\n  font-size: .95em;\n}\n.children .node.ancestor-of-search-result.no-children > .depth > .bullet-container .inner-circle {\n  background-color: #bedff4 !important;\n}\n.children .node.ancestor-of-search-result.has-children > .depth > .bullet-container .inner-circle {\n  background-color: #bedff4 !important;\n}\n.children .node.ancestor-of-search-result.has-children > .depth > .bullet-container .outer-circle {\n  border-color: #bedff4 !important;\n}\n.children .node .children .node .bullet-container {\n  height: 48px;\n  width: 20px;\n}\n.children .node .children .node .bullet-container .inner-circle {\n  width: 8px;\n  height: 8px;\n  top: 20.8px;\n  left: 4.8px;\n}\n.children .node .children .node .bullet-container .outer-circle {\n  width: 16px;\n  height: 16px;\n  top: 16px;\n  left: 0;\n}\n.children .node .children .node.no-children > .depth > .bullet-container .inner-circle {\n  width: 9.6px;\n  height: 9.6px;\n}\n.children .node .children .node .children .node .bullet-container {\n  height: 38.4px;\n  width: 20px;\n}\n.children .node .children .node .children .node .bullet-container .inner-circle {\n  width: 6px;\n  height: 6px;\n  top: 16px;\n  left: 3.84px;\n}\n.children .node .children .node .children .node .bullet-container .outer-circle {\n  width: 12px;\n  height: 12px;\n  top: 12px;\n  left: 0;\n}\n.children .node .children .node .children .node .bullet-container .number {\n  font-size: 18px;\n}\n.children .node .children .node .children .node.no-children .bullet-container .inner-circle {\n  width: 7px;\n  height: 7px;\n}\n.bullet-menu {\n  position: absolute;\n  top: 50px;\n  left: -30px;\n  background-color: #f2f2f2;\n  width: 200px;\n  z-index: 1;\n  color: #000;\n  border-radius: 6px;\n  border: 1px solid #999999;\n}\n.bullet-menu ul {\n  padding: 0;\n  margin: 0;\n}\n.bullet-menu ul li {\n  list-style: none;\n  padding: 10px;\n  font-size: 14px;\n  cursor: pointer;\n}\n.bullet-menu ul li i {\n  margin-top: 4px;\n}\n.bullet-menu ul li:hover {\n  background-color: #f7f7f7;\n}\n.intellisense-container {\n  position: relative;\n}\n.intellisense-container .highlighter {\n  line-height: inherit;\n  font-size: inherit;\n  display: block;\n  background-color: transparent;\n  font-family: inherit;\n  color: transparent;\n  white-space: pre-wrap;\n  word-wrap: break-word;\n}\n.intellisense-container .highlighter span:not(.caret) {\n  visibility: hidden;\n}\n.intellisense-container .highlighter strong.tag {\n  font-weight: inherit;\n  background-color: #d4eaf8;\n}\n.intellisense-container textarea {\n  width: 100%;\n  resize: none;\n  border: 0 none;\n  padding: 0;\n  outline: none;\n  font-size: inherit;\n  line-height: inherit;\n  background: transparent;\n  position: absolute;\n  font-family: inherit;\n  white-space: pre-wrap;\n  word-wrap: break-word;\n}\n.intellisense-container .intellisense-suggestion-box {\n  z-index: 3;\n  background-color: #2185C5;\n  color: #fff;\n  position: absolute;\n  top: 50px;\n  left: 50px;\n  width: 200px;\n}\n.intellisense-container .intellisense-suggestion-box .instruction {\n  font-size: .6em;\n  text-align: center;\n  line-height: 30px;\n}\n.intellisense-container .intellisense-suggestion-box ul.suggestions {\n  margin: 0;\n  padding: 0;\n}\n.intellisense-container .intellisense-suggestion-box ul.suggestions li.suggestion {\n  font-size: .6em;\n  list-style: none;\n  padding: 6px 6px 6px 24px;\n  line-height: 30px;\n}\n.intellisense-container .intellisense-suggestion-box ul.suggestions li.suggestion.selected {\n  background-color: #3b9ede;\n}\nhtml,\nbody {\n  background-color: #fff;\n  font-family: 'Lato', sans-serif;\n  font-size: 14px;\n  padding: 0;\n  margin: 0;\n  height: 100%;\n}\n#root {\n  padding: 0;\n  margin: 0;\n}\n#root,\n#app,\n#signed-in,\n#tree-container {\n  height: 100%;\n}\n.right {\n  float: right;\n}\n.clearfix:after {\n  visibility: hidden;\n  display: block;\n  font-size: 0;\n  content: \" \";\n  clear: both;\n  height: 0;\n}\n.clearfix:after {\n  visibility: hidden;\n  display: block;\n  font-size: 0;\n  content: \" \";\n  clear: both;\n  height: 0;\n}\n.hidden {\n  display: none;\n}\n", ""]);
 	
 	// exports
 
@@ -40125,7 +40154,7 @@
 	
 	var getAppProps = exports.getAppProps = function getAppProps(state, ownProps) {
 	  return _extends({}, ownProps, {
-	    appState: state,
+	    appInitialized: state.app.get('appInitialized'),
 	    currentUserPage: userPageSelectors.currentPage(state),
 	    isAuthenticated: authSelectors.isAuthenticated(state),
 	    initialAuthChecked: state.auth.get('initialCheck'),
@@ -40515,15 +40544,14 @@
 	      var _this2 = this;
 	
 	      var _props = this.props;
-	      var appState = _props.appState;
+	      var appInitialized = _props.appInitialized;
 	      var currentUserPage = _props.currentUserPage;
 	      var isAuthenticated = _props.isAuthenticated;
 	      var initialAuthChecked = _props.initialAuthChecked;
 	
-	      var appIsInitialized = isAuthenticated && currentUserPage && appState.tree.present.get(currentUserPage.get('rootNodeId'));
 	      var userIsAuthenticated = isAuthenticated;
 	      var showSignIn = !userIsAuthenticated && initialAuthChecked;
-	      var showLoading = userIsAuthenticated && !appIsInitialized;
+	      var showLoading = userIsAuthenticated && !appInitialized;
 	
 	      return _react3.default.createElement(
 	        'div',
@@ -40532,7 +40560,7 @@
 	          } },
 	        showSignIn ? _react3.default.createElement(_signIn2.default, null) : null,
 	        showLoading ? _react3.default.createElement(_appLoader2.default, null) : null,
-	        appIsInitialized ? _react3.default.createElement(
+	        appInitialized ? _react3.default.createElement(
 	          'div',
 	          { id: 'signed-in' },
 	          _react3.default.createElement(_topBar2.default, null),
@@ -41324,14 +41352,13 @@
 	  authDomain: 'codex-f90ff.firebaseapp.com',
 	  databaseURL: 'https://codex-f90ff.firebaseio.com'
 	};
-	
+	exports.default = firebaseConfig;
 	// const firebaseDEVConfig = {
 	//   apiKey: 'AIzaSyD7r4XBGn6ZmFe2ThZA037cdoz_dCD-elc',
 	//   authDomain: 'codex-dev.firebaseapp.com',
 	//   databaseURL: 'https://codex-dev.firebaseio.com/'
 	// }
-	
-	exports.default = firebaseConfig;
+	// export default firebaseDEVConfig
 
 /***/ },
 /* 378 */
@@ -41744,21 +41771,12 @@
 	      return 'handled';
 	    }
 	  }, {
-	    key: 'onEditorFocus',
-	    value: function onEditorFocus(e) {
-	      var _props6 = this.props;
-	      var nodeId = _props6.nodeId;
-	      var focusNode = _props6.focusNode;
-	
-	      focusNode(nodeId);
-	    }
-	  }, {
 	    key: 'submitContent',
 	    value: function submitContent() {
-	      var _props7 = this.props;
-	      var nodeId = _props7.nodeId;
-	      var content = _props7.content;
-	      var updateNodeContent = _props7.updateNodeContent;
+	      var _props6 = this.props;
+	      var nodeId = _props6.nodeId;
+	      var content = _props6.content;
+	      var updateNodeContent = _props6.updateNodeContent;
 	
 	      var currentContent = this.currentContent();
 	
@@ -41820,9 +41838,6 @@
 	          },
 	          keyBindingFn: function keyBindingFn(e) {
 	            return _this4.onEditorKeyDown(e);
-	          },
-	          onFocus: function onFocus(e) {
-	            _this4.onEditorFocus(e);
 	          }
 	        }),
 	        _react3.default.createElement(MentionSuggestions, {
@@ -42599,6 +42614,38 @@
 	  // ////////////////////
 	
 	  _createClass(Node, [{
+	    key: 'shouldComponentUpdate',
+	    value: function shouldComponentUpdate(nextProps, nextState) {
+	      var _props = this.props;
+	      var content = _props.content;
+	      var parentId = _props.parentId;
+	      var childIds = _props.childIds;
+	      var id = _props.id;
+	      var focused = _props.focused;
+	      var collapsedBy = _props.collapsedBy;
+	      var visible = _props.visible;
+	      var selected = _props.selected;
+	      var completed = _props.completed;
+	      var notes = _props.notes;
+	      var positionInOrderedList = _props.positionInOrderedList;
+	      var nodeInitialized = _props.nodeInitialized;
+	      var currentlySelectedBy = _props.currentlySelectedBy;
+	      var currentlySelectedById = _props.currentlySelectedById;
+	      var auth = _props.auth;
+	      var menuVisible = _props.menuVisible;
+	      var rootNodeId = _props.rootNodeId;
+	      var lastChild = _props.lastChild;
+	      var currentlySearchingOn = _props.currentlySearchingOn;
+	      var isAncestorOfSearchResult = _props.isAncestorOfSearchResult;
+	
+	
+	      if (parentId != nextProps.parentId || !_lodash2.default.isEqual(childIds, nextProps.childIds) || content !== nextProps.content || focused !== nextProps.focused || !_lodash2.default.isEqual(collapsedBy, nextProps.collapsedBy) || visible != nextProps.visible || completed != nextProps.completed || notes != nextProps.notes) {
+	        return true;
+	      }
+	
+	      return false;
+	    }
+	  }, {
 	    key: 'componentWillReceiveProps',
 	    value: function componentWillReceiveProps(newProps) {
 	      this.setState({
@@ -42625,12 +42672,12 @@
 	  }, {
 	    key: 'onContentPaste',
 	    value: function onContentPaste(e) {
-	      var _props = this.props;
-	      var parentId = _props.parentId;
-	      var id = _props.id;
-	      var createNode = _props.createNode;
-	      var addChild = _props.addChild;
-	      var focusNode = _props.focusNode;
+	      var _props2 = this.props;
+	      var parentId = _props2.parentId;
+	      var id = _props2.id;
+	      var createNode = _props2.createNode;
+	      var addChild = _props2.addChild;
+	      var focusNode = _props2.focusNode;
 	
 	
 	      var pastedText = e.clipboardData.getData('Text');
@@ -42652,9 +42699,9 @@
 	  }, {
 	    key: 'onToggleBulletMenuClick',
 	    value: function onToggleBulletMenuClick(e) {
-	      var _props2 = this.props;
-	      var id = _props2.id;
-	      var toggleNodeMenu = _props2.toggleNodeMenu;
+	      var _props3 = this.props;
+	      var id = _props3.id;
+	      var toggleNodeMenu = _props3.toggleNodeMenu;
 	
 	      e.stopPropagation();
 	      toggleNodeMenu(id);
@@ -42662,21 +42709,18 @@
 	  }, {
 	    key: 'onAddBulletButtonClick',
 	    value: function onAddBulletButtonClick(e) {
-	      var _props3 = this.props;
-	      var id = _props3.id;
-	      var createNode = _props3.createNode;
+	      var _props4 = this.props;
+	      var id = _props4.id;
+	      var createNode = _props4.createNode;
 	
 	      createNode(id, 0, '');
 	    }
 	  }, {
-	    key: 'onBulletIconDragState',
-	    value: function onBulletIconDragState(e) {}
-	  }, {
 	    key: 'selectNodeIfHoldingMouseDown',
 	    value: function selectNodeIfHoldingMouseDown(e) {
-	      var _props4 = this.props;
-	      var selectNode = _props4.selectNode;
-	      var id = _props4.id;
+	      var _props5 = this.props;
+	      var selectNode = _props5.selectNode;
+	      var id = _props5.id;
 	
 	      if (e.nativeEvent.which === 1 && !this.props.selected && this.props.id !== '0') {
 	        selectNode(id);
@@ -42686,10 +42730,10 @@
 	  }, {
 	    key: 'onNodeClick',
 	    value: function onNodeClick(e) {
-	      var _props5 = this.props;
-	      var id = _props5.id;
-	      var focusNode = _props5.focusNode;
-	      var selectNode = _props5.selectNode;
+	      var _props6 = this.props;
+	      var id = _props6.id;
+	      var focusNode = _props6.focusNode;
+	      var selectNode = _props6.selectNode;
 	
 	      e.stopPropagation();
 	      e.preventDefault();
@@ -42699,6 +42743,48 @@
 	      } else {
 	        focusNode(id);
 	      }
+	    }
+	  }, {
+	    key: 'onBulletIconDragState',
+	    value: function onBulletIconDragState(e) {
+	      var dragData = {
+	        nodeId: this.props.id
+	      };
+	      e.dataTransfer.setData('text', JSON.stringify(dragData));
+	    }
+	  }, {
+	    key: 'onNodesDrop',
+	    value: function onNodesDrop(e) {
+	      e.preventDefault();
+	      e.stopPropagation();
+	      var moveNode = this.props.moveNode;
+	
+	      var _JSON$parse = JSON.parse(e.dataTransfer.getData('text'));
+	
+	      var nodeId = _JSON$parse.nodeId;
+	
+	
+	      this.setState({
+	        dragOver: false
+	      });
+	
+	      moveNode(nodeId, this.props.id);
+	    }
+	  }, {
+	    key: 'onNodesDragOver',
+	    value: function onNodesDragOver(e) {
+	      e.preventDefault();
+	
+	      this.setState({
+	        dragOver: true
+	      });
+	    }
+	  }, {
+	    key: 'onNodesDragExit',
+	    value: function onNodesDragExit(e) {
+	      this.setState({
+	        dragOver: false
+	      });
 	    }
 	
 	    // /////////////
@@ -42717,33 +42803,37 @@
 	    value: function render() {
 	      var _this2 = this;
 	
-	      var _props6 = this.props;
-	      var parentId = _props6.parentId;
-	      var childIds = _props6.childIds;
-	      var id = _props6.id;
-	      var focused = _props6.focused;
-	      var collapsedBy = _props6.collapsedBy;
-	      var visible = _props6.visible;
-	      var selected = _props6.selected;
-	      var completed = _props6.completed;
-	      var notes = _props6.notes;
-	      var positionInOrderedList = _props6.positionInOrderedList;
-	      var nodeInitialized = _props6.nodeInitialized;
-	      var currentlySelectedBy = _props6.currentlySelectedBy;
-	      var currentlySelectedById = _props6.currentlySelectedById;
-	      var auth = _props6.auth;
-	      var menuVisible = _props6.menuVisible;
-	      var rootNodeId = _props6.rootNodeId;
-	      var lastChild = _props6.lastChild;
-	      var currentlySearchingOn = _props6.currentlySearchingOn;
-	      var isAncestorOfSearchResult = _props6.isAncestorOfSearchResult;
-	      var content = this.state.content;
+	      var _props7 = this.props;
+	      var parentId = _props7.parentId;
+	      var childIds = _props7.childIds;
+	      var id = _props7.id;
+	      var focused = _props7.focused;
+	      var collapsedBy = _props7.collapsedBy;
+	      var visible = _props7.visible;
+	      var selected = _props7.selected;
+	      var completed = _props7.completed;
+	      var notes = _props7.notes;
+	      var positionInOrderedList = _props7.positionInOrderedList;
+	      var nodeInitialized = _props7.nodeInitialized;
+	      var currentlySelectedBy = _props7.currentlySelectedBy;
+	      var currentlySelectedById = _props7.currentlySelectedById;
+	      var auth = _props7.auth;
+	      var menuVisible = _props7.menuVisible;
+	      var rootNodeId = _props7.rootNodeId;
+	      var lastChild = _props7.lastChild;
+	      var currentlySearchingOn = _props7.currentlySearchingOn;
+	      var isAncestorOfSearchResult = _props7.isAncestorOfSearchResult;
+	      var _state = this.state;
+	      var content = _state.content;
+	      var dragOver = _state.dragOver;
 	
 	
+	      console.log('Rendering Node ' + id);
 	      if (!nodeInitialized) {
 	        return false;
 	      }
 	
+	      // TODO: clean this crap up
 	      var bulletClasses = 'node';
 	      if (focused) {
 	        bulletClasses += ' focused';
@@ -42768,13 +42858,13 @@
 	      if (completed) {
 	        bulletClasses += ' completed';
 	      }
-	
 	      if (isAncestorOfSearchResult) {
 	        bulletClasses += ' ancestor-of-search-result';
 	      }
 	
 	      var currentlySelectedByAnotherUser = currentlySelectedById && currentlySelectedById !== auth.get('id');
-	      var currentlySelectedCss = currentlySelectedById && currentlySelectedByAnotherUser ? 'currentlySelected' : null;
+	      var depthCss = currentlySelectedById && currentlySelectedByAnotherUser ? 'currentlySelected' : '';
+	      depthCss += dragOver ? ' drag-over' : '';
 	
 	      return _react3.default.createElement(
 	        'div',
@@ -42785,7 +42875,8 @@
 	          'div',
 	          { onClick: function onClick(e) {
 	              return _this2.onNodeClick(e);
-	            }, className: 'depth ' + currentlySelectedCss },
+	            },
+	            className: 'depth ' + depthCss },
 	          _react3.default.createElement(
 	            'div',
 	            { className: 'inline-btn' },
@@ -42803,6 +42894,19 @@
 	          _react3.default.createElement(_bulletIcon2.default, { onDragStart: function onDragStart(e) {
 	              return _this2.onBulletIconDragState(e);
 	            }, nodeId: id, positionInOrderedList: positionInOrderedList }),
+	          _react3.default.createElement(
+	            'div',
+	            { className: 'drop-area', onDragOver: function onDragOver(e) {
+	                return _this2.onNodesDragOver(e);
+	              },
+	              onDrop: function onDrop(e) {
+	                return _this2.onNodesDrop(e);
+	              },
+	              onDragLeave: function onDragLeave(e) {
+	                return _this2.onNodesDragExit(e);
+	              } },
+	            'As a Child'
+	          ),
 	          _react3.default.createElement(
 	            'div',
 	            {
@@ -43124,6 +43228,15 @@
 	  }
 	
 	  return state;
+	}), _defineProperty(_reducerFactory, _nodeActionTypes.NODE_MOVE, function (state, action) {
+	  var _action$payload3 = action.payload;
+	  var nodeId = _action$payload3.nodeId;
+	  var newParentId = _action$payload3.newParentId;
+	  var currentParentId = _action$payload3.currentParentId;
+	  var userId = _action$payload3.userId;
+	
+	
+	  return nodeOperations.reassignParent(state, nodeId, currentParentId, newParentId, null, userId);
 	}), _defineProperty(_reducerFactory, _nodeActionTypes.NODE_ADDITION_FROM_SUBSCRIPTION, function (state, action) {
 	  var node = action.payload.node;
 	
@@ -43142,20 +43255,20 @@
 	}), _defineProperty(_reducerFactory, _nodeActionTypes.NODES_DELETION, function (state, action) {
 	  // TODO:
 	}), _defineProperty(_reducerFactory, _nodeActionTypes.NODE_DELETION, function (state, action) {
-	  var _action$payload3 = action.payload;
-	  var nodeId = _action$payload3.nodeId;
-	  var parentId = _action$payload3.parentId;
-	  var allDescendantIds = _action$payload3.allDescendantIds;
-	  var userId = _action$payload3.userId;
+	  var _action$payload4 = action.payload;
+	  var nodeId = _action$payload4.nodeId;
+	  var parentId = _action$payload4.parentId;
+	  var allDescendantIds = _action$payload4.allDescendantIds;
+	  var userId = _action$payload4.userId;
 	
 	  return [nodeId].concat(_toConsumableArray(allDescendantIds)).reduce(function (acc, nid) {
 	    return nodeOperations.deleteNode(acc, nodeId, parentId, userId);
 	  }, state);
 	}), _defineProperty(_reducerFactory, _nodeActionTypes.NODE_CONTENT_UPDATE, function (state, action) {
-	  var _action$payload4 = action.payload;
-	  var nodeId = _action$payload4.nodeId;
-	  var content = _action$payload4.content;
-	  var userId = _action$payload4.userId;
+	  var _action$payload5 = action.payload;
+	  var nodeId = _action$payload5.nodeId;
+	  var content = _action$payload5.content;
+	  var userId = _action$payload5.userId;
 	
 	  return state.updateIn([nodeId], function (node) {
 	    return nodeOperations.updateContent(node, content, userId);
@@ -43171,24 +43284,24 @@
 	}), _defineProperty(_reducerFactory, _nodeActionTypes.NODE_UNFOCUS_ALL, function (state, action) {
 	  return nodeOperations.unfocusAll(state);
 	}), _defineProperty(_reducerFactory, _nodeActionTypes.NODE_DEMOTION, function (state, action) {
-	  var _action$payload5 = action.payload;
-	  var nodeId = _action$payload5.nodeId;
-	  var currentParentId = _action$payload5.currentParentId;
-	  var newParentId = _action$payload5.newParentId;
-	  var addNodeAfterNewSiblingId = _action$payload5.addNodeAfterNewSiblingId;
-	  var userId = _action$payload5.userId;
+	  var _action$payload6 = action.payload;
+	  var nodeId = _action$payload6.nodeId;
+	  var currentParentId = _action$payload6.currentParentId;
+	  var newParentId = _action$payload6.newParentId;
+	  var addNodeAfterNewSiblingId = _action$payload6.addNodeAfterNewSiblingId;
+	  var userId = _action$payload6.userId;
 	
 	
 	  state = nodeOperations.reassignParent(state, nodeId, currentParentId, newParentId, addNodeAfterNewSiblingId, userId);
 	
 	  return nodeOperations.focus(state, nodeId, false);
 	}), _defineProperty(_reducerFactory, _nodeActionTypes.NODE_PROMOTION, function (state, action) {
-	  var _action$payload6 = action.payload;
-	  var nodeId = _action$payload6.nodeId;
-	  var userId = _action$payload6.userId;
-	  var currentParentId = _action$payload6.currentParentId;
-	  var newParentId = _action$payload6.newParentId;
-	  var siblingIds = _action$payload6.siblingIds;
+	  var _action$payload7 = action.payload;
+	  var nodeId = _action$payload7.nodeId;
+	  var userId = _action$payload7.userId;
+	  var currentParentId = _action$payload7.currentParentId;
+	  var newParentId = _action$payload7.newParentId;
+	  var siblingIds = _action$payload7.siblingIds;
 	
 	  // reassign all siblings below to the promoted node
 	
@@ -43202,9 +43315,9 @@
 	
 	  return nodeOperations.focus(state, nodeId, false);
 	}), _defineProperty(_reducerFactory, _nodeActionTypes.NODE_EXPANSION_TOGGLE, function (state, action) {
-	  var _action$payload7 = action.payload;
-	  var nodeId = _action$payload7.nodeId;
-	  var userId = _action$payload7.userId;
+	  var _action$payload8 = action.payload;
+	  var nodeId = _action$payload8.nodeId;
+	  var userId = _action$payload8.userId;
 	
 	  if (state.getIn([nodeId, 'collapsedBy', userId])) {
 	    state = nodeOperations.expand(state, [nodeId], userId);
@@ -43214,15 +43327,15 @@
 	
 	  return state;
 	}), _defineProperty(_reducerFactory, _nodeActionTypes.NODE_COLLAPSE, function (state, action) {
-	  var _action$payload8 = action.payload;
-	  var nodeId = _action$payload8.nodeId;
-	  var userId = _action$payload8.userId;
-	
-	  return nodeOperations.collapse(state, [nodeId], userId);
-	}), _defineProperty(_reducerFactory, _nodeActionTypes.NODE_EXPANSION, function (state, action) {
 	  var _action$payload9 = action.payload;
 	  var nodeId = _action$payload9.nodeId;
 	  var userId = _action$payload9.userId;
+	
+	  return nodeOperations.collapse(state, [nodeId], userId);
+	}), _defineProperty(_reducerFactory, _nodeActionTypes.NODE_EXPANSION, function (state, action) {
+	  var _action$payload10 = action.payload;
+	  var nodeId = _action$payload10.nodeId;
+	  var userId = _action$payload10.userId;
 	
 	  return nodeOperations.expand(state, [nodeId], userId);
 	}), _defineProperty(_reducerFactory, _nodeActionTypes.NODE_SELECTION, function (state, action) {
@@ -43238,50 +43351,50 @@
 	
 	  return nodeOperations.deselect(state, [nodeId].concat(_toConsumableArray(allDescendentIds)));
 	}), _defineProperty(_reducerFactory, _nodeActionTypes.NODE_COMPLETION_TOGGLE, function (state, action) {
-	  var _action$payload10 = action.payload;
-	  var nodeId = _action$payload10.nodeId;
-	  var userId = _action$payload10.userId;
+	  var _action$payload11 = action.payload;
+	  var nodeId = _action$payload11.nodeId;
+	  var userId = _action$payload11.userId;
 	
 	  return state.updateIn([nodeId], function (node) {
 	    return nodeOperations.complete(node, userId);
 	  });
 	}), _defineProperty(_reducerFactory, _nodeActionTypes.NODES_COMPLETION, function (state, action) {}), _defineProperty(_reducerFactory, _nodeActionTypes.NODE_NOTES_UPDATE, function (state, action) {
-	  var _action$payload11 = action.payload;
-	  var nodeId = _action$payload11.nodeId;
-	  var notes = _action$payload11.notes;
-	  var userId = _action$payload11.userId;
+	  var _action$payload12 = action.payload;
+	  var nodeId = _action$payload12.nodeId;
+	  var notes = _action$payload12.notes;
+	  var userId = _action$payload12.userId;
 	
 	  return state.updateIn([nodeId], function (node) {
 	    return nodeOperations.updateNotes(node, notes, userId);
 	  });
 	}), _defineProperty(_reducerFactory, _nodeActionTypes.NODE_SHIFT_UP, function (state, action) {
-	  var _action$payload12 = action.payload;
-	  var nodeId = _action$payload12.nodeId;
-	  var parentId = _action$payload12.parentId;
-	
-	  return state.updateIn([parentId], function (parentNode) {
-	    return nodeOperations.repositionChild(parentNode, nodeId, -1);
-	  });
-	}), _defineProperty(_reducerFactory, _nodeActionTypes.NODE_SHIFT_DOWN, function (state, action) {
 	  var _action$payload13 = action.payload;
 	  var nodeId = _action$payload13.nodeId;
 	  var parentId = _action$payload13.parentId;
 	
 	  return state.updateIn([parentId], function (parentNode) {
-	    return nodeOperations.repositionChild(parentNode, nodeId, 1);
+	    return nodeOperations.repositionChild(parentNode, nodeId, -1);
 	  });
-	}), _defineProperty(_reducerFactory, _nodeActionTypes.NODE_COPY_UP, function (state, action) {
+	}), _defineProperty(_reducerFactory, _nodeActionTypes.NODE_SHIFT_DOWN, function (state, action) {
 	  var _action$payload14 = action.payload;
 	  var nodeId = _action$payload14.nodeId;
 	  var parentId = _action$payload14.parentId;
+	
+	  return state.updateIn([parentId], function (parentNode) {
+	    return nodeOperations.repositionChild(parentNode, nodeId, 1);
+	  });
+	}), _defineProperty(_reducerFactory, _nodeActionTypes.NODE_COPY_UP, function (state, action) {
+	  var _action$payload15 = action.payload;
+	  var nodeId = _action$payload15.nodeId;
+	  var parentId = _action$payload15.parentId;
 	
 	  return state.update(function (state) {
 	    return nodeOperations.copyAndShiftNode(state, parentId, nodeId, -1);
 	  });
 	}), _defineProperty(_reducerFactory, _nodeActionTypes.NODE_COPY_DOWN, function (state, action) {
-	  var _action$payload15 = action.payload;
-	  var nodeId = _action$payload15.nodeId;
-	  var parentId = _action$payload15.parentId;
+	  var _action$payload16 = action.payload;
+	  var nodeId = _action$payload16.nodeId;
+	  var parentId = _action$payload16.parentId;
 	
 	  return state.update(function (state) {
 	    return nodeOperations.copyAndShiftNode(state, parentId, nodeId, 1);
@@ -43358,7 +43471,7 @@
 	      }, callback: onNodeAddOrRemove.bind(null, state, false) }
 	  }, I.Map({
 	    childIds: onChildIdsUpdate.bind(null, state)
-	  }));
+	  }), I.Map({ focused: true }));
 	
 	  if (Object.keys(firebaseUpdates).length > 0) {
 	    nodeRepository.sync(firebaseUpdates);

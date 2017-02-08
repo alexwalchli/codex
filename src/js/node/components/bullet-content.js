@@ -152,11 +152,6 @@ export class BulletContent extends Component {
     return 'handled'
   }
 
-  onEditorFocus (e) {
-    const { nodeId, focusNode } = this.props
-    focusNode(nodeId)
-  }
-
   onSearchChange = ({ value }) => {
     this.setState({
       suggestions: defaultSuggestionsFilter(value, mentions)
@@ -207,7 +202,6 @@ export class BulletContent extends Component {
           onTab={(e) => this.onEditorTabDown(e)}
           onBlur={(e) => this.onEditorBlur(e)}
           keyBindingFn={(e) => this.onEditorKeyDown(e)}
-          onFocus={(e) => { this.onEditorFocus(e) }}
         />
         <MentionSuggestions
           onSearchChange={() => this.onSearchChange()}

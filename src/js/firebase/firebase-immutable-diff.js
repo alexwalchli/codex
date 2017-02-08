@@ -21,9 +21,9 @@ export const diffsToFirebaseUpdate = (
     const diffPath = collectionName + d.get('path')
     const value = extractValue(d.get('value'))
     const handleSpecial = specialPropHandling && specialPropHandling.find((v, k) => diffPath.includes(k))
-    const exclude = exclude && exclude.find((v, k) => diffPath.includes(k))
+    const excludeUpdate = exclude && exclude.find((v, k) => diffPath.includes(k))
 
-    if (!exclude) {
+    if (!excludeUpdate) {
       if (handleSpecial) {
         updates = handleSpecial(updates, diffPath, value)
       } else {

@@ -4,7 +4,7 @@ import * as authSelectors from '../auth/auth-selectors'
 export const getAppProps = (state, ownProps) => {
   return {
     ...ownProps,
-    appState: state,
+    appInitialized: state.app.get('appInitialized'), 
     currentUserPage: userPageSelectors.currentPage(state),
     isAuthenticated: authSelectors.isAuthenticated(state),
     initialAuthChecked: state.auth.get('initialCheck'),
