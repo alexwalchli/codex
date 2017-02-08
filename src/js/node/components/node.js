@@ -94,6 +94,40 @@ export class Node extends Component {
     }
   }
 
+  onBulletIconDragState (e) {
+    const dragData = {
+      nodeId: this.props.id
+    }
+    e.dataTransfer.setData('text', JSON.stringify(dragData)); 
+  }
+
+  onNodesDrop (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    const { moveNode } = this.props
+    const { nodeId } = JSON.parse(e.dataTransfer.getData('text'));
+
+    this.setState({
+      dragOver: false
+    })
+
+    moveNode(nodeId, this.props.id)
+  }
+
+  onNodesDragOver (e) {
+    e.preventDefault()
+
+    this.setState({
+      dragOver: true
+    })
+  }
+
+  onNodesDragExit (e) {
+    this.setState({
+      dragOver: false
+    })
+  }
+
   // /////////////
   // rendering //
   // /////////////
@@ -109,12 +143,13 @@ export class Node extends Component {
     const { parentId, childIds, id, focused, collapsedBy, visible, selected, completed, notes, positionInOrderedList,
             nodeInitialized, currentlySelectedBy, currentlySelectedById, auth, menuVisible, rootNodeId, lastChild,
             currentlySearchingOn, isAncestorOfSearchResult } = this.props
-    const { content } = this.state
+    const { content, dragOver } = this.state
 
     if (!nodeInitialized) {
       return (false)
     }
 
+    // TODO: clean this crap up
     var bulletClasses = 'node'
     if (focused) {
       bulletClasses += ' focused'
@@ -139,13 +174,13 @@ export class Node extends Component {
     if (completed) {
       bulletClasses += ' completed'
     }
-
     if (isAncestorOfSearchResult) {
       bulletClasses += ' ancestor-of-search-result'
     }
 
     let currentlySelectedByAnotherUser = currentlySelectedById && currentlySelectedById !== auth.get('id')
-    let currentlySelectedCss = currentlySelectedById && currentlySelectedByAnotherUser ? 'currentlySelected' : null
+    let depthCss = currentlySelectedById && currentlySelectedByAnotherUser ? 'currentlySelected' : ''
+    depthCss += dragOver ? ' drag-over' : ''
 
     return (
       <div className={bulletClasses}>
@@ -158,7 +193,8 @@ export class Node extends Component {
             : null }
 
         { typeof parentId !== 'undefined'
-          ? <div onClick={(e) => this.onNodeClick(e)} className={`depth ${currentlySelectedCss}`}>
+          ? <div onClick={(e) => this.onNodeClick(e)}
+                 className={`depth ${depthCss}`}>
             <div className='inline-btn'>
               <div className='menu-btn btn' onClick={(e) => this.onToggleBulletMenuClick(e)}><i className='icon dripicons-dots-3' /></div>
             </div>
@@ -168,7 +204,10 @@ export class Node extends Component {
                 />
               : null }
 
-            <BulletIcon nodeId={id} positionInOrderedList={positionInOrderedList} />
+            <BulletIcon onDragStart={(e) => this.onBulletIconDragState(e)} nodeId={id} positionInOrderedList={positionInOrderedList} />
+            <div className='drop-area' onDragOver={(e) => this.onNodesDragOver(e)}
+                 onDrop={(e) => this.onNodesDrop(e)}
+                 onDragLeave={(e) => this.onNodesDragExit(e)} >As a Child</div>
             <div
               className='content'
               onMouseEnter={(e) => this.onContentMouseEnter(e)}

@@ -34,6 +34,14 @@ export const createNode = (originNodeId, originOffset, content) =>
       userId))
   }
 
+export const moveNode = (nodeId, newParentId) => (dispatch, getState) => {
+  const state = getState()
+  const currentParentId = nodeSelectors.getNode(state, nodeId).parentId
+  const userId = state.auth.get('id')
+
+  dispatch(nodeActions.nodeMove(nodeId, newParentId, currentParentId, userId))
+}
+
 export const deleteNode = (nodeId) =>
   (dispatch, getState) => {
     const state = getState()

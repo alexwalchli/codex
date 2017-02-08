@@ -18,14 +18,6 @@ export class BulletMenu extends Component {
     deleteNode(nodeId)
   }
 
-  onChangeDisplayModeClick (e) {
-    const { nodeId, updateNodeDisplayMode, toggleNodeMenu, displayMode } = this.props
-    const newDisplayMode = displayMode && displayMode === 'unordered' ? 'ordered' : 'unordered'
-    e.stopPropagation()
-    toggleNodeMenu(nodeId)
-    updateNodeDisplayMode(nodeId, newDisplayMode)
-  }
-
   onAddNoteClick (e) {
     const {nodeId, toggleNodeMenu, focusNode} = this.props
     e.stopPropagation()
@@ -34,7 +26,7 @@ export class BulletMenu extends Component {
   }
 
   render () {
-    const { nodeId, childIds, completed, displayMode, toggleNodeMenu } = this.props
+    const { nodeId, completed, toggleNodeMenu } = this.props
 
     return (
       <div className='bullet-menu' onMouseLeave={() => toggleNodeMenu(nodeId)}>

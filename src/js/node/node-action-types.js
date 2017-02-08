@@ -1,6 +1,7 @@
 // new action types
 export const INITIAL_TREE_STATE_LOAD = 'INITIAL_TREE_STATE_LOAD'
 export const NODE_CREATION = 'NODE_CREATION'
+export const NODE_MOVE = 'NODE_MOVE'
 export const NODES_DELETION = 'NODES_DELTION'
 export const NODE_DELETION = 'NODE_DELETION'
 export const NODE_CONTENT_UPDATE = 'NODE_CONTENT_UPDATE'

@@ -24,6 +24,16 @@ export const nodeCreation = (nodeId, originNodeId, parentId, nodeIdsToDeselect, 
   }
 })
 
+export const nodeMove = (nodeId, newParentId, currentParentId, userId) => ({
+  type: nodeActionTypes.NODE_MOVE,
+  payload: {
+    nodeId,
+    newParentId,
+    currentParentId,
+    userId
+  }
+})
+
 export const nodeDeletion = (nodeId, parentId, allDescendantIds, userId) => ({
   type: nodeActionTypes.NODE_DELETION,
   payload: {
@@ -132,14 +142,16 @@ export const nodeCollapse = (nodeId, descendantIds, userId) => ({
 export const nodeSelection = (nodeId) => ({
   type: nodeActionTypes.NODE_SELECTION,
   payload: {
-    nodeId
+    nodeId,
+    undoable: false
   }
 })
 
 export const nodeDeselection = (nodeId) => ({
   type: nodeActionTypes.NODE_DESELECTION,
   payload: {
-    nodeId
+    nodeId,
+    undoable: false
   }
 })
 

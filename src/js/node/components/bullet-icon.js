@@ -5,17 +5,35 @@ import * as nodeSelectors from '../node-selectors'
 
 export class BulletIcon extends Component {
 
+  constructor (props) {
+    super(props)
+    this.state = {
+      dragging: false
+    }
+  }
+
   onBulletClick () {
     const { nodeId, toggleNodeExpansion, focusNode } = this.props
     toggleNodeExpansion(nodeId)
     focusNode(nodeId)
   }
 
+  onDragStart (e) {
+    const { onDragStart } = this.props
+    this.setState({ dragging: true })
+    onDragStart(e)
+  }
+
+  onDragStop (e) {
+    this.setState({ dragging: false })
+  }
+
   render () {
     const { nodeCount } = this.props
-
+    const { dragging } = this.state
+    const className = 'bullet-container' + (dragging ? ' dragging' : '')
     return (
-      <div className='bullet-container' onClick={(e) => this.onBulletClick(e)}>
+      <div onDragStart={(e) => this.onDragStart(e)} draggable className={className} onClick={(e) => this.onBulletClick(e)}>
         { nodeCount === 2
           ? <div className='pulse' />
           : null }

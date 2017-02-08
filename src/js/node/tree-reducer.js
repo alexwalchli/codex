@@ -5,6 +5,7 @@ import * as I from 'immutable'
 import {
   INITIAL_TREE_STATE_LOAD,
   NODE_CREATION,
+  NODE_MOVE,
   NODES_DELETION,
   NODE_DELETION,
   NODE_CONTENT_UPDATE,
@@ -58,6 +59,12 @@ export const tree = reducerFactory(initialTreeState, {
     }
 
     return state
+  },
+
+  [NODE_MOVE]: (state, action) => {
+    const { nodeId, newParentId, currentParentId, userId } = action.payload
+
+    return nodeOperations.reassignParent(state, nodeId, currentParentId, newParentId, null, userId) 
   },
 
   [NODE_ADDITION_FROM_SUBSCRIPTION]: (state, action) => {

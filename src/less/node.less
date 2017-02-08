@@ -383,6 +383,22 @@
   }
 }
 
+///////////////////
+// drag and drop //
+///////////////////
+
+.children .node { // depth 1
+  .depth.drag-over {
+    border-bottom: 4px solid @base-color;
+  }
+  .drop-area {
+    display:none;
+    height:2px;
+    width:100%;
+    background-color:@base-color;
+  }
+}
+
 /////////////////
 // bullet icon //
 /////////////////
@@ -394,6 +410,13 @@
     position: absolute;
     height:@node-depth-1-line-height;
     width:@node-depth-1-bullet-icon-outer-circle-diameter;
+
+    &.dragging {
+      cursor: move; /* fallback if grab cursor is unsupported */
+      cursor: grab;
+      cursor: -moz-grabbing;
+      cursor: -webkit-grabbing;
+    }
 
     .pulse {
       animation: pulse 3s ease-out;
