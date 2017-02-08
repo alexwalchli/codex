@@ -26,7 +26,8 @@ function treeStateChanged (state, currentTreeState, nextTreeState) {
     },
     I.Map({
       childIds: onChildIdsUpdate.bind(null, state)
-    })
+    }),
+    I.Map({ focused: true })
   )
 
   if (Object.keys(firebaseUpdates).length > 0) {
