@@ -6,6 +6,9 @@ import {
   SIDE_PANEL_TOGGLE,
   USER_PAGE_NAVIGATION
 } from './app-action-types'
+import {
+  NODE_FOCUS
+} from '../node/node-action-types'
 
 const initialAppState = I.Map({})
 export const app = reducerFactory(initialAppState, {
@@ -28,5 +31,11 @@ export const app = reducerFactory(initialAppState, {
     return state.merge({
       currentUserPageId: action.payload.userPageId
     })
-  }
+  },
+  [NODE_FOCUS]: (state, action) => {
+    return state.merge({
+      currentlyFocusedNodeId: action.payload.nodeId,
+      lastAnchorPosition: action.payload.anchorPosition
+    })
+  },
 })

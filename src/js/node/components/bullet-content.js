@@ -33,7 +33,7 @@ export class BulletContent extends Component {
 
     this.state = {
       editorState: EditorState.createWithContent(
-        ContentState.createFromText(this.props.content),
+        ContentState.createFromText(this.props.nodeId),
         createHighlightDecorator()
       ),
       suggestions: mentions
@@ -52,19 +52,39 @@ export class BulletContent extends Component {
     }, 0)
   }
 
-  // componentWillReceiveProps () {
-  //   this.setState({
-  //     editorState: EditorState.createWithContent(
-  //       ContentState.createFromText(this.currentContent()),
-  //       createHighlightDecorator()
-  //     )
-  //   })
+  // shouldComponentUpdate (nextProps, nextState) {
+  //   if(nextProps.content !== this.props.content) {
+  //     return true
+  //   }
+
+  //   return false
+  // }
+
+  // componentWillReceiveProps (nextProps) {
+  //   if (nextProps.focused) {
+  //     // const updatedSelectionState = this.currentSelection().merge({
+  //     //   anchorOffset: nextProps.anchorPosition,
+  //     //   // focusKey: newContent.getFirstBlock().getKey(),
+  //     //   focusOffset: nextProps.anchorPosition
+  //     // })
+  //     // let updatedEditorState = EditorState.createWithContent(
+  //     //   ContentState.createFromText(this.props.nodeId),
+  //     //   createHighlightDecorator()
+  //     // )
+  //     // updatedEditorState = EditorState.forceSelection(updatedEditorState, updatedSelectionState)
+
+  //     // this.setState({
+  //     //   editorState: updatedEditorState
+  //     // })
+  //     this.maybeFocus()
+  //     // setTimeout(() => {
+  //     //   this.refs.editor.focus()
+  //     // }, 0)
+  //   }
   // }
 
   onEditorChange (editorState) {
-    this.setState({
-      editorState
-    })
+    this.setState({ editorState })
   }
 
   onEditorBlur (e) {
@@ -109,13 +129,16 @@ export class BulletContent extends Component {
     e.preventDefault()
     const { nodeId, focusNodeAbove, shiftNodeUp, copyNodeUp } = this.props
 
+    this.refs.editor.editor.blur()
     this.submitContent()
+    
     if (e.altKey && e.shiftKey) {
       copyNodeUp(nodeId)
     } else if (e.altKey) {
       shiftNodeUp(nodeId)
     } else {
-      focusNodeAbove(nodeId)
+      const anchorPos = this.currentSelection().anchorOffset
+      focusNodeAbove(nodeId, anchorPos)
     }
 
     return 'handled'
@@ -126,6 +149,7 @@ export class BulletContent extends Component {
     e.preventDefault()
     const { nodeId, focusNodeBelow, shiftNodeDown, copyNodeDown } = this.props
 
+    this.refs.editor.editor.blur()
     this.submitContent()
 
     if (e.altKey && e.shiftKey) {
@@ -133,7 +157,8 @@ export class BulletContent extends Component {
     } else if (e.altKey) {
       shiftNodeDown(nodeId)
     } else {
-      focusNodeBelow(nodeId)
+      const anchorPos = this.currentSelection().anchorOffset
+      focusNodeBelow(nodeId, anchorPos)
     }
 
     return 'handled'
@@ -182,15 +207,23 @@ export class BulletContent extends Component {
   }
 
   maybeFocus () {
-    const alreadyFocused = this.currentSelection().get('hasFocus')
+    const currentSelectionState = this.currentSelection()
+    const alreadyFocused = currentSelectionState.get('hasFocus')
     if (!alreadyFocused && this.props.focused) {
-      this.refs.editor.editor.focus()
+      this.refs.editor.focus()
     }
+  }
+
+  onClick (e) {
+    const { nodeId, focusNode } = this.props
+    // this.refs.editor.editor.refs.editor.focus()
+    e.stopPropagation()
+    focusNode(nodeId)
   }
 
   render () {
     return (
-      <div>
+      <div onClick={(e) => this.onClick(e)}>
         <Editor
           ref='editor'
           plugins={allPlugins}
@@ -216,7 +249,9 @@ export class BulletContent extends Component {
 // react redux
 
 function mapStateToProps (state, ownProps) {
-  return { ...ownProps }
+  return { 
+    ...ownProps
+  }
 }
 
 const ConnectedBulletContent = connect(mapStateToProps, actionCreators)(BulletContent)

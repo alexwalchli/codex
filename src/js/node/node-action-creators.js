@@ -89,7 +89,7 @@ export const focusNode = (nodeId, focusNotes) => (dispatch) => {
   dispatch(nodeActions.nodeFocus(nodeId, focusNotes))
 }
 
-export const focusNodeAbove = (currentNodeId) => (dispatch, getState) => {
+export const focusNodeAbove = (currentNodeId, anchorPosition) => (dispatch, getState) => {
   const state = getState()
   const rootNodeId = nodeSelectors.getRootNodeId(state)
   const nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(
@@ -97,11 +97,11 @@ export const focusNodeAbove = (currentNodeId) => (dispatch, getState) => {
   )
 
   if (nodeToFocus) {
-    dispatch(nodeActions.nodeFocus(nodeToFocus.get('id')))
+    dispatch(nodeActions.nodeFocus(nodeToFocus.get('id'), false, anchorPosition))
   }
 }
 
-export const focusNodeBelow = (currentNodeId) => (dispatch, getState) => {
+export const focusNodeBelow = (currentNodeId, anchorPosition) => (dispatch, getState) => {
   const state = getState()
   const rootNodeId = nodeSelectors.getRootNodeId(state)
   const nodeToFocus = nodeSelectors.getNextNodeThatIsVisible(
@@ -109,7 +109,7 @@ export const focusNodeBelow = (currentNodeId) => (dispatch, getState) => {
   )
 
   if (nodeToFocus) {
-    dispatch(nodeActions.nodeFocus(nodeToFocus.get('id')))
+    dispatch(nodeActions.nodeFocus(nodeToFocus.get('id'), false, anchorPosition))
   }
 }
 

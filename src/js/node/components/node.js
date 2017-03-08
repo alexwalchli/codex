@@ -8,20 +8,32 @@ import BulletMenu from './bullet-menu'
 import BulletIcon from './bullet-icon'
 import * as nodeSelectors from '../node-selectors'
 
+// draft js + plugins
+import Editor from 'draft-js-plugins-editor'
+import * as I from 'immutable'
+import { allPlugins, mentionPlugin } from '../utilities/editor-plugins'
+import { extractHashtagsWithIndices } from '../utilities/hashtag-extractor'
+import {
+  ContentState,
+  EditorState
+} from 'draft-js'
+import { createHighlightDecorator } from '../draftjs/highlight-decorator'
+
 export class Node extends Component {
   constructor (props) {
     super(props)
 
     this.state = {
-      tags: [],
-      content: props.content,
-      notes: props.notes
+      editorState: EditorState.createWithContent(
+        ContentState.createFromText(this.props.id),
+        createHighlightDecorator()
+      )
     }
   }
 
-  // ////////////////////
-  // component events //
-  // ////////////////////
+  //
+  // component events
+  //
 
   shouldComponentUpdate (nextProps, nextState) {
      const { content, parentId, childIds, id, focused, collapsedBy, visible, selected, completed, notes, positionInOrderedList,
@@ -31,7 +43,6 @@ export class Node extends Component {
     if(parentId != nextProps.parentId
       || !_.isEqual(childIds, nextProps.childIds)
       || content !== nextProps.content
-      || focused !== nextProps.focused
       || !_.isEqual(collapsedBy, nextProps.collapsedBy)
       || visible != nextProps.visible
       || completed != nextProps.completed
@@ -44,15 +55,118 @@ export class Node extends Component {
 
   componentWillReceiveProps (newProps) {
     this.setState({
-      externalData: newProps.externalData,
       content: newProps.content,
       notes: newProps.notes
     })
+
+    this.maybeFocus()
   }
 
-  // //////////////////
-  // event handling //
-  // //////////////////
+  componentDidMount () {
+    this.maybeFocus()
+  }
+
+  componentDidUpdate () {
+    this.maybeFocus()
+  }
+
+  //
+  // event handling
+  //
+
+  onEditorChange (editorState) {
+    this.setState({ editorState })
+  }
+
+  onEditorBlur (e) {
+    this.submitContent()
+  }
+
+  onEditorKeyDown (e) {
+    const { id, focusNodeAbove, deleteNode, undo, redo } = this.props
+    if (e.key === 'Backspace' && !this.currentContent()) {
+      e.preventDefault()
+      focusNodeAbove(id)
+      deleteNode(id)
+    } else if (e.key === 'v' && (e.metaKey || e.cntrlKey)) {
+      // if there are bullets from within the app copied, then paste those and prevent further actions
+      // else do nothing
+    } else if (e.key === 'c' && (e.metaKey || e.cntrlKey)) {
+      // determine what nodes are selected, and copy them to a clipboardData
+    } else if (e.key === 'Z' && e.shiftKey && (e.metaKey || e.cntrlKey)) {
+      redo()
+    } else if (e.key === 'z' && (e.metaKey || e.cntrlKey)) {
+      undo()
+    }
+  }
+
+  onEditorTabDown (e) {
+    e.stopPropagation()
+    e.preventDefault()
+    const { id, parentId, demoteNode, promoteNode } = this.props
+
+    this.submitContent()
+    if (e.shiftKey) {
+      promoteNode(id, parentId)
+    } else {
+      demoteNode(id, parentId)
+    }
+
+    return 'handled'
+  }
+
+  onEditorArrowUp (e) {
+    e.stopPropagation()
+    e.preventDefault()
+    const { id, focusNodeAbove, shiftNodeUp, copyNodeUp } = this.props
+
+    this.refs.editor.editor.blur()
+    this.submitContent()
+    
+    if (e.altKey && e.shiftKey) {
+      copyNodeUp(id)
+    } else if (e.altKey) {
+      shiftNodeUp(id)
+    } else {
+      const anchorPos = this.currentSelection().anchorOffset
+      focusNodeAbove(id, anchorPos)
+    }
+
+    return 'handled'
+  }
+
+  onEditorArrowDown (e) {
+    e.stopPropagation()
+    e.preventDefault()
+    const { id, focusNodeBelow, shiftNodeDown, copyNodeDown } = this.props
+
+    this.refs.editor.editor.blur()
+    this.submitContent()
+
+    if (e.altKey && e.shiftKey) {
+      copyNodeDown(id)
+    } else if (e.altKey) {
+      shiftNodeDown(id)
+    } else {
+      const anchorPos = this.currentSelection().anchorOffset
+      focusNodeBelow(id, anchorPos)
+    }
+
+    return 'handled'
+  }
+
+  onEditorEnter (e) {
+    e.stopPropagation()
+    e.preventDefault()
+    const { id, createNode } = this.props
+    this.submitContent()
+
+    // if cursor is add the beginning of the input, add new node at current position, else below
+    const offset = e.target.selectionEnd === 0 && e.target.value ? 0 : 1
+    createNode(id, offset, '')
+
+    return 'handled'
+  }
 
   onContentMouseEnter (e) {
     this.selectNodeIfHoldingMouseDown(e)
@@ -102,7 +216,7 @@ export class Node extends Component {
   }
 
   onNodeClick (e) {
-    const { id, focusNode, selectNode } = this.props
+    const { id, selectNode, focusNode } = this.props
     e.stopPropagation()
     e.preventDefault()
 
@@ -147,9 +261,39 @@ export class Node extends Component {
     })
   }
 
-  // /////////////
-  // rendering //
-  // /////////////
+  submitContent () {
+    const { nodeId, content, updateNodeContent } = this.props
+    const currentContent = this.currentContent()
+
+    var tags = extractHashtagsWithIndices(currentContent)
+
+    if (currentContent !== content) {
+      updateNodeContent(nodeId, currentContent.trim(), tags.map(t => t.hashtag))
+    }
+  }
+
+  currentContent () {
+    return this.state.editorState.getCurrentContent().getPlainText()
+  }
+
+  currentSelection () {
+    return this.refs.editor.getEditorState().getSelection()
+  }
+
+  maybeFocus () {
+    setTimeout(() => {
+      const currentSelectionState = this.currentSelection()
+      const alreadyFocused = currentSelectionState.get('hasFocus')
+      if (!alreadyFocused && this.props.focused) {
+        this.refs.editor.focus()
+      }
+    }, 0)
+    
+  }
+
+  //
+  // rendering
+  //
 
   renderChild (childId) {
     const { id } = this.props
@@ -161,10 +305,11 @@ export class Node extends Component {
   render () {
     const { parentId, childIds, id, focused, collapsedBy, visible, selected, completed, notes, positionInOrderedList,
             nodeInitialized, currentlySelectedBy, currentlySelectedById, auth, menuVisible, rootNodeId, lastChild,
-            currentlySearchingOn, isAncestorOfSearchResult } = this.props
+            currentlySearchingOn, isAncestorOfSearchResult, lastAnchorPosition } = this.props
     const { content, dragOver } = this.state
 
     console.log(`Rendering Node ${id}`)
+
     if (!nodeInitialized) {
       return (false)
     }
@@ -213,8 +358,7 @@ export class Node extends Component {
             : null }
 
         { typeof parentId !== 'undefined'
-          ? <div onClick={(e) => this.onNodeClick(e)}
-                 className={`depth ${depthCss}`}>
+          ? <div className={`depth ${depthCss}`} onClick={(e) => this.onNodeClick(e)}>
             <div className='inline-btn'>
               <div className='menu-btn btn' onClick={(e) => this.onToggleBulletMenuClick(e)}><i className='icon dripicons-dots-3' /></div>
             </div>
@@ -234,11 +378,17 @@ export class Node extends Component {
               onMouseLeave={(e) => this.onContentMouseLeave(e)}
               onPaste={(e) => this.onContentPaste(e)}>
 
-              <BulletContent
-                nodeId={id}
-                content={content}
-                focused={focused}
-                highlightText={currentlySearchingOn}
+              <Editor
+                ref='editor'
+                plugins={allPlugins}
+                editorState={this.state.editorState}
+                onChange={(editorState) => this.onEditorChange(editorState)}
+                onUpArrow={(e) => this.onEditorArrowUp(e)}
+                onDownArrow={(e) => this.onEditorArrowDown(e)}
+                handleReturn={(e) => this.onEditorEnter(e)}
+                onTab={(e) => this.onEditorTabDown(e)}
+                onBlur={(e) => this.onEditorBlur(e)}
+                keyBindingFn={(e) => this.onEditorKeyDown(e)}
               />
             </div>
 

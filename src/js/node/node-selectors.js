@@ -122,6 +122,7 @@ export const getNodeProps = (state, id) => {
     visible: state.visibleNodes.present.get(id),
     ...nodeFromState.toJS(),
     currentlySearchingOn,
-    isAncestorOfSearchResult
+    isAncestorOfSearchResult,
+    lastAnchorPosition: state.app.get('lastAnchorPosition')
   }
 }

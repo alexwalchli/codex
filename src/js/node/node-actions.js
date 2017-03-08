@@ -64,12 +64,13 @@ export const nodeNotesUpdate = (nodeId, notes, tags, userId) => ({
   }
 })
 
-export const nodeFocus = (nodeId, focusNotes) => ({
+export const nodeFocus = (nodeId, focusNotes, anchorPosition) => ({
   type: nodeActionTypes.NODE_FOCUS,
   undoable: false,
   payload: {
     nodeId,
-    focusNotes
+    focusNotes,
+    anchorPosition
   }
 })
 
