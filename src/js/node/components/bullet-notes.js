@@ -61,13 +61,13 @@ export class BulletNotes extends Component {
     }
   }
 
-  onSearchChange = ({ value }) => {
+  onSearchChange ({ value }) {
     this.setState({
       suggestions: defaultSuggestionsFilter(value, mentions)
     })
   }
 
-  onAddMention = () => {
+  onAddMention () {
     // get the mention object selected
   }
 

@@ -117,7 +117,7 @@ export class PagesSidePanel extends Component {
           </div>
         </div>
       </div>
-        )
+    )
   }
 }
 

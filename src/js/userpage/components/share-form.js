@@ -69,7 +69,7 @@ export class ShareForm extends Component {
         <a className='btn' disabled='disabled' onClick={(e) => this.onSubmit(e)}>Share</a>
         <a className='btn secondary-btn' onClick={(e) => this.onCancel(e)}>Cancel</a>
       </form>
-        )
+    )
   }
 }
 

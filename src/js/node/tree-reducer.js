@@ -64,7 +64,7 @@ export const tree = reducerFactory(initialTreeState, {
   [NODE_MOVE]: (state, action) => {
     const { nodeId, newParentId, currentParentId, userId } = action.payload
 
-    return nodeOperations.reassignParent(state, nodeId, currentParentId, newParentId, null, userId) 
+    return nodeOperations.reassignParent(state, nodeId, currentParentId, newParentId, null, userId)
   },
 
   [NODE_ADDITION_FROM_SUBSCRIPTION]: (state, action) => {

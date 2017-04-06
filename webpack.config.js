@@ -1,6 +1,5 @@
-var path = require('path');
-var webpack = require('webpack');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var path = require('path')
+var webpack = require('webpack')
 
 module.exports = {
   debug: true,
@@ -20,7 +19,7 @@ module.exports = {
   ],
   module: {
     loaders: [
-      { test: /\.json$/, loader: "json-loader" },
+      { test: /\.json$/, loader: 'json-loader' },
       {
         test: /\.js$/,
         loaders: [ 'babel?presets[]=es2015,presets[]=stage-0,presets[]=react' ],
@@ -28,14 +27,14 @@ module.exports = {
         include: __dirname
       },
       {
-          test: /\.less$/,
-          exclude: /node_modules/,
-          loader: 'style!css!less'
+        test: /\.less$/,
+        exclude: /node_modules/,
+        loader: 'style!css!less'
       },
-      { 
-        test: /\.eot|\.ttf|\.svg|\.woff2?/, 
+      {
+        test: /\.eot|\.ttf|\.svg|\.woff2?/,
         exclude: /node_modules/,
         loader: 'file?name=[name].[ext]' }
     ]
   }
-};
+}

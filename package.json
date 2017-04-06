@@ -1,7 +1,7 @@
 {
   "name": "Codex",
   "version": "0.0.1",
-  "description": "Simple & Smart Note taking",
+  "description": "Your TODO.txt replacement",
   "scripts": {
     "start": "standard 'src/**/*.js' 'test/**/*.js' --fix && mocha && node server.js",
     "test": "standard 'src/**/*.js' 'test/**/*.js' --fix && mocha"
@@ -15,7 +15,6 @@
     "url": "https://github.com/alexwalchli/codex.git"
   },
   "standard": {
-    "parser": "babel-eslint",
     "globals": [
       "describe",
       "it",

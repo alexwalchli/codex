@@ -131,7 +131,7 @@ export class BulletContent extends Component {
 
     this.refs.editor.editor.blur()
     this.submitContent()
-    
+
     if (e.altKey && e.shiftKey) {
       copyNodeUp(nodeId)
     } else if (e.altKey) {
@@ -177,13 +177,13 @@ export class BulletContent extends Component {
     return 'handled'
   }
 
-  onSearchChange = ({ value }) => {
+  onSearchChange (value) {
     this.setState({
       suggestions: defaultSuggestionsFilter(value, mentions)
     })
   }
 
-  onAddMention = () => {
+  onAddMention () {
     // get the mention object selected
   }
 
@@ -249,7 +249,7 @@ export class BulletContent extends Component {
 // react redux
 
 function mapStateToProps (state, ownProps) {
-  return { 
+  return {
     ...ownProps
   }
 }

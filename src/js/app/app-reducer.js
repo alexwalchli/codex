@@ -37,5 +37,5 @@ export const app = reducerFactory(initialAppState, {
       currentlyFocusedNodeId: action.payload.nodeId,
       lastAnchorPosition: action.payload.anchorPosition
     })
-  },
+  }
 })

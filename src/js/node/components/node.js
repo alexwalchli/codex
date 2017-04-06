@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import _ from 'lodash'
 import * as actionCreators from '../node-action-creators'
-import BulletContent from './bullet-content'
 import BulletNotes from './bullet-notes'
 import BulletMenu from './bullet-menu'
 import BulletIcon from './bullet-icon'
@@ -10,8 +9,7 @@ import * as nodeSelectors from '../node-selectors'
 
 // draft js + plugins
 import Editor from 'draft-js-plugins-editor'
-import * as I from 'immutable'
-import { allPlugins, mentionPlugin } from '../utilities/editor-plugins'
+import { allPlugins } from '../utilities/editor-plugins'
 import { extractHashtagsWithIndices } from '../utilities/hashtag-extractor'
 import {
   ContentState,
@@ -36,21 +34,19 @@ export class Node extends Component {
   //
 
   shouldComponentUpdate (nextProps, nextState) {
-     const { content, parentId, childIds, id, focused, collapsedBy, visible, selected, completed, notes, positionInOrderedList,
-            nodeInitialized, currentlySelectedBy, currentlySelectedById, auth, menuVisible, rootNodeId, lastChild,
-            currentlySearchingOn, isAncestorOfSearchResult } = this.props
+    const { content, parentId, childIds, collapsedBy, visible, completed, notes } = this.props
 
-    if(parentId != nextProps.parentId
-      || !_.isEqual(childIds, nextProps.childIds)
-      || content !== nextProps.content
-      || !_.isEqual(collapsedBy, nextProps.collapsedBy)
-      || visible != nextProps.visible
-      || completed != nextProps.completed
-      || notes != nextProps.notes){
-        return true
-      }
+    if (parentId !== nextProps.parentId ||
+        !_.isEqual(childIds, nextProps.childIds) ||
+        content !== nextProps.content ||
+        !_.isEqual(collapsedBy, nextProps.collapsedBy) ||
+        visible !== nextProps.visible ||
+        completed !== nextProps.completed ||
+        notes !== nextProps.notes) {
+      return true
+    }
 
-      return false
+    return false
   }
 
   componentWillReceiveProps (newProps) {
@@ -122,7 +118,7 @@ export class Node extends Component {
 
     this.refs.editor.editor.blur()
     this.submitContent()
-    
+
     if (e.altKey && e.shiftKey) {
       copyNodeUp(id)
     } else if (e.altKey) {
@@ -231,14 +227,14 @@ export class Node extends Component {
     const dragData = {
       nodeId: this.props.id
     }
-    e.dataTransfer.setData('text', JSON.stringify(dragData)); 
+    e.dataTransfer.setData('text', JSON.stringify(dragData))
   }
 
   onNodesDrop (e) {
     e.preventDefault()
     e.stopPropagation()
     const { moveNode } = this.props
-    const { nodeId } = JSON.parse(e.dataTransfer.getData('text'));
+    const { nodeId } = JSON.parse(e.dataTransfer.getData('text'))
 
     this.setState({
       dragOver: false
@@ -288,7 +284,6 @@ export class Node extends Component {
         this.refs.editor.focus()
       }
     }, 0)
-    
   }
 
   //
@@ -305,7 +300,7 @@ export class Node extends Component {
   render () {
     const { parentId, childIds, id, focused, collapsedBy, visible, selected, completed, notes, positionInOrderedList,
             nodeInitialized, currentlySelectedBy, currentlySelectedById, auth, menuVisible, rootNodeId, lastChild,
-            currentlySearchingOn, isAncestorOfSearchResult, lastAnchorPosition } = this.props
+            isAncestorOfSearchResult } = this.props
     const { content, dragOver } = this.state
 
     console.log(`Rendering Node ${id}`)
@@ -370,8 +365,8 @@ export class Node extends Component {
 
             <BulletIcon onDragStart={(e) => this.onBulletIconDragState(e)} nodeId={id} positionInOrderedList={positionInOrderedList} />
             <div className='drop-area' onDragOver={(e) => this.onNodesDragOver(e)}
-                 onDrop={(e) => this.onNodesDrop(e)}
-                 onDragLeave={(e) => this.onNodesDragExit(e)} >As a Child</div>
+              onDrop={(e) => this.onNodesDrop(e)}
+              onDragLeave={(e) => this.onNodesDragExit(e)} >As a Child</div>
             <div
               className='content'
               onMouseEnter={(e) => this.onContentMouseEnter(e)}
